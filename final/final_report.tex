@@ -190,13 +190,21 @@ We can manually impose restrictions on warping paths that are allowed by introdu
 \end{figure}
 
 Sakoe \& Chiba constraint, as first described in \citep{Sakoe:1978ta} allows only the warping paths 
-that satisfy $|i-j| <= k$ where $k$ is some integer specifying the tightness of the constraint. It is commonly referred to as "Sakoe \& Chiba band" as it looks like a band around the main diagonal (see \autoref{fig:DTW:sakoe_chiba:cost}). Intuitively, this constraint imposes the requirement that each point on sequence A is mapped to a point no more than $k$ points away on the sequence B. That is, it assumes that there won't be any warping of the time axis greater than by $k$ points. Note that setting the $k$ parameter to zero would give us Euclidean distance between the two sequences.
+that satisfy $|i-j| \le k$ where $k$ is some integer specifying the tightness of the constraint. The constraint is commonly referred to as "Sakoe \& Chiba band" as the cost matrix looks like a band around the main diagonal (see \autoref{fig:DTW:sakoe_chiba:cost}). Such constraint reduces the complexity of DTW to $O(k \times max(n,m))$ where $n$ and $m$ are the lengths of the two sequences. 
+
+Intuitively, the constraint requires that each point on sequence A is mapped to a point no more than $k$ points away on the sequence B. That is, it assumes that there won't be any warping of the time axis greater than by $k$ points. Note that setting the $k$ parameter to zero would give us Euclidean distance between the two sequences.
 
 \autoref{fig:DTW:sakoe_chiba} compares the same regions in the \autoref{fig:DTW:std} using the DTW constrained with Sakoe \& Chiba band of length $k=12$. One can see that the peaks on the right-hand side of the two sequences are still aligned correctly, but the relatively inactive region in the first sequence is now forced to be mapped to the left peak in the second sequence, resulting in a huge cost penalty and making the sequences quite distant from each other. This alignment results in a total distance of 11920 using squared euclidean distance as the local distance measure. Compare that to the distance of 3494 obtained by unconstrained warping.
 
 As far as the author is aware, there is no established way of picking the value of parameter $k$.
 Historically, $k$ was set to 10\% of the length of the sequences.
 For nearest-neighbour classification tasks, \cite{Ratanamahatana:2004wu} has shown that an even a window sufficiently smaller than 10\% gives the highest accuracy for some datasets, though the actual number strongly depends on the actual dataset. Due to this, the constraint $k$ is not imposed in the Dynamic Genome Warping package and is left as a free parameter an user could specify herself.
+
+\subsubsection{Slanted Band Constraint}
+
+Sakoe \& Chiba band makes DTW incomputable for sequences whose lengths differ by more than $k$ items, as the last points of those sequences point $n$ and point $m$ will not satisfy the constraint 
+$|i-j| \le k$. 
+
 
 \subsection{Constant-Penalty DTW}
 \section{Agglomerative clustering}
@@ -211,7 +219,7 @@ For nearest-neighbour classification tasks, \cite{Ratanamahatana:2004wu} has sho
 \section{File formats}
 \subsection{BAM}
 \subsection{BED}
-
+  
 \section{Time Complexity}
 \subsection{Native-C Modules}
 \subsection{Parallel processing}

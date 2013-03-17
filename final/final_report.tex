@@ -1,0 +1,119 @@
+\documentclass[parskip]{cs4rep}
+
+\usepackage{hyperref}
+\usepackage{todonotes}
+\usepackage{natbib}
+
+\begin{document}
+
+\title{Clustering and Visualisation\\ of DNA Sequencing Data}
+
+\author{Saulius Lukauskas}
+
+\degree{Artificial Intelligence}
+\project{Undergraduate Dissertation}
+
+\date{\today}
+
+\abstract{
+\todo{Need an abstract}
+}
+
+\maketitle
+
+%\section*{Acknowledgements}
+%Acknowledgements go here.
+
+\tableofcontents
+
+%\pagenumbering{arabic}
+
+
+\chapter{Background and Introduction}
+
+The complete set of information required to create and maintain cells of a
+living organism is contained in the genome of the organism. In humans, this
+information is encoded in a long chain of nucleotides within the DNA molecules
+in 23 different chromosomes located in the nucleus of every cell as well as in
+a small segment of DNA located within the mitochondrion of the cell.  
+These chains of nucleotides can be sequenced by determining the order of appearance
+of the four bases within the genome: adenine (often abbreviated as simply "A"), cytosine (abbreviated as C),
+guanine (G) or thymine (T).
+The sequence of these nucleobases is commonly referred to as the DNA Sequence. 
+
+\section{Structure of  DNA}
+Generally DNA molecules are observed in pairs of two tightly connected
+molecules, rather than as a single molecule. These molecules are known as
+strands and are held together by the bonds between the nucleobases: guanine is
+known to form a bond with cytosine, whereas adenine forms a bond with thymine.
+Since each kind of nucleobase can form a bond with only one other kind of
+nucleobase, both of the DNA strands contain enough information to recreate the
+other on its own. This redundancy is required for DNA replication process. 
+
+Because of this redundancy, the sequences on complimentary strands are often considered at the
+same time as sequences of base pairs, rather than sequences of nucleotides. The
+human sex cells are known to contain around three billion such base pairs.
+
+\subsection{Histones}
+\todo{Fill me in}
+\subsection{Transcription and Splicing}
+\todo{Need to explain here what are transcription start sites, exons and why they are important}
+
+\section{Next-Generation Sequencing}
+The Human Genome Project was the research project that has sequenced all
+three billion of these base pairs for the first time. The project was estimated
+to cost 3 billion dollars for American tax payers and last 15 years, but has ended up
+costing a bit less than that - \$2.7 billion and was completed in 13
+years\footnote{See \url{http://www.genome.gov/11006943} and
+    \url{http://www.ornl.gov/sci/techresources/Human_Genome/project/about.shtml}
+    for more information}. 
+    
+ Since then, a variety of DNA sequencing methods were
+developed that reduce both the time and cost required to perform sequencing
+significantly\citep{Shendure:2008uc,Liu:2012ve}. New technology and reduced
+costs of DNA Sequencing has made it more accessible and allowed
+development of new genome-scale analysis methods such as ChIP-Sequencing
+(ChIP-Seq).
+
+\section{ChIP Sequencing}
+
+\chapter{Motivation}
+\todo{Write about data processing challenges in ChIP-SEQ}
+
+\section{Previous art}
+
+\todo{Mention the two major papers in the game}
+
+\chapter{Methods}
+\section{DTW Distance}
+\subsection{Constrained DTW}
+\subsection{Constant-Penalty DTW}
+\section{Agglomerative clustering}
+\todo{Make sure to write about: 1) Triangle inequality and stuff, 2) complete linkage}
+\section{Prototyping and Visualisation}
+\section{Biological Heuristics}
+\todo{Write about antisense regions correction}
+
+\chapter{Implementation Details}
+\todo{Mention and cite all the libraries DTW builds on}
+
+\section{File formats}
+\subsection{BAM}
+\subsection{BED}
+
+\section{Time Complexity}
+\subsection{Native-C Modules}
+\subsection{Parallel processing}
+\todo{Write about how expensive DTW is, write about what a pain is to do multiprocessing it in Python}
+
+\chapter{Results}
+
+\chapter{Conclusions and Contributions}
+
+\bibliographystyle{alpha}
+\bibliography{papers2}
+
+\appendix
+\todo{Include both papers}
+
+\end{document}

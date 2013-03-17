@@ -3,6 +3,7 @@
 \usepackage{hyperref}
 \usepackage{todonotes}
 \usepackage{natbib}
+\usepackage{subcaption}
 
 \begin{document}
 
@@ -78,20 +79,49 @@ development of new genome-scale analysis methods such as ChIP-Sequencing
 \section{ChIP Sequencing}
 
 \chapter{Motivation}
-\todo{Write about data processing challenges in ChIP-SEQ}
+
 
 \section{Previous art}
 
 \todo{Mention the two major papers in the game}
 
 \chapter{Methods}
-\section{DTW Distance}
+\section{Dynamic Time Warping}
+Underneath the methods used in this project, lies the Dynamic Time Warping (DTW) algorithm. This algorithm was initially developed in the speech recognition community in order to allow accurate comparisons between words spoken with tempo variations. 
+This comparison is achieved by warping the time axis nonlinearly. That is, the axis is stretched or compressed arbitrarily as to minimise the total distance between the points aligned to each other. For example see figure \ref{fig:DTW:alignments}, there two sequences are aligned to each other. Those two sequences are sine and cosine over the range $[-pi; pi)$ therefore we are confident that they share similar patterns, just at different locations.
+
+In figure \ref{fig:DTW:euclidean_alignment}, each point on the sequence A is aligned to corresponding point on the sequence B. If we were to sum the distances between aligned points, we would get the Euclidean distance between these two sequences. We can see that the alignment is not very good as the highest point on the first sequence is mapped to a mid-point of the second.
+
+The mapping seen in \ref{fig:DTW:dtw_alignment} is completely different. The highest points are now mapped to each other, so are the other points that are in the patterns existing in both of the sequences. If we were to calculate the differences between the mapped points again, we would see that the resulting distance is much smaller than Euclidean one.
+
+\begin{figure}[t,b]
+   \centering
+   \begin{subfigure}[b]{0.4\textwidth}
+       \centering
+       \includegraphics[width=\textwidth]{figures/DTW/sin-cos-no-dtw.eps}
+       \caption{Euclidean alignment}
+       \label{fig:DTW:euclidean_alignment}
+   \end{subfigure}
+   ~
+   \begin{subfigure}[b]{0.4\textwidth}
+       \centering
+       \includegraphics[width=\textwidth]{figures/DTW/sin-cos-dtw.eps}
+       \caption{DTW alignment}
+       \label{fig:DTW:dtw_alignment}
+   \end{subfigure}
+   
+   \caption{Two sequences aligned to each other. Figure \ref{fig:DTW:euclidean_alignment} maps each point on sequence A to a point on sequence B directly, resulting in an Euclidean distance measure, whereas figure \ref{fig:DTW:dtw_alignment} uses Dynamic Time Warping algorithm to find a better mapping between the points}
+   \label{fig:DTW:alignments}
+\end{figure}
+
+\missingfigure{Streching-compressing axis}
+
 \subsection{Constrained DTW}
 \subsection{Constant-Penalty DTW}
 \section{Agglomerative clustering}
 \todo{Make sure to write about: 1) Triangle inequality and stuff, 2) complete linkage}
 \section{Prototyping and Visualisation}
-\section{Biological Heuristics}
+\section{Biologically Relevant Heuristics}
 \todo{Write about antisense regions correction}
 
 \chapter{Implementation Details}

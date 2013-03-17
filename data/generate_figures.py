@@ -24,10 +24,10 @@ def visualise_dtw_cost_function(index_a, index_b, *args, **kwargs):
 
 def to_figure(index_a, index_b, suffix="",  extension='pdf', *args, **kwargs):
     f = visualise_dtw_mappings(index_a, index_b, *args, **kwargs)
-    f.savefig("{0}-{1}-mappings-{2}.{3}".format(index_a, index_b, suffix, extension))
+    f.savefig("{0}-{1}-mappings-{2}.{3}".format(index_a.replace('.', '_'), index_b.replace('.', '_'), suffix, extension))
     plt.close(f)
 
     f = visualise_dtw_cost_function(index_a, index_b, *args, **kwargs)
-    f.savefig("{0}-{1}-cost-{2}.{3}".format(index_a, index_b, suffix, extension))
+    f.savefig("{0}-{1}-cost-{2}.{3}".format(index_a.replace('.', '_'), index_b.replace('.', '_'), suffix, extension))
     plt.close(f)
 

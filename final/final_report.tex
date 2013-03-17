@@ -8,6 +8,9 @@
 \DeclareMathOperator*{\argmax}{arg\,max}
 \DeclareMathOperator*{\argmin}{arg\,min}
 
+\newcommand{\gene}[1]{{\tt #1}}
+\newcommand{\histonemodification}[1]{#1}
+
 \begin{document}
 
 \title{Clustering and Visualisation\\ of DNA Sequencing Data}
@@ -138,9 +141,63 @@ To illustrate what DTW does, have a look at the \autoref{fig:DTW:alignments}. Th
 In \autoref{fig:DTW:euclidean_alignment}, each point on the sequence A is aligned to corresponding point on the sequence B. If we were to sum the distances between aligned points, we would get the Euclidean distance between these two sequences. We can see that these sequences will likely not be labelled as similar, because the distance between mapped points is always large. The mapping seen in \autoref{fig:DTW:dtw_alignment}, on the other hand is able to correct for the shift in the X axis. 
 The highest points are now mapped to each other, so are the other points that are in the patterns existing in both of the sequences. If we were to calculate the differences between the mapped points again, we would see that the resulting distance is much smaller than Euclidean one and the two sequences will likely be considered close, yet not identical, as there still are features in the sequence A that are not in the sequence B, for instance, the valley in the beginning, therefore resulting in a costly mapping between the two.
 
-\todo{Do a few examples with peaks}
-
 \subsection{Constrained DTW}
+
+\begin{figure}
+   \centering
+   \begin{subfigure}[b]{0.45\textwidth}
+       \centering
+       \includegraphics[width=\textwidth]{figures/DTW/uc003okl_3-uc021uwd_1-mappings-std.pdf}
+       \caption{Alignments}
+       \label{fig:DTW:std:mappings}
+   \end{subfigure}
+   ~
+   \begin{subfigure}[b]{0.45\textwidth}
+       \centering
+       \includegraphics[width=\textwidth]{figures/DTW/uc003okl_3-uc021uwd_1-cost-std.pdf}
+       \caption{Cost matrix and path}
+       \label{fig:DTW:std:cost}
+   \end{subfigure}
+   \caption{Result of DTW distance calculation on the \histonemodification{H3K4Me3} Activation profiles around transcription start sites for two genes,  \gene{uc003okl.3} and \gene{uc021uwd.1}.}
+   \label{fig:DTW:std}
+\end{figure}
+\todo{Make sure to explain what gene names mean}
+
+In some cases, warping the time axis arbitrarily might not necessarily be a correct thing to do.
+For instance, have a look at \autoref{fig:DTW:std}. Here DTW is used to compare the \histonemodification{H3K4Me3} activation profiles around transcription start sites (TSS) of two genes, \gene{uc003okl.3} and \gene{uc021uwd.1}. We can immediatelly see that first activation profile appears to be unimodal, whereas the second one is clearly bimodal. The minimal warping path maps a relatively inactive region from around bin 40 to around bin 80 in the series for \gene{uc003okl.3} to a single point on the series for \gene{uc021uwd.1}. However, this unexpressed region might have biological significance, e.g. indicate removal of a nucleosome \todo{ask Gabrielle if that is not bullshit} and we might not want to allow it to be compressed to a single point. 
+
+We can manually impose restrictions on warping paths that are allowed by introducing global constraints. The two most commonly used global constraints on DTW are Sakoe-Chiba Band and Itakura parallelogram\citep{Ratanamahatana:2004wu}.
+
+\subsubsection{Sakoe-Chiba Band}
+
+\begin{figure}
+   \centering
+   \begin{subfigure}[b]{0.45\textwidth}
+       \centering
+       \includegraphics[width=\textwidth]{figures/DTW/uc003okl_3-uc021uwd_1-mappings-sakoe-chiba.pdf}
+       \caption{Alignments}
+       \label{fig:DTW:sakoe_chiba:mappings}
+   \end{subfigure}
+   ~
+   \begin{subfigure}[b]{0.45\textwidth}
+       \centering
+       \includegraphics[width=\textwidth]{figures/DTW/uc003okl_3-uc021uwd_1-cost-sakoe-chiba.pdf}
+       \caption{Cost matrix and path}
+       \label{fig:DTW:sakoe_chiba:cost}
+   \end{subfigure}
+   \caption{Result of DTW distance calculation on the \histonemodification{H3K4Me3} Activation profiles around transcription start sites for two genes, \gene{uc003okl.3} and \gene{uc021uwd.1}. The DTW distance was constrained with Sakoe & Chiba constraint with $k = 12$.}
+   \label{fig:DTW:sakoe_chiba}
+\end{figure}
+
+Sakoe \& Chiba constraint, as first described in \citep{Sakoe:1978ta} allows only the warping paths 
+that satisfy $|i-j| <= k$ where $k$ is some integer specifying the tightness of the constraint. It is commonly referred to as "Sakoe \& Chiba band" as it looks like a band around the main diagonal (see \autoref{fig:DTW:sakoe_chiba:cost}). Intuitively, this constraint imposes the requirement that each point on sequence A is mapped to a point no more than $k$ points away on the sequence B. That is, it assumes that there won't be any warping of the time axis greater than by $k$ points. Note that setting the $k$ parameter to zero would give us Euclidean distance between the two sequences.
+
+\autoref{fig:DTW:sakoe_chiba} compares the same regions in the \autoref{fig:DTW:std} using the DTW constrained with Sakoe \& Chiba band of length $k=12$. One can see that the peaks on the right-hand side of the two sequences are still aligned correctly, but the relatively inactive region in the first sequence is now forced to be mapped to the left peak in the second sequence, resulting in a huge cost penalty and making the sequences quite distant from each other. This alignment results in a total distance of 11920 using squared euclidean distance as the local distance measure. Compare that to the distance of 3494 obtained by unconstrained warping.
+
+As far as the author is aware, there is no established way of picking the value of parameter $k$.
+Historically, $k$ was set to 10\% of the length of the sequences.
+For nearest-neighbour classification tasks, \cite{Ratanamahatana:2004wu} has shown that an even a window sufficiently smaller than 10\% gives the highest accuracy for some datasets, though the actual number strongly depends on the actual dataset. Due to this, the constraint $k$ is not imposed in the Dynamic Genome Warping package and is left as a free parameter an user could specify herself.
+
 \subsection{Constant-Penalty DTW}
 \section{Agglomerative clustering}
 \todo{Make sure to write about: 1) Triangle inequality and stuff, 2) complete linkage}

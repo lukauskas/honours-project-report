@@ -203,8 +203,18 @@ For nearest-neighbour classification tasks, \cite{Ratanamahatana:2004wu} has sho
 \subsubsection{Slanted Band Constraint}
 
 Sakoe \& Chiba band makes DTW incomputable for sequences whose lengths differ by more than $k$ items, as the last points of those sequences point $n$ and point $m$ will not satisfy the constraint 
-$|i-j| \le k$. 
+$|i-j| \le k$. The reason for this failure is the fact that $i=j$ is not the real diagonal of the cost matrix if the lengths of the two sequences, $n$ and $m$, are not equal. 
+Toni Giorgino \nocite{Giorgino:2009ue} was well aware of this problem when implementing DTW module for R \footnote{The R Project For Statistical Computing - \url{http://www.r-project.org/}} where he included a modified version of Sakoe \& Chiba constraint, he calls a slanted band constraint\citep{Giorgino:2009ue}. 
 
+Slanted band constraint solves the problem of different sequence lengths by changing the constraint to 
+$|i - \frac{m}{n} \times j| <= k$, where $m$ and $n$ are the lengths of the two sequences being compared. This essentially changes the slope of the diagonal line to $\frac{m}{n}$ (cf. to slope being 1 in \citep{Sakoe:1978ta}). Unfortunately, the meaning of the parameter $k$ is inconsistent in this definition: if the second sequence is longer than the first one, thus $m > n$, the constraint can be thought to scale the second sequence down to the length of the first one and then apply the Sakoe \& Chiba constraint of size $k$, meaning $k$ is in the units of the shorter sequence. However, if the second sequence is shorter than the first one, it will be essentially rescaled to match the length of the first (longer) sequence and then the parameter $k$ will be measured in units of the longer sequence. In this particular case, DTW distance might not even be computable as in order for the warping path to remain continuous, the following inequality must hold $(j+1) \frac{m}{n} - k \le j \frac{m}{n} + k + 1$. In other words, for each $j$, there should be some $i$ in the warping window, that is either in the window of $j+1$ or is by at most one unit away from some $i'$ that is. Reshuffling the inequality we get that this holds if $\frac{m}{n} \le 2k + 1$ does.
+
+This inconsistency might not be important in the situations where we have a query sequence that we want to match to a reference sequence as the order of parameters will not change in these cases. However, other applications, such as clustering, require symmetry. Since DGW uses DTW distance for clustering, I had to solve these issues with slanted band constraint, thus
+DGW implements a modified version of it. 
+
+The new constraint always assumes that the first sequence is longer than the second one. The slope parameter is again calculated as $s = \frac{m}{n}$, however it is now always less than or equal to one. This slope this slope is now applied to the first sequence, (not the second one as in \citep{Giorgino:2009ue}) essentially scaling it down to the length of the shorter sequence, giving the constraint: $|\lceil i \times \frac{m}{n} \rceil - j| \le k$. The algorithm could be modified and the slope applied to the second sequence instead, of course, however, the implementation is a bit more intuitive if it is the first sequence that gets rescaled not the second. 
+
+This modified constraint is now always consistent, being in units of shorter sequence, and defined for all possible sequences.
 
 \subsection{Constant-Penalty DTW}
 \section{Agglomerative clustering}

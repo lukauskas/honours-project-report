@@ -10,6 +10,7 @@
 
 \newcommand{\gene}[1]{{\tt #1}}
 \newcommand{\histonemodification}[1]{#1}
+\newcommand{\celltype}[1]{#1}
 
 \begin{document}
 
@@ -164,7 +165,7 @@ The highest points are now mapped to each other, so are the other points that ar
 \todo{Make sure to explain what gene names mean}
 
 In some cases, warping the time axis arbitrarily might not necessarily be a correct thing to do.
-For instance, have a look at \autoref{fig:DTW:std}. Here DTW is used to compare the \histonemodification{H3K4Me3} activation profiles around transcription start sites (TSS) of two genes, \gene{uc003okl.3} and \gene{uc021uwd.1}. We can immediatelly see that first activation profile appears to be unimodal, whereas the second one is clearly bimodal. The minimal warping path maps a relatively inactive region from around bin 40 to around bin 80 in the series for \gene{uc003okl.3} to a single point on the series for \gene{uc021uwd.1}. However, this unexpressed region might have biological significance, e.g. indicate removal of a nucleosome \todo{ask Gabrielle if that is not bullshit} and we might not want to allow it to be compressed to a single point. 
+For instance, have a look at \autoref{fig:DTW:std}. Here DTW is used to compare the \histonemodification{H3K4Me3} activation profiles around transcription start sites (TSS) of two genes, \gene{uc003okl.3} and \gene{uc021uwd.1}. We can immediatelly see that first activation profile appears to be unimodal, whereas the second one is clearly bimodal. The minimal warping path maps a relatively inactive region from around bin 40 to around bin 80 in the series for \gene{uc003okl.3} to a single point on the series for \gene{uc021uwd.1}. However, this unexpressed region might have biological significance, e.g. \todo{double check if this is actually true} indicate removal of a nucleosome and we might not want to allow it to be compressed to a single point. 
 
 We can manually impose restrictions on warping paths that are allowed by introducing global constraints. The two most commonly used global constraints on DTW are Sakoe-Chiba Band and Itakura parallelogram\citep{Ratanamahatana:2004wu}.
 
@@ -217,9 +218,19 @@ The new constraint always assumes that the first sequence is longer than the sec
 This modified constraint is now always consistent, being in units of shorter sequence, and defined for all possible sequences.
 
 \subsection{Constant-Penalty DTW}
-\section{Agglomerative clustering}
-\todo{Make sure to write about: 1) Triangle inequality and stuff, 2) complete linkage}
-\section{Prototyping and Visualisation}
+
+\section{Clustering}
+
+Centroid based clustering methods, e.g. K-Means, require a notion of centroid for data points being averaged. Centroid is usually defined as a data point that minimises the distance to all other data points in the set. In the Euclidean space this problem is trivial and solvable by calculating the mean of the data.
+
+In the Dynamically Time Warped space, however, finding the centroid sequence, called a Steiner sequence, is a NP complete problem as the search space grows exponentially to the number of sequences\cite{Hautamaki:2008fh,Petitjean:2012bp}.
+
+The fact that DTW distance does not satisfy the triangle inequality, \cite{Muller:2007bo}, 
+is one of the reasons why this is such a hard problem. Various approximations for shape averaging were
+proposed throughout the years, some of them can be find in, e.g. \cite{Niennattrakul:2009ep}\cite{Petitjean:2011bq}\cite{Petitjean:2012bp} \todo{Okay, i wont do this today as my mind is on the results section, do this some other time when you can do it properly}
+
+\todo{Complete linkage}
+
 \section{Biologically Relevant Heuristics}
 \todo{Write about antisense regions correction}
 
@@ -236,6 +247,145 @@ This modified constraint is now always consistent, being in units of shorter seq
 \todo{Write about how expensive DTW is, write about what a pain is to do multiprocessing it in Python}
 
 \chapter{Results}
+Evaluation of results of clustering methods has always been a challenging problem. Since clustering, by definition, is unsupervised, there hardly is any ground truth on what the correct way of assigning data into clusters is. Some cluster assignments might be desired in some applications, others might be desired in completely different applications. Furthermore, there is the problem on where to cut the hierarchical clustering dendrogram at, \todo{Discuss this}that has already been discussed.
+
+\section{Clustering an Artificial Dataset}
+One way to estimate the performance of the clustering is by performing it on a dataset known to have some \emph{a priori} groups. In the spirit of the paper claiming that first exon length influences the H3K4Me3 mark around the Transcription Start Sites\cite{Bieberstein:2012tf}, a test dataset randomly stretching the exons of known transcription start sites was generated.
+
+More precisely, 5 random transcription start sites that have their first exon in the window of 2000 base pairs were chosen. \todo{The sites were chosen as to pass --min-pileup constraint, add this if I explain about min pileup somewhere before} The data for these windows around the transcription start sites was read at the resolution of 25 base pairs per bin. 
+
+The regions where first exons lie were extended randomly to be up to 60 bins longer (that's up to $60x25=1500$ base pairs longer). The extension was performed by repeating the bins uniformly in the same order as to obtain the same mark within the exon, just stretched. A new dataset of size 500 was generated by performing these random permutations on the 5 seed regions. 
+These newly-generated regions were then randomly mutated, with probability of $0.33$, by changing a value of a data point, to some random value picked from the uniform distribution $U(0.5x, 1.5x)$ where $x$ is the previous value of the point. These newly-generated regions were then randomly reversed with probability of 50\% to generate data for antisense patterns.
+
+
+\begin{figure}[t,b]
+    \centering
+    \begin{subfigure}[b]{0.3\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{figures/evaluation/exon_stretching/uc002ler_4.pdf}
+        \caption{\gene{uc001ler.4}}
+        \label{fig:evaluation:exon_stretching:seeds:a}
+    \end{subfigure}
+    ~
+    \begin{subfigure}[b]{0.3\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{figures/evaluation/exon_stretching/uc002pnj_3.pdf}
+        \caption{\gene{uc001pnj.3}}
+        \label{fig:evaluation:exon_stretching:seeds:b}
+    \end{subfigure}
+    ~
+    \begin{subfigure}[b]{0.3\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{figures/evaluation/exon_stretching/uc002ufe_2.pdf}
+        \caption{\gene{uc001ufe.2}}
+        \label{fig:evaluation:exon_stretching:seeds:c}
+    \end{subfigure}
+    ~
+    \begin{subfigure}[b]{0.3\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{figures/evaluation/exon_stretching/uc001ngg_3.pdf}
+        \caption{\gene{uc001ngg.3}}
+        \label{fig:evaluation:exon_stretching:seeds:d}
+    \end{subfigure}
+    ~
+    \begin{subfigure}[b]{0.3\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{figures/evaluation/exon_stretching/uc002czx_3.pdf}
+        \caption{\gene{uc001czx.3}}
+        \label{fig:evaluation:exon_stretching:seeds:e}
+    \end{subfigure}
+    \caption{The five seed regions that were used to create the manual dataset. Note how similar the the patterns in \ref{fig:evaluation:exon_stretching:seeds:d} and \ref{fig:evaluation:exon_stretching:seeds:e} are if they were reversed.}
+    \label{fig:evaluation:exon_stretching:seeds}
+\end{figure}
+
+\autoref{fig:evaluation:exon_stretching:seeds} shows the five seed patterns that were selected. 
+Notice that two of them, namely \gene{uc001ngg.3} (\autoref{fig:evaluation:exon_stretching:seeds:d}) and \gene{uc001czx.3} (\autoref{fig:evaluation:exon_stretching:seeds:e}) seem to have a relatively similar shape, if the pattern was reversed: a large peak followed by a smaller one. One would expect the algorithm to join the clusters from these two samples relatively early.
+
+\begin{figure}[t,b]
+   \centering
+   \includegraphics[width=\textwidth]{figures/evaluation/exon_stretching/dgw_cut.pdf}
+   \caption{Result of clustering the dataset that was generated by stretching exon regions from the five seed samples in \autoref{fig:evaluation:exon_stretching:seeds}. The extended exons are marked as black points in the heatmap.}
+   \label{fig:evaluation:exon_stretching:cut}
+\end{figure}
+
+\begin{figure}[t,b]
+    \centering
+    \begin{subfigure}[b]{0.22\textwidth}
+        \includegraphics[width=\textwidth]{figures/evaluation/exon_stretching/cluster-1.pdf}
+        \caption{Magenta cluster prototype}
+        \label{fig:evaluation:exon_stretching:clusters:1:prototype}
+    \end{subfigure}
+    ~
+    \begin{subfigure}[b]{0.22\textwidth}
+        \includegraphics[width=\textwidth]{figures/evaluation/exon_stretching/cluster-2.pdf}
+        \caption{Cyan cluster prototype}
+        \label{fig:evaluation:exon_stretching:clusters:2:prototype}
+    \end{subfigure}
+    ~
+    \begin{subfigure}[b]{0.22\textwidth}
+        \includegraphics[width=\textwidth]{figures/evaluation/exon_stretching/cluster-3.pdf}
+        \caption{Red cluster prototype}
+        \label{fig:evaluation:exon_stretching:clusters:3:prototype}
+    \end{subfigure}
+    ~
+    \begin{subfigure}[b]{0.22\textwidth}
+        \includegraphics[width=\textwidth]{figures/evaluation/exon_stretching/cluster-4.pdf}
+        \caption{Green cluster prototype}
+        \label{fig:evaluation:exon_stretching:clusters:4:prototype}
+    \end{subfigure}
+    \caption{Prototypes of the four clusters resulting from clustering the artificial dataset}
+    \label{fig:evaluation:exon_stretching:clusters:prototypes}
+\end{figure}
+
+
+\begin{figure}[t,b]
+    \centering
+    \begin{subfigure}[b]{0.22\textwidth}
+        \includegraphics[width=\textwidth]{figures/evaluation/exon_stretching/cluster-warped-1.pdf}
+        \caption{Magenta cluster}
+        \label{fig:evaluation:exon_stretching:clusters:1:warped}
+    \end{subfigure}
+    ~
+    \begin{subfigure}[b]{0.22\textwidth}
+        \includegraphics[width=\textwidth]{figures/evaluation/exon_stretching/cluster-warped-2.pdf}
+        \caption{Cyan cluster}
+        \label{fig:evaluation:exon_stretching:clusters:2:warped}
+    \end{subfigure}
+    ~
+    \begin{subfigure}[b]{0.22\textwidth}
+        \includegraphics[width=\textwidth]{figures/evaluation/exon_stretching/cluster-warped-3.pdf}
+        \caption{Red cluster}
+        \label{fig:evaluation:exon_stretching:clusters:3:warped}
+    \end{subfigure}
+    ~
+    \begin{subfigure}[b]{0.22\textwidth}
+        \includegraphics[width=\textwidth]{figures/evaluation/exon_stretching/cluster-warped-4.pdf}
+        \caption{Green cluster}
+        \label{fig:evaluation:exon_stretching:clusters:4:warped}
+    \end{subfigure}
+    \caption{Data dynamically warped onto the prototypes.}
+    \label{fig:evaluation:exon_stretching:clusters:warped}
+\end{figure}
+
+\autoref{fig:evaluation:exon_stretching:cut} shows the resulting hierarchical clustering of these regions. One can see that only four clusters are formed at the cut level chosen by me, not five. 
+These clusters are pictured in Figures \ref{fig:evaluation:exon_stretching:clusters:prototypes} and \ref{fig:evaluation:exon_stretching:clusters:warped}. It can be estimated from the prototypes of each of the cluster in \ref{fig:evaluation:exon_stretching:clusters:prototypes} which seed the data was generated from.
+
+The largest, green cluster, was generated from the two similar regions, \gene{uc001nng.3} and \gene{uc001czx.3}. As expected, these two regions were joined early, because of their similarity and the flipping of one of the seed regions can be clearly seen in \autoref{fig:evaluation:exon_stretching:clusters:3:warped}. In fact, from the dendrogram we can see that these two clusters were joined earlier than other clusters were formed. This can be explained remembering that the mutation function used in this experiment is proportional to the value of the actual point, therefore regions having more bins that are relatively unexpressed, such as the ones in figures \ref{fig:evaluation:exon_stretching:seeds:c} and \ref{fig:evaluation:exon_stretching:seeds:d},
+will be mutated less, and therefore would be constructed earlier.
+
+\todo{Edit out the preview button maybe from \autoref{fig:evaluation:exon_stretching:cut}?}
+
+\section{Clustering the Results of a Peak Caller}
+
+Tests on a artificial benchmark have shown that the DGW algorithm is able to do what it says it does.
+However, is the performance of DGW on a real dataset. The DGW was evaluated in the following scenario. MACS peak caller \cite{Zhang:2008wp} was run on the Chip-Seq results for \histonemodification{H3K4Me3} marks in K562 cell type. A control sample was used when calling for peaks as to anticipate between significant and insignificant peaks. The remaining parameters of MACS peak caller were left default.
+
+Peaks that are within 50bp of each other, were then merged together using {\\tt BEDTools} package\cite{Quinlan:2010ur}. Then, all transcription start sites and first splicing sites overlapping these regions were found and marked as points of interest.
+
+The regions containing at least one transcription start site within them were clustered,
+resulting in .. \todo{complete}.
+
+\todo{Write a list of datasets somewhere in appendix}
 
 \chapter{Conclusions and Contributions}
 

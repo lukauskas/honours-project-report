@@ -65,7 +65,8 @@ human sex cells are known to contain around three billion such base pairs.
 \subsection{Histones}
 \todo{Fill me in}
 \subsection{Transcription and Splicing}
-\todo{Need to explain here what are transcription start sites, exons and why they are important}
+\todo{Need to explain here what are transcription start sites, exons and why they are important
+as the remaining sections assume the reader is aware of them}
 
 \section{Next-Generation Sequencing}
 The Human Genome Project was the research project that has sequenced all
@@ -83,12 +84,43 @@ costs of DNA Sequencing has made it more accessible and allowed
 development of new genome-scale analysis methods such as ChIP-Sequencing
 (ChIP-Seq).
 
+\todo{Unfinished}
+\todo{Mention that NGS = Next Generation Sequencing}
+
 \section{ChIP Sequencing}
 
 \chapter{Motivation}
+The amount of data collected from the next-generation sequencing is increasing rapidly together with the popularity of NGS. This data has already provided useful insights into the processes of living organisms, and it is expected that more and more such insights will be discovered as more data is obtained.\todo{find a few examples} 
+Unfortunately, the more data is obtained, the harder the process of obtaining useful insights becomes.  
+The title of one of the conference on NGS, where a poster about this project will be presented at, seems to summarises this problem well: "The Next NGS Challenge: Data Processing and Integration"\footnote{http://www.thenextngschallenge.org/}.
 
+This trend seem to be following the prediction published in one of the early reviews of ChIP-Seq, \cite{Park:2009wc}, where P J Park already predicted data processing to be the major challenge of this technology. In this paper, he listed the common approaches to data processing at that time, most of which are still valid today.
 
-\section{Previous art}
+For protein-DNA binding, he writes, the most common analysis is the discovery of binding sequence motifs. A large variety of methods in doing that are available to this day, probably the best-known one being MEME\cite{Grundy:1997vb}. In order to find these transcription factor binding sites, significantly enriched regions of the genome (so called "peaks") need to be located first. A variety of methods exist to aid this task. The probably best-known of them, MACS peak caller\cite{Zhang:2008wp}, has been used in one of the experiments performed for this project (\autoref{sec:macs-experiment})\todo{Explain how macs works if there is time}. Other methods of finding these enriched regions are summarised in a more recent review on ChIP-SEQ\cite{Furey:2012ha}.
+
+For histone modifications, as claimed by P J Park, an obvious approach is to annotate the locations of these peaks relative to known genomic features. For instance, such analysis would record the fact that \histonemodification{H3K4me3} tends to be enriched near transcription start sites, as discussed earlier\todo{Discuss earlier}. Then these annotated regions need to be analysed either by looking for correlations, or by advanced clustering techniques. 
+
+One of the early clustering methods, referenced by Park, is ChromaSig\cite{Hon:2008wv}. The authors claim their method is able to identify the motifs previously defined by \cite{Heintzman:2007ke} near well-defined genomic regions (e.g. transcription start sites) in a completely unsupervised way. 
+A bit more recent approach, \cite{Lai:2010ue}, uses a similar method to find the best alignment between 
+a set of user-defined regions. 
+
+These methods share a major weakness of being window-based.
+Window-based methods are not able to identify similar patterns if they differ in length. Bieberstein and colleagues, have shown an example of such pattern. They found that \histonemodification{H3K4Me3} profiles tend to peak at the locations of first splicing sites of genes\cite{Bieberstein:2012tf}. Since the locations of first splice site relative to transcription start sites vary from one gene to another, methods that do not model this are deemed to fail identifying that these peaks at the splicing sites are related.
+
+Also, in some cases, using a window-based approach does not make any sense at all. For instance, if one was comparing genes, which differ vastly in length, it makes little sense to compare the full length of one gene, to a small part of some other gene. This is the reason why some studies, e.g. \cite{Taslim:vj}, rescale the regions of interest to be of the same length, before doing clustering. This could indeed detect similar patterns that vary in length, however such approach is vulnerable to misalignment -- a problem window-based alignment methods solve pretty well.
+
+An interesting approach on this problem is taken by Wang et al.\citep{Wang:2012cb}. 
+Their method is based on the methods developed for sequence alignment.
+The algorithm they propose, ChAT, tries to find the best alignment between two patterns before doing any clustering, just as ChromaSig or ArchAlign, yet it allows to ignore a part of some region as if it was not there. The authors of the paper claim that these gaps "are critical because they allow the algorithm to extend beyond regions with variant (or diffuse) chromatin enrichment signatures, and in so doing facilitate the discovery of chromatin signatures that span long genomic regions as well as those with complex multi-modal patterns of histone modification enrichment". 
+
+This, in fact, is a very similar approach to the one taken in this project. The main difference is that when creating gaps, ChAT algorithm applies a penalty that is proportional to the norm of the vector that is being skipped. Such penalty biases the algorithm to skip unexpressed regions more than expressed ones as per reasoning that depleted regions are not as interesting as the expressed ones. 
+While this penalty allows the discovery of multi-modal patterns separated by depleted regions across genome as the authors claim, it would heavily penalise any attempts to discover highly-expressed patterns of varying lengths.
+
+The intuition behind the methods proposed in this project comes from realising that the problem of comparing genomic marks is a problem that is very similar to comparing waveforms for speech recognition. That is, in speech recognition, we want to identify two words being the same even though we started recording one of them, say half a second later, which is equivalent of detecting patterns that are similar, but misaligned. Similarly, if one speaker was to say the same word faster than the other, what is equivalent to comparing genomic regions of different lengths, the words should still be detected as being the same. A common solution for this problem in Speech Recognition community is to use Dynamic Time Warping distance to compare the waveforms.
+
+Contrary to the ChAT method, this distance measure does not allow skipping of points at all. It does, however, allow a set of points on one sequence to a single point on another as if that point was stretched to become a sequence of n points. This way the penalty of warping the genome depends directly on the points that are mapped together, so the algorithm is able to do this both for highly-expressed and depleted regions, as long as the values mapped to each other are similar. See methods section for an in-depth overview of this.
+
+\todo{Talk about CAGT a little bit. From what I understand their tool is focused on reversing the patterns correctly. If this is true, the need to add the reversing next to aims of this project, if not then it need not be here.}
 
 \todo{Mention the two major papers in the game}
 
@@ -377,7 +409,7 @@ will be mutated less, and therefore would be constructed earlier.
 \todo{Edit out the preview button maybe from \autoref{fig:evaluation:exon_stretching:cut}?}
 
 \section{Clustering the Results of a Peak Caller}
-
+\label{sec:macs-experiment}
 Tests on a artificial benchmark have shown that the DGW algorithm is able to do what it says it does.
 However, is the performance of DGW on a real dataset. The DGW was evaluated in the following scenario. MACS peak caller \cite{Zhang:2008wp} was run on the Chip-Seq results for \histonemodification{H3K4Me3} marks in \celltype{K562} cell type. A control sample was used when calling for peaks as to anticipate between significant and insignificant peaks. The remaining parameters of MACS peak caller were left default.
 

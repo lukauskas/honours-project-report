@@ -5,8 +5,8 @@ import dgw.dtw.visualisation
 import matplotlib.pyplot as plt
 
 
-regions = dgw.read_bed('interesting_tss_regions.bed')
-data = dgw.read_bam('/Users/saulius/dev/coursework/proj/data/interesting/broad/K562/wgEncodeBroadHistoneK562H3k4me3StdAlnRep1.bam', regions, resolution=25, extend_to=200)
+regions = dgw.read_bed('macs_interesting.bed')
+data = dgw.read_bam(['/Users/saulius/dev/coursework/proj/data/interesting/broad/K562/wgEncodeBroadHistoneK562H3k4me3StdAlnRep1.bam'], regions, resolution=50, extend_to=200)
 
 def visualise_dtw_mappings(index_a, index_b, *args, **kwargs):
     a = data.ix[index_a]

@@ -258,7 +258,7 @@ Previous chapters have defined the mechanics of DTW distance. The important ques
 
 It has been shown, that computation of a sequence that minimises the distance to all other sequences in the cluster under DTW distance, so called centroid sequence, is a NP-Complete problem as the search space grows exponentially with number of sequences being averaged\cite{Hautamaki:2008fh,Petitjean:2012bp}.
 
-Even though, a variety of methods to approximate this calculation have been proposed through the years, \cite{Gupta:1996tw,Niennattrakul:2009ep,Petitjean:2011bq,Petitjean:2012bp}, it has been shown that one needs to be careful about using them, as incorrect averaging methods might create incorrect clusterings, e.g. allow the averaged center drift outside the sequences being averaged \cite{Niennattrakul:2007wv}. Due to this, it is not trivial to implement centroid-based clustering methods (e.g. k-means) under Dynamic Time Warping distance. 
+Even though a variety of methods to approximate this calculation have been proposed through the years, \cite{Gupta:1996tw,Niennattrakul:2009ep,Petitjean:2011bq,Petitjean:2012bp}, it has been shown that one needs to be careful about using them for clustering, as incorrect averaging methods might create incorrect clusterings, e.g. allow the averaged center drift outside the sequences being averaged \cite{Niennattrakul:2007wv}. Due to this, it is not clear how to implement centroid-based clustering methods (e.g. k-means) under Dynamic Time Warping distance. 
 
 Hierarchical-clustering methods, on the other hand, do not require a notion of centroid. A well-known agglomerative clustering method, works by first computing the distances between all pairs of points in the dataset, then joining the two closest points into a cluster, forming a new cluster this way. Then the two second-closest points based on that distance forming another cluster, and so on. There are quite a few ways established in practice on how to compare these newly created clusters:
 
@@ -295,6 +295,23 @@ if we were to cut the dendrogram at pretty much any point we would get the major
 
 We can see that chaining behaviour is not visible when using complete linkage. Here, the clusters are formed early, and then joined later on, as one would expect (\autoref{fig:clustering:dendrogram:complete}). In fact, Hirano et al. \cite{Hirano:2005wh} have shown empirically that out of the three linkage methods discussed above, only complete linkage was able to produce meaningful clusters when clustering time series data under DTW. Since such meaningful clusters are expected from an exploratory tool, complete linkage criterion is used to generate the clusters
 in the software produced by this project.
+
+\subsection{Forming Flat Clusters}
+
+It is also worth noting, that there have been attempts to relax the requirement of having a notion of centroid in centroid clustering methods by using a medoid -- a representative object from within the cluster. For instance, k-medoids algorithm, implemented e.g. in \cite{Park:2009ks}, could in theory be used to cluster DTW distances. 
+
+The disadvantage of this method against hierarchical clustering is the fact that the number of clusters, the $k$ in k-medoids, still needs to be picked before the clustering was done. Several iterations of the algorithm could be run, and the results with different $k$s could be compared, of course, yet this is not efficient, and in the end it is not clear what metric should be used to
+measure the meaningfulness of the clustering.
+
+Hierarchical clustering methods, on the other hand, need to decide on the number of clusters \emph{after} the clustering was done. This way the clusters can be decided on by cutting the dendrogram at some arbitrarily selected distance threshold between clusters. 
+
+This cutting can either be done automatically, if there is clear way to do this, e.g. the distances in the dendrogram correspond to p-values, like in \cite{Wang:2012cb}, or by visual inspection of the resulting dendrogram, like in this project.
+
+\todo{this should link to the page describing the implementaton, where sliding line is mentioned}.
+
+\subsection{Generating Cluster Prototypes}
+
+
 
 \todo{Complete linkage}
 

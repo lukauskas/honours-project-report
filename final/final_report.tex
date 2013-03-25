@@ -254,13 +254,47 @@ This modified constraint is now always consistent, being in units of shorter seq
 
 \section{Clustering}
 
-Centroid based clustering methods, e.g. K-Means, require a notion of centroid for data points being averaged. Centroid is usually defined as a data point that minimises the distance to all other data points in the set. In the Euclidean space this problem is trivial and solvable by calculating the mean of the data.
+Previous chapters have defined the mechanics of DTW distance. The important question that is yet to be raised is how the data can be clustered under it. 
 
-In the Dynamically Time Warped space, however, finding the centroid sequence, called a Steiner sequence, is a NP complete problem as the search space grows exponentially to the number of sequences\cite{Hautamaki:2008fh,Petitjean:2012bp}.
+It has been shown, that computation of a sequence that minimises the distance to all other sequences in the cluster under DTW distance, so called centroid sequence, is a NP-Complete problem as the search space grows exponentially with number of sequences being averaged\cite{Hautamaki:2008fh,Petitjean:2012bp}.
 
-The fact that DTW distance does not satisfy the triangle inequality, \cite{Muller:2007bo}, 
-is one of the reasons why this is such a hard problem. Various approximations for shape averaging were
-proposed throughout the years, some of them can be find in, e.g. \cite{Niennattrakul:2009ep}\cite{Petitjean:2011bq}\cite{Petitjean:2012bp} \todo{Okay, i wont do this today as my mind is on the results section, do this some other time when you can do it properly}
+Even though, a variety of methods to approximate this calculation have been proposed through the years, \cite{Gupta:1996tw,Niennattrakul:2009ep,Petitjean:2011bq,Petitjean:2012bp}, it has been shown that one needs to be careful about using them, as incorrect averaging methods might create incorrect clusterings, e.g. allow the averaged center drift outside the sequences being averaged \cite{Niennattrakul:2007wv}. Due to this, it is not trivial to implement centroid-based clustering methods (e.g. k-means) under Dynamic Time Warping distance. 
+
+Hierarchical-clustering methods, on the other hand, do not require a notion of centroid. A well-known agglomerative clustering method, works by first computing the distances between all pairs of points in the dataset, then joining the two closest points into a cluster, forming a new cluster this way. Then the two second-closest points based on that distance forming another cluster, and so on. There are quite a few ways established in practice on how to compare these newly created clusters:
+
+\begin{itemize}
+   \item \emph{Single linkage:} The distance between two clusters is equal to the smallest distance between the any two elements in the two clusters.
+   \item \emph{Complete linkage:} The distance between two clusters is equal to the largest distance between any two elements in the two clusters.
+   \item \emph{Average linkage:} The distance between two clusters is equal to the average of the distances between the elements in the clusters.
+\end{itemize}
+\todo{Visualise this}
+
+\begin{figure}
+    \centering
+    \begin{subfigure}[b]{0.45\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{figures/clustering/linkage_single.pdf}
+        \caption{Single linkage}
+        \label{fig:clustering:dendrogram:single}
+    \end{subfigure}
+    ~
+    \begin{subfigure}[b]{0.45\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{figures/clustering/linkage_complete.pdf}
+        \caption{Complete linkage}
+        \label{fig:clustering:dendrogram:complete}
+    \end{subfigure}
+    \caption{Comparison of dendrograms obtained by clustering using single and complete linkages. The datasets being clustered are the same, generated from \celltype{K562} \histonemodification{H3K4Me3} dataset, and unconstrained DTW distance metric was used to cluster both of them. The only thing that is different is the linkage method.
+      One can see chaining of the items in the single linkage clustering  dendrogram (\ref{fig:clustering:dendrogram:single}), where each element is subsequently added to the same cluster, rather than forming many smaller clusters before, when complete linkage is used (\ref{fig:clustering:dendrogram:complete}).}
+    \label{fig:clustering:dendrogram}
+\end{figure}
+
+Single linkage applied to agglomerative clustering using DTW distance is vulnerable to a phenomenon known as \emph{chaining}. This phenomenon occurs, when instead of forming distinct clusters early, agglomerative clustering algorithm forms a single cluster and incrementally joins more and more elements to it one, at the time. This is illustrated in \autoref{fig:clustering:dendrogram:single}. 
+Here it seems that majority of data is in one cluster and each data point is joined to the cluster one by one, creating a nice downwards going slope seen in the figure. This is an unhelpful clustering, as 
+if we were to cut the dendrogram at pretty much any point we would get the majority of the data in one of the clusters, with the remaining data points having a separate cluster for themselves. 
+
+We can see that chaining behaviour is not visible when using complete linkage. Here, the clusters are formed early, and then joined later on, as one would expect (\autoref{fig:clustering:dendrogram:complete}). In fact, Hirano et al. \cite{Hirano:2005wh} have shown empirically that out of the three linkage methods discussed above, only complete linkage was able to produce meaningful clusters when clustering time series data under DTW. Since such meaningful clusters are expected from an exploratory tool, complete linkage criterion is used to generate the clusters
+in the software produced by this project.
 
 \todo{Complete linkage}
 

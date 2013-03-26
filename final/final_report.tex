@@ -147,8 +147,10 @@ Contrary to the ChAT method, this distance measure does not allow skipping of po
    \label{fig:DTW:alignments}
 \end{figure}
 
+\subsection{Unconstrained Dynamic Time Warping}
 
 Dynamic Time Warping (DTW) algorithm is the corner stone of the methods implemented in this project. This algorithm was initially developed in the speech recognition community in order to allow accurate comparisons between words spoken with tempo variations. 
+
 This comparison is achieved by warping the time axis nonlinearly. That is, the axis is stretched or compressed as to minimise the total distance between the points aligned to each other. The stretching and compressing is done by creating an alignment between the two sequences, also known as the warping path, almost arbitrarily, with a few constraints described below. The distances between aligned points are then computed and summed to obtain what is commonly referred to as DTW Distance.
 
 More formally, given two sequences $\mathbf{a} = a_1, a_2, ..., a_n$ and $\mathbf{b} = b_1, b_2, ..., b_m$, Dynamic Time Warping aims to construct a warping path $\mathbf{p} = { (p_{1,0}, p_{1,1}), (p_{2,0}, p_{2,1}), ..., (p_{k,0}, p_{k, 1}) }$ that maps each point on the first sequence, specified as $p_{i,0}$ to a point on the second sequence, $p_{i,1}$ such that the following three constraints hold:
@@ -252,7 +254,10 @@ This modified constraint is now always consistent, being in units of shorter seq
 
 \subsection{Constant-Penalty DTW}
 
+\todo{Fill me in}
+
 \section{Clustering}
+\label{sec:clustering}
 
 Previous chapters have defined the mechanics of DTW distance. The important question that is yet to be raised is how the data can be clustered under it. 
 
@@ -307,13 +312,77 @@ Hierarchical clustering methods, on the other hand, need to decide on the number
 
 This cutting can either be done automatically, if there is clear way to do this, e.g. the distances in the dendrogram correspond to p-values, like in \cite{Wang:2012cb}, or by visual inspection of the resulting dendrogram, like in this project.
 
-\todo{this should link to the page describing the implementaton, where sliding line is mentioned}.
+\todo{this should link to the page describing the implementation, where sliding line is mentioned}
 
-\subsection{Generating Cluster Prototypes}
+\subsection{Cluster Prototypes}
+\label{sec:prototypes}
 
+After the flat clusters are formed, the clusters need to be visualised to the user somehow. Just displaying the original data (i.e. in the form of a heatmap) is insufficient, as such representation of the data does not does not explain why the data was clustered together in the first place. 
 
+The end user of the software, would want to see the data represented after warping, i.e. average profile of the warped data, to be able to get the structure and the shape of the resulting cluster marks. The problem of extracting this average warped profile lies in the fact that only two sequences are compared with each other at the time, and both of them can be arbitrarily warped. What this means, unfortunately, that the same sequence might be warped in as manny ways as there are sequences to compare it against. In order to be able to give an average warping of sequences in a cluster, one needs to agree upon the base sequence upon which to warp the remaining sequences on. In other words,
+one needs to find a prototype for the cluster to be able to visualise the warped items.
 
-\todo{Complete linkage}
+Remember that inability to compute perfect centroids was one of the reasons why hierarchical clustering was chosen in favour of centroid-clustering in the first place. However, at this case the data is already clustered, and flat clusters are already formed. In this case, some error is acceptable as it will not will not be able to accumulate as clustering is being processed. The only requirement that is posed on the prototype is that it expresses a similar shape than the marks being clustered visually.
+
+\subsubsection{Prioritised Shape Averaging}
+A method called Prioritised Shape Averaging (PSA), proposed in \cite{Niennattrakul:2009ep}, was chosen to generate the cluster prototypes. The reason why PSA was chosen, in favour of other methods, is the fact that it can exploit the hierarchical structure, we've already computed in prototype generation stage.
+
+The basic idea under the PSA can be thought of in terms of bottom-up algorithm.
+Initially, make all of the leaf nodes to be the prototypes of themselves, with the weight of one assigned to each of them. Moving up the clustering tree, for each node, average the two prototypes of the left and right child of the node (remember that hierarchical clustering trees are always binary), with some averaging procedure that takes the weights of the two nodes into account. Make the weight of this newly formed node equal to the number of elements in that node.
+
+The proposed method to be used in PSA is Scaled Dynamic Time Warping (SDTW) averaging algorithm that is also defined in the paper. This algorithm works similarly to the standard path averaging algorithm, which is defined as follows: For each pair of points on the DTW warping path, $(i,j)$, average the corresponding points in the two sequences $a_i$, and $b_j$, in the following way:
+\begin{equation} \label{eq:standard_path_averaging}
+ x =  \frac{\lambda_a \times a_i + \lambda_b \times b_j}{\lambda_a + \lambda_b}
+\end{equation}
+
+Essentially, it is doing weighted averaging of these paths.
+SDTW extends this definition, by making the algorithm "stretch" the resulting point $x$,  $\lambda_a$ times, if the point in sequence $\mathbf{a}$ was unchanged compared to previous pair of points in the path, i.e. the warping path moved straight upwards; $\lambda_b$ times if the warping path moved horizontally, $\frac{\lambda_a + \lambda_b}{2}$ times if the warping path moved diagonally.
+
+Now it is obvious to see how such averaging method would create paths that are getting longer and longer as more and more points are being averaged. The proposed solution for this problem is to rescale the resulting average path to be of the length of one of the two sequences. As a convention, I always use the length of the longer sequence when rescaling the path.
+
+\begin{figure}
+    \centering
+    \begin{subfigure}[b]{0.45\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{figures/clustering/prototypes/uc001ocv_3.pdf}
+        \caption{Sequence A, weight 10}
+        \label{fig:clustering:prototypes:seq_a} 
+    \end{subfigure}
+    ~
+    \begin{subfigure}[b]{0.45\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{figures/clustering/prototypes/uc011lag_2.pdf}
+        \caption{Sequence B, weight 50}
+        \label{fig:clustering:prototypes:seq_b} 
+    \end{subfigure}
+    ~
+    \begin{subfigure}[b]{0.31\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{figures/clustering/prototypes/psa.pdf}
+        \caption{SDTW}
+        \label{fig:clustering:prototypes:sdtw}
+    \end{subfigure}
+    ~
+    \begin{subfigure}[b]{0.31\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{figures/clustering/prototypes/std.pdf}
+        \caption{Standard}
+        \label{fig:clustering:prototypes:std}
+    \end{subfigure}
+    ~
+    \begin{subfigure}[b]{0.31\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{figures/clustering/prototypes/unweighted.pdf}
+        \caption{Standard-Unweighted}
+        \label{fig:clustering:prototypes:unweighted}
+    \end{subfigure}
+    \caption{Visualisation of the three prototyping methods discussed in \autoref{sec:prototypes}. Two sequences in \ref{fig:clustering:prototypes:seq_a} and \ref{fig:clustering:prototypes:seq_b} were averaged with each other using DTW with Sakoe & Chiba band constraint set to 12. The first sequence had a weight of 10, whereas the second sequence had a weight of 50. The results using various averaging methods are shown in \ref{fig:clustering:prototypes:sdtw}, \ref{fig:clustering:prototypes:std} and \ref{fig:clustering:prototypes:unweighted}.}
+    \label{fig:clustering:prototypes}
+\end{figure}
+
+\autoref{fig:clustering:prototypes} compares the STDW averaging method with standard averaging method as in \autoref{eq:standard_path_averaging} as well as to standard unweighted averaging method (where $\lambda_a = \lambda_b = 1$). One can see that the average sequences produced by both SDTW and standard averaging methods favour the sequence with more weight strongly and therefore resulting average does resemble the second sequence more than the first one. Compare this to unweighted average of the two sequences, where the new shape resemble both features equally. 
+
+From these figures, it is hard to spot the difference between prototypes generated by SDTW and Standard methods in this particular case. Surprisingly, I did not find any but miniscule improvements SDTW makes to the end result of cluster prototype along the whole hierarchical clustering tree. These improvements seem not worth the extra overhead incurred by the clever treatment of these path changes, and therefore the DGW uses standard path averaging by default (though the user is able to override this, if she wants to).
 
 \section{Biologically Relevant Heuristics}
 \todo{Write about antisense regions correction}

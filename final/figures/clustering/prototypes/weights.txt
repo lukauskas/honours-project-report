@@ -1,0 +1,2 @@
+Weight of uc001ocv.3 is 10
+Weight of uc011lag.2 is 50

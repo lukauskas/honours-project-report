@@ -5,6 +5,7 @@
 \usepackage{natbib}
 \usepackage{subcaption}
 \usepackage{amsmath}
+\usepackage{copyrightbox}
 \DeclareMathOperator*{\argmax}{arg\,max}
 \DeclareMathOperator*{\argmin}{arg\,min}
 
@@ -50,23 +51,55 @@ guanine (G) or thymine (T).
 The sequence of these nucleobases is commonly referred to as the DNA Sequence. 
 
 \section{Structure of  DNA}
-Generally DNA molecules are observed in pairs of two tightly connected
+Generally, DNA molecules are observed in pairs of two tightly connected
 molecules, rather than as a single molecule. These molecules are known as
 strands and are held together by the bonds between the nucleobases: guanine is
 known to form a bond with cytosine, whereas adenine forms a bond with thymine.
 Since each kind of nucleobase can form a bond with only one other kind of
 nucleobase, both of the DNA strands contain enough information to recreate the
-other on its own. This redundancy is required for DNA replication process. 
+other on its own, what is crucial for DNA replication. 
 
-Because of this redundancy, the sequences on complimentary strands are often considered at the
-same time as sequences of base pairs, rather than sequences of nucleotides. The
-human sex cells are known to contain around three billion such base pairs.
+Because of this redundancy, the sequences on complimentary strands are often sequenced simultaneously as sequences of base pairs, rather than sequences of nucleotides. Human sex cells are known to contain around three billion such base pairs, while diploid cells contain twice the amount\cite{Annunziato:2008wh}.
 
-\subsection{Histones}
-\todo{Fill me in}
-\subsection{Transcription and Splicing}
-\todo{Need to explain here what are transcription start sites, exons and why they are important
-as the remaining sections assume the reader is aware of them}
+\todo{Fit info  about strand directionality somewhere}
+
+\begin{figure}[p]
+   \centering
+   \copyrightbox[b]{\includegraphics[width=1.1\textwidth]{figures/background/pierce_11_5_FULL.jpg}}
+   {Copyright 2005 W. H. Freeman Pierce, Benjamin. Genetics: A Conceptual Approach, 2nd ed. (New York: W. H. Freeman and Company), 292. Sublicensed by Scitable to be used for non-commercial use in an educational environment in print form (via \cite{Annunziato:2008wh}).}
+   
+   \caption{Infographics of DNA Packaging mechanism. }
+   \label{fig:background:dna_packaging} 
+\end{figure}
+
+Since each base pair in the DNA is around 0.34 nanometers long \cite{Annunziato:2008wh},
+the DNA sequence of a human diploid cell will take up around 2 meters, if stretched, yet it lies there, packaged into the volume as small as the nucleus of a cell. The proteins that lie within the nucleus are directly responsible for packaging the DNA. These proteins, called histones, fold the DNA around them, eventually wrapping it into three dimensional structures.
+
+More specifically, DNA wraps around octomer of two copies of each of the four core histones, H2A, H2B, H3, and H4, creating a structure resembling beads on a string (as pictured in panels 2 and 3 of \autoref{fig:background:dna_packaging}). The fifth histone, H1, attaches to the DNA from the other side of the other histones (pictured in yellow, panel 4 of \autoref{fig:background:dna_packaging}). This DNA is then wrapped to a fiber, which is then subsequently compressed in some higher-order structures, as seen in \autoref{fig:background:dna_packaging}.
+
+\section{Transcription and Translation}
+\begin{figure}[t,b,p]
+\centering
+\copyrightbox[b]{
+\includegraphics[width=\textwidth]{figures/background/gene_splicing.png}}
+{\centering Modified version of \url{https://en.wikipedia.org/wiki/File:Pre-mRNA_to_mRNA.svg}. The original image was released to the public domain.}
+\caption{RNA splicing}
+\label{fig:background:splicing}
+\end{figure}
+
+In order to understand how the genetic code is able to describe organisms, it is important to understand how the information flows within a living organism. The central dogma of molecular biology states \emph{DNA makes RNA makes protein [and proteins make us]}. In it's essence, it encodes the two key processes occurring within a living cell, transcription from DNA to RNA and translation from RNA to protein.
+
+During transcription, RNA polymerase molecule binds to a region of DNA, indicated by a complex ensemble of proteins that bind to promoter regions of DNA. It then proceeds to read the information encoded in one of the strands. As it progresses through the genome, it creates a single-stranded RNA molecule that is complimentary to the DNA that it has just read. The parts of the genome that can be transcribed are known as \emph{genes}.
+
+Eukaryotic genes typically consist of parts that are translated to proteins, exons, and the parts that are not, introns. When the gene is transcribed, the RNA for both the exons and introns is created. However, intron regions are then removed post-transcriptionally using a process known as RNA splicing (pictured in \autoref{fig:background:splicing}). The remaining regions are joined together and translated into a protein within a ribosome.
+
+\section{Epigenetics}
+
+The central dogma of molecular biology explains how living organisms are built from the genetic code.
+However, if all cells of a living organism contain the same DNA sequence, how can the diversity of cell types within a human body be explained? Epigenetics is a field of genetics that studies such diversity and changes in gene expression, that occur without any changes in the DNA sequence.
+
+It is known that the physical structure of DNA plays an important part in gene regulation. 
+Tightly packed regions of DNA are harder to interact with, therefore harder to initiate the transcription with. Modifications of the core histones, e.g. acetylation, methylation or phosphation can change the underlying structure of chromatin and thus make the DNA more accessible for interactions.
 
 \section{Next-Generation Sequencing}
 The Human Genome Project was the research project that has sequenced all

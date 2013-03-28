@@ -91,7 +91,9 @@ Because of this redundancy, the sequences on complimentary strands are often seq
 Since each base pair in the DNA is around 0.34 nanometers long \cite{Annunziato:2008wh},
 the DNA sequence of a human diploid cell will take up around 2 meters, if stretched, but it is, packaged into the volume as small as the nucleus of a cell. The proteins that lie within the nucleus are directly responsible for packaging the DNA. These proteins, called histones, fold the DNA around them, eventually wrapping it into three dimensional structures.
 
-More specifically, DNA wraps around an octomer of two copies of each of the four core histones, H2A, H2B, H3, and H4, creating a structure resembling beads on a string (as pictured in panels 2 and 3 of \autoref{fig:background:dna_packaging}). The fifth histone, H1, attaches to the DNA from the other side of the other histones (pictured in yellow, panel 4 of figure \ref{fig:background:dna_packaging}). This DNA is then wrapped to a fiber, which is then subsequently compressed in some higher-order structures, as seen in \autoref{fig:background:dna_packaging}.
+More specifically, DNA wraps around an octomer of two copies of each of the four core histones, H2A, H2B, H3, and H4, creating a structure resembling beads on a string (as pictured in panels 2 and 3 of \autoref{fig:background:dna_packaging}). The fifth histone, H1, attaches to the DNA from the other side of the other histones (pictured in yellow, panel 4 of figure \ref{fig:background:dna_packaging}). This DNA is then wrapped to a 30-nanometer fiber, which is then subsequently compressed in some higher-order structures, as seen in \autoref{fig:background:dna_packaging}.
+
+The histones are mostly modular, but contain a variety of "tails" that are susceptible to chemical modifications such as methylation, acetylation and phosphorylation \cite{Kouzarides:2007js}. These modifications have been shown to alter the structure of chromatin, for instance acetylation of histone H4 on lysine 16 (shortened as \histonemodification{H4K16Ac}) has been shown to inhibit formation of the 30-nanometer fiber (pictured in panel 5 of \autoref{fig:background:dna_packaging}) \cite{ShogrenKnaak:2006gt}. Such changes of the chromatin structure may change the DNA accessibility for chemical interactions that play important role in gene expression.
 
 \section{Gene expression}
 \begin{figure}[t]
@@ -104,22 +106,22 @@ More specifically, DNA wraps around an octomer of two copies of each of the four
 \end{figure}
 
 Gene expression process can be summarised using the central dogma of molecular biology: 
-DNA makes RNA makes proteins. Technically speaking, two processes, transcription (DNA to RNA) and
-translation (RNA to protein) play a key part of synthesising a functional product of a gene (e.g. protein).
+\emph{DNA makes RNA makes proteins}. Technically speaking, gene expression is a combination of two processes, transcription (DNA to RNA) and
+translation (RNA to protein) which produce a functional product of a gene, protein\footnote{Not all genes produce proteins as their functional product. For simplicity, this chapter does not cover them.}.
 
-During transcription, RNA polymerase molecule binds to a region of DNA, that indicated by a complex ensemble of proteins bound to promoter regions of DNA. This molecule then proceeds to read the information encoded in one of the strands creating an RNA molecule that is complimentary to it. These transcribed regions are often referred to as "genes".
+During transcription, RNA polymerase molecule binds to a region of DNA, that indicated by a complex ensemble of proteins bound to promoter regions of DNA. This molecule then proceeds to read the information encoded in one of the strands creating an RNA molecule that is complimentary to it. The strand that the RNA polymerase reads is called the template or antisense strand, and is read in direction from $3'$ end to $5'$ end, meaning that the RNA molecule is created from $5'$ end to $3'$ end. The other strand, is often referred to coding or sense strand, because the sequence of nucleotides on that strand is equivalent to the sequence the RNA molecule will have (with thymine replaced with uracyl). 
 
-Even though the complete length of the gene is transcribed into RNA, only a fraction of it is translated to the protein in ribosome. Fragments of gene, known as introns, are removed post-transcription by the process known as RNA splicing. The remaining regions, exons, are then joined and form the final messenger RNA. This process is schematically illustrated in \autoref{fig:background:splicing}. The regions between exons and introns are known as splicing sites (SS). 
+Even though the complete length of the gene is transcribed into RNA, only a fraction of it is translated to the protein in ribosome. Fragments of gene, known as introns, are removed post-transcription by the process known as RNA splicing. The remaining regions, exons, are then joined and form the final messenger RNA. This process is schematically illustrated in \autoref{fig:background:splicing}. The regions between exons and introns are known as splicing sites. 
 
-After splicing the resulting messenger RNA (mRNA) is transferred to ribosome, where the proteins are created from the blueprint encoded inside the mRNA. A more in depth view of these processes can be found in a molecular biology textbook, e.g. \cite{Alberts:2002vj,Alberts:2002wf}.
+After splicing the resulting messenger RNA (mRNA) is transferred to ribosome, where the proteins are created from the blueprint encoded inside the mRNA. A more in depth view of these processes can be found in a molecular biology textbook, e.g. in \cite{Alberts:2002vj,Alberts:2002wf}.
 
-It is believed that the physical structure of DNA plays an important part in gene regulation. 
-Tightly packed regions of DNA are harder to interact with, therefore harder for transcription factors or RNA polymerase to bind with the DNA. Modifications of the core histones, can change the structure of chromatin and therefore change the accessibility of DNA for processes such as transcription.
-For instance, acetylation of histone H4 on lysine 16 (shortened as \histonemodification{H4K16Ac}) has been shown to inhibit formation of the 30-nanometer fiber (pictured in panel 5 of \autoref{fig:background:dna_packaging}) \cite{ShogrenKnaak:2006gt}. Other histone modifications, such as Histone 3 lysine 4 trimethylation (\histonemodification{H3K4Me3}) tend to locate near transcription start sites and correlate with the transcriptional activity of genes\cite{Pokholok:2005wn}.
+The important question that can be raised from this is what factors make some genes to be expressed more than others, and, more importantly, what changes the levels of this expression without the changes  in the underlying DNA sequence. The second question is a major topic of research in the field of epigenetics. Within this field it is known that modified histones tend to locate near known genomic regions, such as transcription start sites of known genes\cite{Pokholok:2005wn,Kouzarides:2007js}, therefore histone modifications is an important direction of research within the field.
 
-The development of next-generation sequencing techniques has allowed ... \todo{here}
-
+The following section describes the Next-Generation Sequencing methods that are used to study these
+histone modifications.
+ 
 \section{Next-Generation Sequencing}
+
 The Human Genome Project was the research project that has sequenced all
 three billion of these base pairs for the first time. The project was estimated
 to cost 3 billion dollars for American tax payers and last 15 years, but has ended up

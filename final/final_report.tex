@@ -222,8 +222,10 @@ While this penalty allows the discovery of multi-modal patterns separated by dep
 
 The intuition behind the methods proposed in this project comes from realising that comparing genomic marks is very similar to comparing waveforms of spoken words. That is, in speech recognition, we want to identify two words being the same even though we started recording one of them, say half a second later, which is equivalent of detecting patterns that are similar, but misaligned. Similarly, if one speaker was to say the same word faster than the other, what is equivalent to comparing genomic regions of different lengths, the words should still be detected as being the same. A common solution for this problem in Speech Recognition community is to use Dynamic Time Warping distance to compare the waveforms, which is used in this project.
 
-Contrary to the ChAT method, this distance measure does not allow skipping of points at all. It does, however, allow a set of points on one sequence to a single point on another as if that point was stretched to become a sequence of n points. This way the penalty of warping the genome depends directly on the points that are mapped together, so the algorithm is able to do this both for highly expressed and fairly depleted regions, as long as the values mapped to each other are similar. See methods section for an in-depth overview of this.
+Contrary to the ChAT method, this distance measure does not allow skipping of points at all. It does, however, allow a set of points on one sequence to a single point on another as if that point was stretched to become a sequence of n points. This way the penalty of warping the genome depends directly on the points that are mapped together, so the algorithm is able to do this both for highly expressed and fairly depleted regions, as long as the values mapped to each other are similar.
 
+\todo{Maybe summarise?}
+The later chapters give an in-depth overview of these methods.
 \todo{Talk about CAGT a little bit. From what I understand their tool is focused on reversing the patterns correctly. If this is true, the need to add the reversing next to aims of this project, if not then it need not be here.}
 
 \chapter{Methods}

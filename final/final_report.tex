@@ -94,7 +94,7 @@ the DNA sequence of a human diploid cell will take up around 2 meters, if stretc
 
 More specifically, DNA wraps around an octomer of two copies of each of the four core histones, H2A, H2B, H3, and H4, creating a structure resembling beads on a string (as pictured in panels 2 and 3 of \autoref{fig:background:dna_packaging}). The fifth histone, H1, attaches to the DNA from the other side of the other histones (pictured in yellow, panel 4 of figure \ref{fig:background:dna_packaging}). This DNA is then wrapped to a 30-nanometer fiber, which is then subsequently compressed in some higher-order structures, as seen in \autoref{fig:background:dna_packaging}.
 
-The histones are mostly modular, but contain a variety of "tails" that are susceptible to chemical modifications such as methylation, acetylation and phosphorylation \cite{Kouzarides:2007js}. These modifications have been shown to alter the structure of chromatin, for instance acetylation of histone H4 on lysine 16 (shortened as \histonemodification{H4K16Ac}) has been shown to inhibit formation of the 30-nanometer fiber (pictured in panel 5 of \autoref{fig:background:dna_packaging}) \cite{ShogrenKnaak:2006gt}. Such changes of the chromatin structure may change the DNA accessibility for chemical interactions that play important role in gene expression.
+The histones are mostly modular, but contain a variety of "tails" that are susceptible to chemical modifications such as methylation, acetylation and phosphorylation \cite{Fischle:2003tl,Kouzarides:2007js}. These modifications have been shown to alter the structure of chromatin, for instance acetylation of histone H4 on lysine 16 (shortened as \histonemodification{H4K16Ac}) has been shown to inhibit formation of the 30-nanometer fiber (pictured in panel 5 of \autoref{fig:background:dna_packaging}) \cite{ShogrenKnaak:2006gt}. Such changes of the chromatin structure may change the DNA accessibility for chemical interactions that play important role in gene expression.
 
 \section{Gene expression}
 \begin{figure}[t]
@@ -132,7 +132,7 @@ It took 13 years to complete and around \$2.7 billion to sequence the whole huma
     \copyrightbox[b]{\includegraphics[width=0.8\textwidth]{figures/background/IlluminaSequencing.png}}
     {Adapted by permission from Macmillan Publishers Ltd: Nature Reviews Genetics,
      Michael L. Metzker, \emph{Sequencing technologies — the next generation}, copyright 2010 (\cite{Metzker:j6NWuwFp})}
-    \caption{Illustration of parallel sequencing of nucleotides, as in Illumina Sequencing platform.
+    \caption{Illustration of parallel sequencing of nucleotides, as in Illumina/Solexa Sequencing platform.
     Each coloured dot in the figure corresponds to a different fragment of DNA being sequenced. 
     At each cycle, colour-coded nucleotide is incorporated to DNA by a mechanism similar to DNA replication. Then imaging is performed to get the sequences of all the pieces of DNA all at once, resulting in an image similar to the one in this figure. For each DNA fragment, the colour is read and mapped back to the nucleotide. The dyes are then washed and the cycle continues\cite{Metzker:j6NWuwFp}.}
     \label{fig:background:ngs:illumina}
@@ -140,7 +140,8 @@ It took 13 years to complete and around \$2.7 billion to sequence the whole huma
 
 Since then, the cost and duration of DNA sequencing has dropped sharply with the invention of
 next-Generation Sequencing methods (NGS). Instead of sequencing a long segment of DNA sequentially,
-the next-generation sequencing methods sequence a lot of short DNA segments in a massively-parallel way, much like as depicted in \autoref{fig:background:ngs:illumina}, where the sequencing step of Illumina/Solexa Sequencing Platform is illustrated as described in \cite{Metzker:j6NWuwFp}. 
+the next-generation sequencing methods sequence a lot of short DNA segments in a massively-parallel way, much like as depicted in \autoref{fig:background:ngs:illumina}.
+
 The short-sequenced reads can then be put together via the overlapping fragments between these short reads. Anyone who ever tried solving a puzzle without looking at the cover, knows how hard this process could be, even for computers. That is why NGS methods that produce very short reads are usually used not for tasks of sequencing the genome for the first time (\emph{de-novo} sequencing), but
 rather to study the DNA itself.
 
@@ -156,9 +157,9 @@ The original document was licensed under Creative Commons Attribution-Share Alik
 \label{fig:background:chip}
 \end{figure}
 
-Chromatin Immunoprecipitation, followed by Sequencing (ChIP-Seq) is a NGS method that studies protein-DNA interactions within the cell. Instead of sequencing the whole genome, ChIP-Seq aims to sequence only parts of DNA that interact with some target protein. These target proteins can either be internal to DNA (e.g. Histones) or arbitrary external proteins that interact with DNA.
+Chromatin Immunoprecipitation, followed by Sequencing (ChIP-Seq) is a NGS method that studies protein-DNA interactions within the cell. Instead of sequencing the whole genome, ChIP-Seq aims to sequence only parts of DNA that interact with some target protein. These target proteins can either be internal to DNA (histones) or arbitrary external proteins that interact with DNA.
 
-Basic ChIP-Seq workflow is summarised in \autoref{fig:background:chip}. In short, proteins are first "glued" together with the DNA by chemical cross-linking. This DNA-with proteins attached to it is then shorn into smaller pieces and antibodies are added to single the target proteins out using immunoprecipitation. The precipitate is then collected in order to sequence the DNA that is attached to the target proteins\cite{Mardis:2007wa}. This sequenced DNA is then matched to the reference genome.
+Basic ChIP-Seq workflow is summarised in \autoref{fig:background:chip}. In short, proteins are first ``glued" together with the DNA by chemical cross-linking. This DNA-with proteins attached to it is then shorn into smaller pieces and antibodies are added to single the target proteins out using immunoprecipitation. The precipitate is then collected in order to sequence the DNA that is attached to the target proteins\cite{Mardis:2007wa}. This sequenced DNA is then matched to the reference genome to provide hints of which parts of genome interact with the protein.
 
 \begin{figure}[t]
     \centering
@@ -168,27 +169,13 @@ Basic ChIP-Seq workflow is summarised in \autoref{fig:background:chip}. In short
 \end{figure}
 
 Figure \ref{fig:background:chip-results} shows a typical result of ChIP-Sequencing experiment.
-The aligned reads from the experiment are pictured as rectangles below the histogram. Since ChIP-Seq DNA fragments are usually sequenced from $5'$ end only\cite{Park:2009wc}, the reads have varying directionalities, depending on which strand was sequenced. These directionalities are indicated by the colour of the rectangle in the figure. These aligned reads are then stacked together to generate a
-landscape of target protein enrichment, seen as the histogram in the figure \ref{fig:background:chip-results}.
+The aligned reads from the experiment are pictured as rectangles below the histogram. ChIP-Seq DNA fragments are usually sequenced for a fixed amount of base pairs (e.g. 26) from $5'$ end only\cite{Park:2009wc}. Due to this, it is beneficial to have directionality associated with ChIP-Seq
+reads, depending on which of the two strands happened to be sequenced, so the short reads could be artificially extended later on. These directionalities of reads are indicated by the colour of the rectangle in the figure. 
 
-\todo{Pick up from here}
-
-ChIP-Seq can be used to study transcription factor binding sites of proteins
-that interact with DNA, or can be used to study the chromatin within the DNA
-itself. Chromatin is a combination of DNA and proteins that also lie within the
-nucleus.  A major unit of a chromatin is a nucleosome, that consists of a
-string of DNA wrapped around core histone proteins.  Histones are proteins
-responsible for the compacting the DNA to fit inside the nucleus of a cell.
-These proteins are acceptors for variety of modifications such as methylation
-and acetylation of lysine (K) residues\cite{Fischle:2003tl}. These modifications
-are often associated with DNA-based functions and such as transcription of
-genes.  The histone modification mechanism is hypothesised to play a part in
-these DNA-based functions by  "unravelling" the chromatin so it is more
-accessible, and by recruiting non-histone proteins \cite{Kouzarides:2007ui}.
-
-
+The aligned reads are then stacked together to generate a landscape of target protein enrichment, seen as the histogram in the figure \ref{fig:background:chip-results}. These enrichment landscapes, often just referred as to just ``marks", are then analysed computationally in order to gain insights on the role these proteins play in the living organisms.
 
 \chapter{Motivation}
+
 The amount of data collected from the next-generation sequencing is increasing rapidly together with the popularity of NGS. This data has already provided useful insights into the processes of living organisms, and it is expected that more and more such insights will be discovered as more data is obtained.\todo{find a few examples} 
 Unfortunately, the more data is obtained, the harder the process of obtaining useful insights becomes.  
 The title of one of the conference on NGS, where a poster about this project will be presented at, seems to summarises this problem well: "The Next NGS Challenge: Data Processing and Integration"\footnote{http://www.thenextngschallenge.org/}.

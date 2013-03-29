@@ -3,6 +3,7 @@
 \usepackage{hyperref}
 \usepackage{todonotes}
 \usepackage{natbib}
+\usepackage[font=footnotesize]{caption}
 \usepackage{subcaption}
 \usepackage{amsmath}
 \usepackage{copyrightbox}
@@ -60,7 +61,7 @@ The sequence of these nucleobases is commonly referred to as the DNA Sequence.
     \copyrightbox{\includegraphics[height=0.4\textheight]{figures/background/DNA_structure.png}}
                  {Illustration from the Wikipedia Commons, released to public domain by the author.\\
                   Available at \url{https://simple.wikipedia.org/wiki/File:DNA_chemical_structure.svg}}
-    \caption{Chemical structure of the DNA molecule}
+    \caption{Chemical structure of the DNA molecule. Note that $5'$ end of a strand has a phosphate group in the end (yellow), whereas $3'$ end of a strand has a deoxyribose group (orange) instead.}
     \label{fig:background:dna_structure}
 \end{figure}
 
@@ -122,25 +123,29 @@ histone modifications.
  
 \section{Next-Generation Sequencing}
 
-The Human Genome Project was the research project that has sequenced all
-three billion of these base pairs for the first time. The project was estimated
-to cost 3 billion dollars for American tax payers and last 15 years, but has ended up
-costing a bit less than that - \$2.7 billion and was completed in 13
-years\footnote{See \url{http://www.genome.gov/11006943} and
-    \url{http://www.ornl.gov/sci/techresources/Human_Genome/project/about.shtml}
-    for more information}. 
+It took 13 years to complete and around \$2.7 billion to sequence the whole human genome for the first time, by the scientists of the Human Genome Project\footnote{For more information, see \url{http://www.genome.gov/11006943} and
+    \url{http://www.ornl.gov/sci/techresources/Human_Genome/project/about.shtml}}. 
     
- Since then, a variety of DNA sequencing methods were
-developed that reduce both the time and cost required to perform sequencing
-significantly\citep{Shendure:2008uc,Liu:2012ve}. New technology and reduced
-costs of DNA Sequencing has made it more accessible and allowed
-development of new genome-scale analysis methods such as ChIP-Sequencing
-(ChIP-Seq).
+    
+\begin{figure}
+    \centering
+    \copyrightbox[b]{\includegraphics[width=0.8\textwidth]{figures/background/IlluminaSequencing.png}}
+    {Adapted by permission from Macmillan Publishers Ltd: Nature Reviews Genetics,
+     Michael L. Metzker, \emph{Sequencing technologies — the next generation}, copyright 2010 (\cite{Metzker:j6NWuwFp})}
+    \caption{Illustration of parallel sequencing of nucleotides, as in Illumina Sequencing platform.
+    Each coloured dot in the figure corresponds to a different fragment of DNA being sequenced. 
+    At each cycle, colour-coded nucleotide is incorporated to DNA by a mechanism similar to DNA replication. Then imaging is performed to get the sequences of all the pieces of DNA all at once, resulting in an image similar to the one in this figure. For each DNA fragment, the colour is read and mapped back to the nucleotide. The dyes are then washed and the cycle continues\cite{Metzker:j6NWuwFp}.}
+    \label{fig:background:ngs:illumina}
+\end{figure}
 
-\todo{Unfinished}
-\todo{Mention that NGS = Next Generation Sequencing}
+Since then, the cost and duration of DNA sequencing has dropped sharply with the invention of
+next-Generation Sequencing methods (NGS). Instead of sequencing a long segment of DNA sequentially,
+the next-generation sequencing methods sequence a lot of short DNA segments in a massively-parallel way, much like as depicted in \autoref{fig:background:ngs:illumina}, where the sequencing step of Illumina/Solexa Sequencing Platform is illustrated as described in \cite{Metzker:j6NWuwFp}. 
+The short-sequenced reads can then be put together via the overlapping fragments between these short reads. Anyone who ever tried solving a puzzle without looking at the cover, knows how hard this process could be, even for computers. That is why NGS methods that produce very short reads are usually used not for tasks of sequencing the genome for the first time (\emph{de-novo} sequencing), but
+rather to study the DNA itself.
 
 \section{ChIP Sequencing}
+Chromatin Immunoprecipitation followed by Sequencing 
 
 \chapter{Motivation}
 The amount of data collected from the next-generation sequencing is increasing rapidly together with the popularity of NGS. This data has already provided useful insights into the processes of living organisms, and it is expected that more and more such insights will be discovered as more data is obtained.\todo{find a few examples} 

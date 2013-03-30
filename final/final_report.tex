@@ -575,6 +575,13 @@ MACS_peak_89:1709727,1710184,1711343
 Since this is an \emph{ad-hoc} file format, an utility script to automatically generate this file from overlapping regions in two BED files was developed and is shipped together with DGW, so the end users do not have to adapt any of existing workflows to support this new format.
 
 \section{Structure of the software}
+\begin{figure}
+    \centering
+    \includegraphics[width=1.1\textwidth]{figures/implementation/DGW-worker-workflow.pdf}
+    \caption{Workflow of DGW-Worker submodule. First the datasets are read at the regions of interest specified by the user. Then, the resulting collection of alignment profilesi s filtered leaving only highly-expressed alignments. These alignments are then pre-processed by converting them to log-scale and, optionally, normalising their values. The module then performs pairwise alignments between the items in order to calculate the pairwise distance matrix, which is then used to compute the linkage matrix for hierarchical clustering. After that, prototypes for each of the possible clusters are calculated from this linkage matrix, and the data is projected onto these prototypes.}
+    \label{fig:implementation:dgw-worker-workflow}
+\end{figure}
+
 
 \section{Time Complexity challenges}
 \subsection{Native-C Modules}

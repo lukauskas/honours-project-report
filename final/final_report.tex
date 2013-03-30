@@ -539,9 +539,20 @@ From these figures, it is hard to spot the difference between prototypes generat
 \todo{Write about antisense regions correction}
 
 \chapter{Implementation Details}
-\todo{Mention and cite all the libraries DTW builds on}
+The algorithms described in the previous chapter were packaged into a software package, named Dynamic Genome Warping, or DGW for short. This section describes in detail the implementation of this software including its structure, interface and the solutions to key computational challenges faced.
+
+\section{Dependancies}
+The core of DGW package was written in Python 2.7\footnote{See Python's homepage for more information \url{http://www.python.org/}}. The developed software exploits the maturing scientific community around Python and builds upon a large variety of packages available.
+
+One of the core dependancies of DGW is the \verb"pandas" package available from \url{http://pandas.pydata.org/}. This package provides efficient, R-like data structures that are extremely easy to use. These data structures are used throughout the code to be able to store and manipulate the histone marks efficiently. 
+
+Packages in PyLab, namely \verb"numpy", \verb"scipy" and \verb"matplotlib" also play a very important role. Together these packages bring functionality of MATLAB\footnote{See \url{http://www.mathworks.co.uk/products/matlab/} for more information about MATLAB} to Python. The first package, \verb"numpy" provides efficient computational routines on arrays and matrices; the second package, \verb"scipy" has a majority of scientific procedures implemented, including the ones required for drawing and analysing dendrograms; whereas the third one, \verb"matplotlib" \cite{Hunter:2007ux}, handles all of the visualisation and plotting. \todo{Get a link when scipy.org is back}
+
+Daniel M\"ullner's \verb"fastcluster" package \cite{Mullner:2011wb}, is used for efficient computations
+of hierarchical clustering linkage matrices; and finally, \verb"pysam" (\url{https://code.google.com/p/pysam/}) provides a Python wrapper around the \verb"samtools" (\cite{Li:2009ka}) toolkit.
 
 \section{File formats}
+
 \subsection{BAM}
 \subsection{BED}
   

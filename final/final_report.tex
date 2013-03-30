@@ -207,7 +207,7 @@ Another, very recent paper by Bieberstein and colleagues\cite{Bieberstein:2012tf
 
 These two observations are the ones that motivate this project. This project aims to develop a method, that given a set of user-defined points of interest, such as peaks called by MACS or regions around known transcription start sites, would be able to clusters the marks that share similar patterns, so these patterns can then be explored in order to look for biological reason for them to occur.
 
-\subsection{Prior art}
+\section{Prior art}
 
 I have already mentioned the ChromaSig\cite{Hon:2008wv} approach earlier. In it's essence, it aligns various segments of genome to each other in order to find patterns that are common between them and then outputs the patterns that are shared in the genome the most. Another, a bit more recent approach \cite{Lai:2010ue}, uses a similar alignment method to output the best-possible alignment of ChIP-Seq patterns between the user defined regions so they can be compared visually or computationally.
 
@@ -563,7 +563,7 @@ DGW uses one of such CSV processing methods, that is implemented in \pythonpacka
 
 These two file formats are used for input to the software -- the ChIP-Seq datasets are expected to be in indexed BAM format, whereas the regions of interest to cluster are expected to be in BED format.
 
-DGW module also allows tracking of interesting locations both before and after the warping, for instance, tracking the locations of transcription start sites overlapping with clustered regions. In some cases there might be more than one such point to be tracked within some region, e.g. more than a single transcription start site overlapping some peak called by MACS. BED format does not support describing disjoint regions very intuitively, and therefore a simple \emph{ad-hoc} file format for defining such regions is used in DGW. Each line in this file format starts with the name of the region of interest that was clustered (e.g. name of the MACS peak), followed by a colon, followed by a list of comma-separated locations of points of interest within that region, for instance:
+DGW module also allows tracking of interesting locations both before and after the warping, for instance, tracking the locations of transcription start sites overlapping with clustered regions. In some cases there might be more than one such point to be tracked within some region, e.g. more than a single transcription start site overlapping some peak called by MACS. BED format does not support describing disjoint regions very intuitively, and therefore a simple file format for defining such regions is created to be used in DGW. Each line in this file format starts with the name of the region of interest that was clustered (e.g. name of the MACS peak), followed by a colon, followed by a list of comma-separated locations of points of interest within that region, for instance:
 
 \begin{verbatim}
 MACS_peak_84:1655238,1655387,1655705,1655696,1656202
@@ -572,7 +572,7 @@ MACS_peak_87:1689803
 MACS_peak_89:1709727,1710184,1711343
 \end{verbatim}
 
-The utility program that automatically generates such file from overlapping regions in two BED files is shipped together with the software, so the users do not have to worry about how to create these files.
+Since this is an \emph{ad-hoc} file format, an utility script to automatically generate this file from overlapping regions in two BED files was developed and is shipped together with DGW, so the end users do not have to adapt any of existing workflows to support this new format.
 
 \section{Structure of the software}
 

@@ -232,6 +232,7 @@ The later chapters give an in-depth overview of these methods.
 
 \chapter{Methods}
 \section{Dynamic Time Warping}
+\label{sec:DTW}
 
 \begin{figure}[b,t]
    \centering
@@ -547,11 +548,12 @@ The core of DGW package was written in Python 2.7\footnote{See Python's homepage
 
 One of the core dependancies of DGW is the \verb"pandas" package available from \url{http://pandas.pydata.org/}. This package provides efficient, R-like data structures that are extremely easy to use. These data structures are used throughout the code to be able to store and manipulate the histone marks efficiently. 
 
-Packages in PyLab, namely \pythonpackage{numpy}, \pythonpackage{scipy} and \pythonpackage{matplotlib} also play a very important role. Together these packages bring functionality of MATLAB\footnote{See \url{http://www.mathworks.co.uk/products/matlab/} for more information about MATLAB} to Python. The first package, \pythonpackage{numpy} provides efficient computational routines on arrays and matrices; the second package, \pythonpackage{scipy} has a majority of scientific procedures implemented, including the ones required for drawing and analysing dendrograms; whereas the third one, \pythonpackage{matplotlib} \cite{Hunter:2007ux}, handles all of the visualisation and plotting. \todo{Get a link when scipy.org is back}
+Packages in PyLab, namely \pythonpackage{numpy}, \pythonpackage{scipy} and \pythonpackage{matplotlib} also play a very important role. Together these packages bring functionality of MATLAB\footnote{See \url{http://www.mathworks.co.uk/products/matlab/} for more information about MATLAB} to Python. The first package, \pythonpackage{numpy} provides efficient computational routines on arrays and matrices; the second package, \pythonpackage{scipy} has a majority of scientific procedures implemented, including the ones required for drawing and analysing dendrograms; whereas the third one, \pythonpackage{matplotlib} \cite{Hunter:2007ux}, handles all of the visualisation and plotting. \todo{Get a link when scipy.org is back}.
 
 Daniel M\"ullner's \pythonpackage{fastcluster} package \cite{Mullner:2011wb}, is used for efficient computations
-of hierarchical clustering linkage matrices; and finally, \pythonpackage{pysam} (\url{https://code.google.com/p/pysam/}) provides a Python wrapper around the \emph{SAMtools} (\cite{Li:2009ka}) toolkit.
+of hierarchical clustering linkage matrices; and \pythonpackage{pysam} (\url{https://code.google.com/p/pysam/}) provides a Python wrapper around the \emph{SAMtools} (\cite{Li:2009ka}) toolkit.
 
+Finally, the implementation of DTW algorithm is based on \pythonpackage{mlpy} package \cite{Albanese:2012vf}. This package was extended to support variations of DTW algorithm, such as Sakoe \& Chiba band as described in \autoref{sec:DTW}. The package was modified to allow alignment of multidimensional data as well.
 \section{File formats}
 Since ENCODE project, \cite{Rosenbloom:2011gw} is probably the largest repository of genomic data to date, the formats of data that are used in this repository can be considered to be the industry standard. These formats are listed at the FAQ section on their website, \url{https://genome.ucsc.edu/FAQ/FAQformat.html}, most important ones, BAM and BED are described below.
 
@@ -575,14 +577,36 @@ MACS_peak_89:1709727,1710184,1711343
 Since this is an \emph{ad-hoc} file format, an utility script to automatically generate this file from overlapping regions in two BED files was developed and is shipped together with DGW, so the end users do not have to adapt any of existing workflows to support this new format.
 
 \section{Structure of the software}
+Dynamic Time Warping is an expensive distance metric to use, as the runtime of the algorithm scales quadratically with the length of the sequences. Combine that with tens of thousands regions of interest  that need to be compared to each other in order to hierarchically cluster them, and you will get a algorithm, that might take a long while to complete on your laptop. CPU-demanding software like this is not uncommon in the field of life sciences, due to the amount of data modern experiments can produce, and therefore a majority of these labs are equipped with a supercomputer.\todo{citation needed} 
+
+With this in mind, DGW is designed as a combination of two standalone modules: a computationally heavy module designed to be run on a supercomputer, and an exploratory module, that can analyse the results obtained from the worker module on a less-powerful computer.
+
+\subsection{The Worker Module}
 \begin{figure}
     \centering
     \includegraphics[width=1.1\textwidth]{figures/implementation/DGW-worker-workflow.pdf}
-    \caption{Workflow of DGW-Worker submodule. First the datasets are read at the regions of interest specified by the user. Then, the resulting collection of alignment profilesi s filtered leaving only highly-expressed alignments. These alignments are then pre-processed by converting them to log-scale and, optionally, normalising their values. The module then performs pairwise alignments between the items in order to calculate the pairwise distance matrix, which is then used to compute the linkage matrix for hierarchical clustering. After that, prototypes for each of the possible clusters are calculated from this linkage matrix, and the data is projected onto these prototypes.}
+    \caption{Workflow of \emph{DGW-Worker} submodule. The datasets are read at the regions of interest specified by the user. Then, the resulting collection of alignment profiles is filtered leaving only highly-expressed alignments. These alignments are then pre-processed by converting them to log-scale and, optionally, normalising their values. The module then performs pairwise alignments between the items in order to calculate the pairwise distance matrix, which is then used to compute the linkage matrix for hierarchical clustering. After that, prototypes for each of the possible clusters are calculated from this linkage matrix, and the data is projected onto these prototypes.}
     \label{fig:implementation:dgw-worker-workflow}
 \end{figure}
 
+\autoref{fig:implementation:dgw-worker-workflow} outlines the workflow of the worker module.
+The module first reads the regions of interest supplied by the user in a BED file. These regions are then divided into a set of bins of specified width (50 base pairs wide by default), and the histogram of number reads falling within those bins is computed, much like in \autoref{fig:background:chip-results}, to get a collection of profiles to be analysed. 
 
+These profiles are then filtered by keeping only the ones that have at least one bin with more than 10 reads falling into it. \todo{Maybe move this to preprocessing section in methods} This filtering removes a substantial part of the dataset and thus reduces the runtime significantly. The underlying assumption under it is that relatively unexpressed regions are not as interesting from the scientific point of view, and more prone to variations in patterns due to random noise. The resulting data is then converted to log scale and, optionally, normalised to be on the same scale. \todo{definitely need this in methods section}. At this point the alignments are ready for clustering. 
+
+\subsubsection{Clustering}
+During the clustering step, pairwise distances between each of the profiles are calculated.
+Since this is the most time-demanding step of the algorithm, an extra effort has been put to make the clustering as efficient as it gets. as efficient as it gets. To achieve this, the DTW clustering routines are implemented in native C. These native C modules are then called from Python code using the C-Extensions for Python suite (\url{http://www.cython.org/}). Native C code reduces the time required to compute the distance between two alignments from milliseconds to microseconds. Microseconds might not seem much, but the number of computations that are needed to compute the pairwise distance matrix is extraordinary. If the DTW distance computation on average takes around $161$ microseconds to complete for two sequences of length 80, computing the pairwise distances for $30000$ regions would take around $20$ hours to complete as there would be ${30000 \choose 2} \approx 4.5 \times 10^8$ comparisons to make. Fortunately, computation of pairwise distances is easy to parallelise as each computation is completely independent from the others.
+
+Python supports multithreading out of the box, however, there is a catch. The Global Interpreter Lock (GIL), prohibits more than one thread interacting with the Python interpreter. Unfortunately, this means that the multithreading module is only useful for off-loading long-running non-Python procedures, such as I/O waits to a separate thread. Due to this, instead of creating new threads, parallel programs in Python create new processes each having separate Python interpreters attached to them and therefore separate GILs. Such architecture, however, makes sharing of information between threads challenging.
+By default, Python copies the memory contents from the parent process to the child process. This behaviour is sufficient in nine cases out of ten, however, not this one. In DGW, the alignment profiles, once read, could take up to a few gigabytes of memory. While it is not uncommon today to see computers with 8 or more gigabytes of RAM that can easily fit datasets like this into memory, few computers could afford copying this dataset four or more times in the memory. With this in mind, DGW implementation is careful to share critical bits of memory between the processes so the same amount of memory is used when splitting the computation between the processes.
+
+This multiprocessing reduces the computational time needed by the number of processes used, usually upper-bounded by the number of CPUs in the computer. For instance, it would take eight times less to cluster the dataset on a machine with eight CPU cores, than it would take to cluster the same dataset on a computer with a single CPU only. 
+
+\subsubsection{Prototype Generation and Data Projection}
+
+
+ 
 \section{Time Complexity challenges}
 \subsection{Native-C Modules}
 \subsection{Parallel processing}
@@ -598,7 +622,6 @@ More precisely, 5 random transcription start sites that have their first exon in
 
 The regions where first exons lie were extended randomly to be up to 60 bins longer (that's up to $60x25=1500$ base pairs longer). The extension was performed by repeating the bins uniformly in the same order as to obtain the same mark within the exon, just stretched. A new dataset of size 500 was generated by performing these random permutations on the 5 seed regions. 
 These newly-generated regions were then randomly mutated, with probability of $0.33$, by changing a value of a data point, to some random value picked from the uniform distribution $U(0.5x, 1.5x)$ where $x$ is the previous value of the point. These newly-generated regions were then randomly reversed with probability of 50\% to generate data for antisense patterns.
-
 
 \begin{figure}[t,b]
     \centering
@@ -772,8 +795,6 @@ The results are visible in \autoref{fig:evaluation:macs-peaks}. \todo{Comment on
     
     
 \end{figure}
-
-
 
 
 \todo{Write a list of datasets somewhere in appendix}

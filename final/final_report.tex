@@ -178,10 +178,11 @@ The next chapter reviews the common computational approaches of exploring this d
 
 \chapter{Motivation}
 
-In one of the early reviews of ChIP-Seq, \cite{Park:2009wc}, P J Park already predicted data processing to be the major challenge of this technology. In this paper, he listed the common approaches to data processing at that time, most of which are still valid today.
+In one of the early reviews of ChIP-Seq, \cite{Park:2009wc}, P J Park already predicted data processing to be the major challenge of this technology, and therefore listed the most common approaches to data processing at that time. Most of these approaches are still valid to this date.
 
-For protein-DNA binding, he writes, the most common analysis is the discovery of binding sequence motifs. A large variety of methods in doing that are available to this day, probably the best-known one being MEME\cite{Grundy:1997vb}. In order to find these transcription factor binding sites, significantly enriched regions of the genome (so called "peaks") need to be located first. A variety of methods exist to aid this task. The probably best-known of them, MACS peak caller\cite{Zhang:2008wp}, has been used in one of the experiments performed for this project (\autoref{sec:macs-experiment})\todo{Explain how macs works if there is time}. Other methods of finding these enriched regions are summarised in a more recent review on ChIP-SEQ\cite{Furey:2012ha}.
+For protein-DNA binding, he writes, the most common analysis is the discovery of binding sequence motifs. A large variety of methods in doing that are available today, probably the best-known one being MEME\cite{Grundy:1997vb}.
 
+In order to find these transcription factor binding sites, significantly enriched regions of the genome (so called "peaks") need to be located first. MACS peak caller\cite{Zhang:2008wp} is probably the most popular method of doing this to date, even though a variety of methods exist (see \cite{Furey:2012ha} for a recent review). This peak caller has been used in one of the experiments in this paper (see \autoref{sec:macs-experiment}).\todo{Explain how macs works if there is time}
 
 \begin{figure}[p]
    \centering
@@ -192,7 +193,7 @@ For protein-DNA binding, he writes, the most common analysis is the discovery of
 \end{figure}
 
 For histone modification studies, an obvious approach, as claimed by P J Park, is to annotate the locations of these peaks relative to known genomic features. For instance, it has been observed
-that Histone Modifications have a very distinct bimodal marks near Transcription Start Sites on average\cite{Barski:2007ww}, as pictured in \autoref{fig:motivation:histone_profiles}. In these graphs, ``normalized counts" refers to the normalised number of reads obtained from ChIP-Seq experiment that overlap the bin around transcription start site. The authors also note that most of the marks, e.g.
+that Histone Modifications have a very distinct bimodal marks neartTranscription start sites on average\cite{Barski:2007ww}, as pictured in \autoref{fig:motivation:histone_profiles}. In these graphs, ``normalized counts" refers to the normalised number of reads obtained from ChIP-Seq experiment that overlap the bin around transcription start site. The authors also note that most of the marks, e.g.
 \histonemodification{H3K4me3} mark, correlate with the activity of genes being analysed: highly active genes (red in the figure) have more reads falling within the same region than intermediately active ones (green and blue).
 
 What is more interesting, however, is that these histone marks are so distinctive, that 
@@ -201,11 +202,11 @@ What is more interesting, however, is that these histone marks are so distinctiv
 There is also evidence that ChIP-Seq signal can tell us more than just the type of DNA region. In the same paper discussed earlier, \cite{Barski:2007ww}, the authors note: ``A series of peaks of H3K4me3 signals at +50, +210, and +360 were detected, suggesting similar nucleosome positioning relative to TSS in active genes"\footnote{Original citation has a typo and spells \emph{H4K4me3}, instead of \emph{H3K4Me3}}, these peaks can be seen in figure \autoref{fig:motivation:histone_profiles}. 
 This claim was later followed-up by \cite{Schmid:2007ue}, who were able to locate promoter-specific nucleosomes ``with unprecedented precision" from this ChIP-Seq data. 
 
-Another, more More recently, \cite{Bieberstein:2012tf} has shown that \histonemodification{H3K4me3} and \histonemodification{H3K9ac} profiles tend to peak at the locations of $5'$ splicing sites of known genes. The authors also conclude that these peaks are independent of nucleosome positioning, unlike the peaks observed by \cite{Barski:2007ww}.
+Another, very recent paper by Bieberstein and colleagues\cite{Bieberstein:2012tf} has shown that \histonemodification{H3K4me3} and \histonemodification{H3K9ac} profiles tend to peak at the locations of $5'$ splicing sites of known genes. The authors also conclude that these peaks are independent of nucleosome positioning, unlike the peaks observed by \cite{Barski:2007ww}.
 
 These two observations are the ones that motivate this project. This project aims to develop a method, that given a set of user-defined points of interest, such as peaks called by MACS or regions around known transcription start sites, would be able to clusters the marks that share similar patterns, so these patterns can then be explored in order to look for biological reason for them to occur.
 
-\subsection{Previous Approaches to this problem}
+\subsection{Prior art}
 
 I have already mentioned the ChromaSig\cite{Hon:2008wv} approach earlier. In it's essence, it aligns various segments of genome to each other in order to find patterns that are common between them and then outputs the patterns that are shared in the genome the most. Another, a bit more recent approach \cite{Lai:2010ue}, uses a similar alignment method to output the best-possible alignment of ChIP-Seq patterns between the user defined regions so they can be compared visually or computationally.
 

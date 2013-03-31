@@ -601,16 +601,42 @@ Since this is the most time-demanding step of the algorithm, an extra effort has
 Python supports multithreading out of the box, however, there is a catch. The Global Interpreter Lock (GIL), prohibits more than one thread interacting with the Python interpreter. Unfortunately, this means that the multithreading module is only useful for off-loading long-running non-Python procedures, such as I/O waits to a separate thread. Due to this, instead of creating new threads, parallel programs in Python create new processes each having separate Python interpreters attached to them and therefore separate GILs. Such architecture, however, makes sharing of information between threads challenging.
 By default, Python copies the memory contents from the parent process to the child process. This behaviour is sufficient in nine cases out of ten, however, not this one. In DGW, the alignment profiles, once read, could take up to a few gigabytes of memory. While it is not uncommon today to see computers with 8 or more gigabytes of RAM that can easily fit datasets like this into memory, few computers could afford copying this dataset four or more times in the memory. With this in mind, DGW implementation is careful to share critical bits of memory between the processes so the same amount of memory is used when splitting the computation between the processes.
 
-This multiprocessing reduces the computational time needed by the number of processes used, usually upper-bounded by the number of CPUs in the computer. For instance, it would take eight times less to cluster the dataset on a machine with eight CPU cores, than it would take to cluster the same dataset on a computer with a single CPU only. 
+This multiprocessing reduces the computational time by a factor equal to the number of processes used, usually upper-bounded by the number of CPUs in the computer. For instance, it would take eight times less to cluster the dataset on a machine with eight CPU cores, than it would take to cluster the same 
+dataset on a computer with a single CPU only. 
+
+The clustering step is completed by computing the hierarchical clustering linkage matrix. In order to do this, an efficient 
+algorithm from the \pythonpackage{fastcluster} package is used.
 
 \subsubsection{Prototype Generation and Data Projection}
 
+An important property of hierarchical clustering is that there will always be $n-1$ nodes in the resulting dendrogram, where $n$ is the number of elements being clustered. This means that there are at most $n-1$ distinct clusters possible from any particular clustering of data, therefore there will at most be $n-1$ cluster prototypes possible. The worker exploits this and computes all $n-1$ prototypes using the bottom-up algorithm described in \autoref{sec:prototypes}. 
 
- 
-\section{Time Complexity challenges}
-\subsection{Native-C Modules}
-\subsection{Parallel processing}
-\todo{Write about how expensive DTW is, write about what a pain is to do multiprocessing it in Python}
+\begin{figure}[t,b]
+   \centering
+   \begin{subfigure}[b]{0.45\textwidth}
+       \centering
+       \includegraphics[width=\textwidth]{figures/implementation/worst_case_linkage.png}
+       \caption{Worst case}
+       \label{fig:implementation:dendrogram:worst}
+   \end{subfigure}
+   \label{fig:implementation:dendrogram}
+   \caption{Illustration of best-case and worst-case linkage matrices that may result from clustering of eight items. The number above the horizontal nodes corresponds to the num
+   ~
+   \begin{subfigure}[b]{0.45\textwidth}
+       \centering
+       \includegraphics[width=\textwidth]{figures/implementation/perfect_linkage.png}
+       \caption{Best case}
+       \label{fig:implementation:dendrogram:best}
+   \end{subfigure}
+   ber of items in the cluster. The number on the right side shows the number of items per level.}
+\end{figure}
+
+In order to compute the warped dataset, DTW projection algorithm has to be run for each of the possible cluster prototypes. This sounds like a tedious task, and indeed, in the worst case,  where the nodes would form a structure pictured in \autoref{fig:implementation:dendrogram:worst}, this computation would take $\frac{1}{2} n(n+1) - 1$ operations to complete, what is a bit more than ${n \choose 2}$ operations needed to compute the pairwise distance matrix. On the other hand, in the best case where the $n-1$ nodes would form a perfect binary tree, as pictured in \autoref{fig:implementation:dendrogram:best}, only $O(n(log)n)$ DTW projection computations would be needed.
+
+Now, in the worst-case, the phenomenon of \emph{chaining} would force all of these $n-1$ clusters to line-up into $n-1$ distinct levels, as in \autoref{fig:implementation:dendrogram:worst}. 
+
+\subsection{Explorer module}
+
 
 \chapter{Results}
 Evaluation of results of clustering methods has always been a challenging problem. Since clustering, by definition, is unsupervised, there hardly is any ground truth on what the correct way of assigning data into clusters is. Some cluster assignments might be desired in some applications, others might be desired in completely different applications. Furthermore, there is the problem on where to cut the hierarchical clustering dendrogram at, \todo{Discuss this}that has already been discussed.

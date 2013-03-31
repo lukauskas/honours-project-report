@@ -254,7 +254,7 @@ The later chapters give an in-depth overview of these methods.
    \label{fig:DTW:alignments}
 \end{figure}
 
-\subsection{Unconstrained Dynamic Time Warping}
+\subsection{Canonical Dynamic Time Warping}
 
 Dynamic Time Warping (DTW) algorithm is the corner stone of the methods implemented in this project. This algorithm was initially developed in the speech recognition community in order to allow accurate comparisons between words spoken with tempo variations. 
 
@@ -364,7 +364,9 @@ This modified constraint is now always consistent, being in units of shorter seq
 \todo{Fill me in}
 
 \subsection{DTW projection}
-\label{sec:dtw:projection}
+
+\label{sec:dtw-projection}
+
 Just like one can project a vector in euclidean space to new basis, one can project some time series onto the time axis of another series with the help of DTW. 
 
 Given the original sequence $\mathbf{a}$ and the basis sequence $\mathbf{b}$, we can project $\mathbf{a}$ onto $\mathbf{b}$ by computing the warping path between the two sequences, 
@@ -636,8 +638,36 @@ On the other hand, in the best case where the $n-1$ nodes would form a perfect b
 
 The worker module exploits this and precomputes the DTW warping paths needed to project the dataset so the worker module does not have to. Computing these paths in the worker module has another advantage of the worker being able to parallelise these tasks within the multiple CPUs of the machine the code is being run on. Only the paths, and not the actual projections are computed, as the former takes up less memory to store. Also, having the precomputed paths allows the explorer module to be able to efficiently track locations of points-of-interest in the warped data, as described in the next section.
 
-\subsection{Explorer module}
+\subsection{The Explorer module}
 
+The explorer module is a complimentary module from DGW-worker. This module is responsible for
+visualising the results computed by the worker module.
+
+\begin{figure}[p]
+   \centering
+       \includegraphics[height=0.45\textheight]{figures/implementation/explorer/main-window.png}
+       
+   \caption{Annotated screenshot of the main window of DGW-Explorer application}
+   \label{fig:implementation:explorer:main}
+\end{figure}
+
+The main window of \emph{DGW-explorer} is shown in \autoref{fig:implementation:explorer:main}.
+Here the dendrogram and zoomable heatmap of the original dataset is shown. The user is able to select the dendrogram cut threshold by simply right-clicking anywhere on the dendrogram with her mouse. 
+The right-click was chosen instead of left-click in order to not interfere with the default zoom controls available in the bottom-left corner of \pythonpackage{matplotlib} windows. After the dendrogram is cut, a vertical line marking the threshold is drawn and the resulting clusters are immediately colour-coded, as seen in the figure. At this stage, pressing the \emph{Preview} button, brings the Cluster Previewer window up.
+
+\begin{figure}[p]
+    \centering
+    \includegraphics[height=0.45\textheight]{figures/implementation/explorer/previewer-window.png}
+    \caption{Annotated screenshot of the Cluster Previewer}
+    \label{fig:implementation:explorer:previewer}
+\end{figure}
+ 
+Cluster Previewer window is pictured in \autoref{fig:implementation:explorer:previewer}.
+This window previews the resulting clustering on a cluster-by-cluster basis. The top-left panel of the window shows the resulting cluster prototype. The original data is shown below it. This dataset is then projected onto the prototype using the DTW projection technique, described in the methods section. The user can navigate between the clusters by the help of \emph{Previous} and \emph{Next} buttons in the top-left corner of the window, or can choose to save the clusters to a set of BED files that can then be processed by other means, e.g. viewed in the Genome Browser (\cite{Kent:2002wd}).
+
+\subsubsection{Point-of-interest tracking}
+The warped heatmap is the most useful piece of information in this window. 
+In order to .... write about POI tracking HERE. \todo{TODO}
 
 \chapter{Results}
 Evaluation of results of clustering methods has always been a challenging problem. Since clustering, by definition, is unsupervised, there hardly is any ground truth on what the correct way of assigning data into clusters is. Some cluster assignments might be desired in some applications, others might be desired in completely different applications. Furthermore, there is the problem on where to cut the hierarchical clustering dendrogram at, \todo{Discuss this}that has already been discussed.

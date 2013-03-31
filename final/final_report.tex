@@ -619,8 +619,6 @@ An important property of hierarchical clustering is that there will always be $n
        \caption{Worst case}
        \label{fig:implementation:dendrogram:worst}
    \end{subfigure}
-   \label{fig:implementation:dendrogram}
-   \caption{Illustration of best-case and worst-case linkage matrices that may result from clustering of eight items. The number above the horizontal nodes corresponds to the num
    ~
    \begin{subfigure}[b]{0.45\textwidth}
        \centering
@@ -628,12 +626,15 @@ An important property of hierarchical clustering is that there will always be $n
        \caption{Best case}
        \label{fig:implementation:dendrogram:best}
    \end{subfigure}
-   ber of items in the cluster. The number on the right side shows the number of items per level.}
+   \label{fig:implementation:dendrogram}
+   \caption{Illustration of best-case and worst-case linkage matrices that may result from clustering of eight items. The number above the horizontal nodes corresponds to the number of items in the cluster. The number on the right side shows the number of items per level.}
 \end{figure}
 
-In order to compute the warped dataset, DTW projection algorithm has to be run for each of the possible cluster prototypes. This sounds like a tedious task, and indeed, in the worst case,  where the nodes would form a structure pictured in \autoref{fig:implementation:dendrogram:worst}, this computation would take $\frac{1}{2} n(n+1) - 1$ operations to complete, what is a bit more than ${n \choose 2}$ operations needed to compute the pairwise distance matrix. On the other hand, in the best case where the $n-1$ nodes would form a perfect binary tree, as pictured in \autoref{fig:implementation:dendrogram:best}, only $O(n(log)n)$ DTW projection computations would be needed.
+In order to compute the warped dataset, each element in each of the possible clusters of the dataset has to be projected onto the cluster prototype. This sounds like a tedious task, and indeed, in the worst case,  where the nodes would form a structure pictured in \autoref{fig:implementation:dendrogram:worst}, this computation would take $\frac{1}{2} n(n+1) - 1$ operations to complete, what is a bit more than ${n \choose 2}$ operations needed to compute the pairwise distance matrix. 
 
-Now, in the worst-case, the phenomenon of \emph{chaining} would force all of these $n-1$ clusters to line-up into $n-1$ distinct levels, as in \autoref{fig:implementation:dendrogram:worst}. 
+On the other hand, in the best case where the $n-1$ nodes would form a perfect binary tree, as pictured in \autoref{fig:implementation:dendrogram:best}, only $O(n \log n)$ DTW projection computations would be needed. Luckily, as the reader might remember from \autoref{sec:clustering}, the complete linkage criterion makes dendrograms like the one in \autoref{fig:implementation:dendrogram:worst} highly unlikely, and instead makes the dendrograms look closer to the one in \autoref{fig:implementation:dendrogram:best} on average. 
+
+The worker module exploits this and precomputes the DTW warping paths needed to project the dataset so the worker module does not have to. Computing these paths in the worker module has another advantage of the worker being able to parallelise these tasks within the multiple CPUs of the machine the code is being run on. Only the paths, and not the actual projections are computed, as the former takes up less memory to store. Also, having the precomputed paths allows the explorer module to be able to efficiently track locations of points-of-interest in the warped data, as described in the next section.
 
 \subsection{Explorer module}
 

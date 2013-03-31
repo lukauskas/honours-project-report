@@ -824,15 +824,22 @@ Looking at the DTW projections of the data onto these cluster prototypes in \aut
 
 \section{Clustering the Results of a Peak Caller}
 \label{sec:macs-experiment}
-Tests on a artificial benchmark have shown that the DGW algorithm is able to do what it says it does.
-However, is the performance of DGW on a real dataset. The DGW was evaluated in the following scenario. MACS peak caller \cite{Zhang:2008wp} was run on the Chip-Seq results for \histonemodification{H3K4Me3} marks in \celltype{K562} cell type. A control sample was used when calling for peaks as to anticipate between significant and insignificant peaks. The remaining parameters of MACS peak caller were left default.
+Tests on a artificial benchmark have shown that the DGW algorithm is able to do what it says on the label. However, this does not give any insights on the whether the method will prove useful for actual research. In order to test this, an experiment to simulate a likely research scenario was created.
 
-Peaks that are within 50bp of each other, were then merged together using {\\tt BEDTools} package\cite{Quinlan:2010ur}. Then, all transcription start sites and first splicing sites overlapping these regions were found and marked as points of interest. Regions that contain no first splicing sites in them were dropped.
+In this experiment, MACS peak caller with default configuration \cite{Zhang:2008wp} was run on the Chip-Seq results for \histonemodification{H3K4Me3} marks in \celltype{K562} cell type to generate a list of regions of interest. Data from control ChIP-Seq experiment was used to allow MACS anticipate between significantly and insignificantly enriched regions relative to the control.
 
-The datasets for \histonemodification{H3K4Me3} and \histonemodification{H3K9Ac} histone modifications for \celltype{K562} were obtained from ENCODE. These modifications were then clustered at the extracted regions of interest using DGW.
-The DGW parameters were set to have resolution of 50 base pairs per bin, use squared euclidean distance as a local distance measure, use slanted band constraint of size 12 (see \autoref{sec:slanted-band-constraint} for more information) and normalise the height of read pileups \todo{Need to write about this!}.
+The output of this peak caller was then preprocessed by joining together resulting regions that are within 50bp of each other, using {\\tt BEDTools} package \cite{Quinlan:2010ur}. 
+All transcription start sites and first splicing sites that overlap these regions were identified and compiled into a list of points of interest. Regions containing no such points of interest were dropped.
 
-The results are visible in \autoref{fig:evaluation:macs-peaks}. \todo{Comment on the results following the paper}.
+The datasets for \histonemodification{H3K4Me3} and \histonemodification{H3K9Ac} histone modifications, the same histone modifications that were observed to peak at first splicing sites by \cite{Bieberstein:2012tf}, were obtained from ENCODE.
+
+Histone marks at the regions of interest were then clustered by DGW at the resolution of 50 base pairs per bin. Squared euclidean distance was selected to be the local distance measure and slanted band constraint of width 12, as described in \autoref{sec:slanted-band-constraint} was chosen. The maximum histogram heights were all normalised to be equal to one\todo{Need to write about this!}.
+
+The results are shown in \autoref{fig:evaluation:macs-peaks}. \autoref{fig:evaluation:macs-peaks:cut} shows the resulting dendrogram and the cut that was made. Explorer window for one of the clusters is pictured in \autoref{fig:evaluation:macs-peaks:explorer}. Note the highly varying lengths of the peaks in the original data. \autoref{fig:evaluation:macs-peaks:warped-heatmap} shows enlarged heatmap of the data projected onto the cluster prototype. Here, the heatmap of the left represents the projected \histonemodification{H3K4Me3} mark, whereas the heatmap on the right corresponds to \histonemodification{H3K9Ac}. 
+
+Looking closely, it can be seen that the first splicing sites (marked in black) are aligned to the same location after warping. This alignment can also be seen in \autoref{fig:evaluation:macs-peaks:histogram-warped}. This figure plots the number of point-of-interest sites overlapping particular bin of the warped data, for each bin. The top row corresponds to the distribution of $5'$ splicing sites, whereas the bottom one corresponds to transcription start site distribution. From this figure, and from the heatmap, it is clear that not only first splicing sites are aligned, but also the transcription start site locations are aligned a few bins to the right from the $5'$ splicing site.
+
+This alignment is nowhere visible in the original data, as pictured in \autoref{fig:evaluation:macs-peaks:histogram-original}. In order to generate this histogram, the regions were stretched to match the length of the longest region first, using a procedure similar to the one used to stretch the exons. The distributions for these stretched regions were then computed in the same way as for warped data.
 
 \begin{figure}
     \centering
@@ -842,44 +849,35 @@ The results are visible in \autoref{fig:evaluation:macs-peaks}. \todo{Comment on
          \label{fig:evaluation:macs-peaks:cut}
     \end{subfigure}
     ~
-    \begin{subfigure}[b]{0.45\textwidth}
-        \includegraphics[width=\textwidth]{figures/evaluation/macs-peaks/dgw-explorer-cluster-35.pdf}
+    \begin{subfigure}[b]{0.5\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{figures/evaluation/macs-peaks/dgw-explorer-cluster-35.png}
         \caption{Explorer window for cluster 35}
         \label{fig:evaluation:macs-peaks:explorer}
     \end{subfigure}
     ~
-    \begin{subfigure}[b]{0.45\textwidth}
-        \includegraphics[width=\textwidth]{figures/evaluation/macs-peaks/dgw-cluster-35-original-heatmap.pdf}
-        \caption{Heatmap of the original data in the cluster}
-        \label{fig:evaluation:macs-peaks:original-heatmap}
-    \end{subfigure}
-    ~
-    \begin{subfigure}[b]{0.45\textwidth}
+    \begin{subfigure}[b]{0.8\textwidth}
         \includegraphics[width=\textwidth]{figures/evaluation/macs-peaks/dgw-cluster-35-warped-heatmap.pdf}
-        \caption{Heatmap of the cluster data projected onto the cluster prototype.}
+        \caption{Cluster data projected onto the cluster prototype. First splicing sites are marked in black, whereas the trasncription start sites are marked in white.}
         \label{fig:evaluation:macs-peaks:warped-heatmap}
     \end{subfigure}
     ~
-    \begin{subfigure}[b]{0.45\textwidth}
+    \begin{subfigure}[b]{0.3\textwidth}
+        \centering
         \includegraphics[width=\textwidth]{figures/evaluation/macs-peaks/cluster-35-histogram-clean.png}
-        \caption{Distribution of POI per bin before warping.}
+        \caption{Distribution of POI before warping.}
         \label{fig:evaluation:macs-peaks:histogram-original}
     \end{subfigure}
     ~
-    \begin{subfigure}[b]{0.45\textwidth}
+    \begin{subfigure}[b]{0.3\textwidth}
+         \centering
         \includegraphics[width=\textwidth]{figures/evaluation/macs-peaks/cluster-35-warped-histogram-clean.png}
-        \caption{Distribution of POI per bin after warping.}
+        \caption{Distribution of POI after warping.}
         \label{fig:evaluation:macs-peaks:histogram-warped}
     \end{subfigure}
     \caption{Results of clustering the peaks found by MACS peak caller. Transcription start sites are marked in white and the first splicing sites are marked in black in the heatmaps. The two histograms in \ref{fig:evaluation:macs-peaks:histogram-original} and \ref{fig:evaluation:macs-peaks:histogram-warped} show the distribution of the number of regions containing a transcription start site or a first splicing site in each of the bins. For original data, all regions were stretched to be of the same length before calculating the distributions.}
     \label{fig:evaluation:macs-peaks}
-
-    
-    
 \end{figure}
-
-
-\todo{Write a list of datasets somewhere in appendix}
 
 \chapter{Conclusions and Contributions}
 

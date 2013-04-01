@@ -601,7 +601,41 @@ Of course, as the reader might remember, usually only a short fragment of the DN
 Intuitively, the less reads collect to the same bin, the more likely this could have happened due to one kind of noise or another. Given a long-enough region, even in a setting where reads arrive to bins completely at random, there will be at least a few bins within that region that will have at least a few bins piled up. Even though these regions provide little meaning biologically, they still need the same amount of CPU operations to be processed as every other region. With this in mind, DGW employs a filtering strategy that automatically filters regions that do not have a single bin with more than 10 reads piled up inside. Again, as with other parameters this number can be easily changed by the user.
 
 \subsection{Pileup Height Normalisation}
-\todo{Write about why the height of pileups needs to be normalised.}
+\begin{figure}
+   \centering
+   \begin{subfigure}[b]{0.3\textwidth}
+       \includegraphics[width=\textwidth]{figures/methods/pileup_normalisation/mappings_x_1_5_x.pdf}
+       \caption{}
+       \label{fig:pileup_normalisation:mappings_unnormalised}
+   \end{subfigure}
+   ~
+   \begin{subfigure}[b]{0.3\textwidth}
+       \includegraphics[width=\textwidth]{figures/methods/pileup_normalisation/cost_x_1_5_x.pdf}
+       \caption{}
+       \label{fig:pileup_normalisation:cost_unnormalised}
+   \end{subfigure}
+   ~
+   \begin{subfigure}[b]{0.3\textwidth}
+       \includegraphics[width=\textwidth]{figures/methods/pileup_normalisation/cost_x_1_5_x_normalised.pdf}
+       \caption{}
+       \label{fig:pileup_normalisation:cost_normalised}
+   \end{subfigure}
+   \caption{DTW sensitivity to changes of scale. The number of reads falling to the region around transcription start site for \gene{uc003okl.3} was increased $1.5$ times. Even though this increase does not change the shape of the region (a), just the scale, the DTW distance between the original and modified regions has grown to $5411.5$ (b) which is about half of the distance between two distinct marks seen in \autoref{fig:DTW:sakoe_chiba}. A non-diagonal warping path between the regions can also be seen. After the pileup height normalisation, the distance is zero again and the path is diagonal (c).}
+   \label{fig:pileup_normalisation}
+\end{figure}
+
+DTW is sensitive to changes in scale, if the local distance measure is sensitive to changes of scale.
+In case of squared euclidean distance, it is very easy to artificially inflate the DTW warped distance between the two regions. For instance, consider the same region used in \autoref{fig:DTW:sakoe_chiba}. If one was to multiply all the bin counts by $1.5$, the underlying shape of the region will not change, however, as pictured in figures \ref{fig:pileup_normalisation:mappings_unnormalised} and \ref{fig:pileup_normalisation:cost_unnormalised}, the DTW distance will increase dramatically.
+
+In some settings, such as when we are comparing \histonemodification{H3K4Me3} marks at the $5'$ splicing sites, this is not desirable. In cases like this, where we are comparing only the shape of the mark, and not the expression value of the regions, it is desirable to have the scale normalised.
+
+DGW performs this normalisation by dividing all of the regions by the height of the maximum pileup.
+That is, if we thought the mark as of a vector $\mathbf{x}$, then the normalisation equation could be written as:
+\begin{equation}
+   \mathbf{x}_{norm} = \frac{\mathbf{x}}{max (\mathbf{x})}
+\end{equation}
+
+After the normalisation the bin with the highest number of reads in it, will always have a value equal to $1$, so the bins will be compared at the same scale. One can see the normalisation turning the distance between the original and modified regions to zero again in \autoref{fig:pileup_normalisation:cost_normalised}.
 
 \chapter{Implementation Details}
 The algorithms described in the previous chapter were packaged into a software package, named Dynamic Genome Warping, or DGW for short. This section describes in detail the implementation of this software including its structure, interface and the solutions to key computational challenges faced.

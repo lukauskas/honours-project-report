@@ -147,6 +147,7 @@ The short-sequenced reads can then be put together via the overlapping fragments
 rather to study the DNA itself.
 
 \section{ChIP-Sequencing}
+\label{sec:chip}
 
 \begin{figure}
 \centering
@@ -173,7 +174,7 @@ Figure \ref{fig:background:chip-results} shows a typical result of ChIP-Sequenci
 The aligned reads from the experiment are pictured as rectangles below the histogram. ChIP-Seq DNA fragments are usually sequenced for a fixed amount of base pairs (e.g. 26) from $5'$ end only\cite{Park:2009wc}. Due to this, it is beneficial to have directionality associated with ChIP-Seq
 reads, depending on which of the two strands happened to be sequenced, so the short reads could be artificially extended later on. These directionalities of reads are indicated by the colour of the rectangle in the figure. 
 
-The aligned reads are then stacked together to generate a landscape of target protein enrichment, seen as the histogram in the figure \ref{fig:background:chip-results}. These enrichment landscapes, often just referred as to just ``marks", are then analysed computationally in order to gain insights on the role these proteins play in the living organisms.
+The aligned reads are then stacked together into a histogram, creating a landscape of target protein enrichment, as seen in \autoref{fig:background:chip-results}. These enrichment landscapes, often just referred as to just ``marks", are then analysed computationally in order to gain insights on the role these proteins play in the living organisms. Even though these marks are technically histograms of reads falling within the region, they are commonly treated and visualised as continuous functions, for the sake of simplicity.
 
 Chapter \ref{cha:motivation} reviews the common computational approaches of exploring this data, as well as gives motivation on the approach taken by the author.
 
@@ -314,10 +315,9 @@ The highest points are now mapped to each other, so are the other points that ar
    \caption{Result of DTW distance calculation on the \histonemodification{H3K4Me3} Activation profiles around transcription start sites for two genes,  \gene{uc003okl.3} and \gene{uc021uwd.1}.}
    \label{fig:DTW:std}
 \end{figure}
-\todo{Make sure to explain what gene names mean}
 
 In some cases, warping the time axis arbitrarily might not necessarily be a correct thing to do.
-For instance, have a look at \autoref{fig:DTW:std}. Here DTW is used to compare the \histonemodification{H3K4Me3} activation profiles around transcription start sites (TSS) of two genes, \gene{uc003okl.3} and \gene{uc021uwd.1}. We can immediatelly see that first activation profile appears to be unimodal, whereas the second one is clearly bimodal. The minimal warping path maps a relatively inactive region from around bin 40 to around bin 80 in the series for \gene{uc003okl.3} to a single point on the series for \gene{uc021uwd.1}. However, this unexpressed region might have biological significance, e.g. \todo{double check if this is actually true} indicate removal of a nucleosome and we might not want to allow it to be compressed to a single point. 
+For instance, have a look at \autoref{fig:DTW:std}. Here DTW is used to compare the \histonemodification{H3K4Me3} activation profiles around transcription start sites (TSS) of two genes, \gene{uc003okl.3} and \gene{uc021uwd.1}. We can immediatelly see that first activation profile appears to be unimodal, whereas the second one is clearly bimodal. The minimal warping path maps a relatively inactive region from around bin 40 to around bin 80 in the series for \gene{uc003okl.3} to a single point on the series for \gene{uc021uwd.1}. However, this unexpressed region might have biological significance, e.g. indicate removal of a nucleosome, and we might not want to allow it to be compressed to a single point. 
 
 We can manually impose restrictions on warping paths that are allowed by introducing global constraints. The two most commonly used global constraints on DTW are Sakoe-Chiba Band and Itakura parallelogram\citep{Ratanamahatana:2004wu}.
 
@@ -370,9 +370,30 @@ The new constraint always assumes that the first sequence is longer than the sec
 
 This modified constraint is now always consistent, being in units of shorter sequence, and defined for all possible sequences.
 
-\subsection{Constant-Penalty DTW}
+\subsubsection{Correction for Antisense Regions}
+\begin{figure}
+    \centering
+    \begin{subfigure}[b]{0.3\textwidth}
+         \centering
+         \includegraphics[width=\textwidth]{figures/DTW/forward_strand.pdf}
+         \caption{Forward strand}
+         \label{fig:DTW:antisense_comparison:forward}
+    \end{subfigure}
+    ~
+    \begin{subfigure}[b]{0.3\textwidth}
+         \centering
+         \includegraphics[width=\textwidth]{figures/DTW/reverse_strand.pdf}
+         \caption{Reverse strand}
+         \label{fig:DTW:antisense_comparison:reverse}
+    \end{subfigure}
+    \caption{\histonemodification{H3K4Me3} profiles for regions around transcription start sites within ENCODE pilot regions \cite{ENCODEProjectConsortium:2007fu}. Genes known to be transcribed on the forward strand are pictured in (a), whereas genes known to be transcribed on the reverse strand are pictured in (b). Note the symmetry between these marks.}
+    \label{fig:DTW:antisense_comparison}
+\end{figure}
 
-\todo{Fill me in}
+\autoref{fig:DTW:antisense_comparison} shows the average profiles of regions around annotated transcription start sites in the ENCODE pilot regions of the genome \cite{ENCODEProjectConsortium:2007fu}. The average patterns are evidently symmetrical along the horizontal axis.
+Even though this directionality is generally known for patterns around well-annotated regions, such as the transcription start sites, the directionality for other regions of interest, such as peaks found by a peak caller, is rarely known.  With this in mind, every DTW comparison is actually made twice: once as described in previous sections, and once with one of the patterns reversed. The smaller distance between the two is then returned as the true distance between patterns. 
+
+Of course, DGW also supports an option to turn this behaviour off, in case we would like to force the different strands into different clusters, or an option to use the annotated strandedness, if it is provided.
 
 \subsection{DTW projection}
 
@@ -549,9 +570,38 @@ Now it is obvious to see how such averaging method would create paths that are g
 
 From these figures, it is hard to spot the difference between prototypes generated by SDTW and Standard methods in this particular case. Surprisingly, I did not find any but miniscule improvements SDTW makes to the end result of cluster prototype along the whole hierarchical clustering tree. These improvements seem not worth the extra overhead incurred by the clever treatment of these path changes, and therefore the DGW uses standard path averaging by default (though the user is able to override this, if she wants to).
 
+\section{Reading and Preprocessing Data}
 
-\section{Biologically Relevant Heuristics}
-\todo{Write about antisense regions correction}
+\begin{figure}
+   \centering
+   \copyrightbox{
+   \begin{subfigure}[b]{0.3\textwidth}
+       \includegraphics[width=\textwidth]{figures/methods/reading/read-shift.png}
+       \caption{}
+       \label{fig:methods:reading:shifts:broken}
+   \end{subfigure}
+   ~
+   \begin{subfigure}[b]{0.3\textwidth}
+       \includegraphics[width=\textwidth]{figures/methods/reading/read-shift-extended.png}
+       \caption{}
+       \label{fig:methods:reading:shifts:fixed}
+   \end{subfigure}
+   }
+   {Inspired by a similar figure in \cite{Park:2009wc}.} 
+   \caption{Illustration of the reasoning for extending the ChIP-Seq aligned reads. The DNA attached to the protein is pictured in grey, while the sequenced reads are pictured as coloured rectangles. In general, these short sequenced reads will not capture the true structure of the DNA that is bound to protein, as seen in (a). This can be mitigated by extending these reads to some length after the alignment, as shown in (b).}
+    \label{fig:methods:reading:shifts}
+\end{figure}
+
+
+As previously mentioned in \autoref{sec:chip}, the result of ChIP-Seq experiment is a collection of short reads that are aligned to the reference genome, as pictured in \autoref{fig:background:chip-results}. In order to compute the activation profiles, each of the regions of interest are split into a series of bins of equal width. This bin width is simply referred to as \emph{read resolution}. The number of reads that falling within these bins is then counted to produce the activation mark.
+
+Of course, as the reader might remember, usually only a short fragment of the DNA attached to the target protein is sequenced. In some cases, these short reads will not be able to capture the true distribution of DNA attached to the target proteins, as pictured in \autoref{fig:methods:reading:shifts:broken}. Extending the reads seems to reduce this problem, as pictured in \autoref{fig:methods:reading:shifts:fixed}, therefore DGW extends the reads to be 200 bp before estimating the profiles.
+
+\subsection{Highest Pileup Filter}
+Intuitively, the less reads collect to the same bin, the more likely this could have happened due to one kind of noise or another. Given a long-enough region, even in a setting where reads arrive to bins completely at random, there will be at least a few bins within that region that will have at least a few bins piled up. Even though these regions provide little meaning biologically, they still need the same amount of CPU operations to be processed as every other region. With this in mind, DGW employs a filtering strategy that automatically filters regions that do not have a single bin with more than 10 reads piled up inside. Again, as with other parameters this number can be easily changed by the user.
+
+\subsection{Pileup Height Normalisation}
+\todo{Write about why the height of pileups needs to be normalised.}
 
 \chapter{Implementation Details}
 The algorithms described in the previous chapter were packaged into a software package, named Dynamic Genome Warping, or DGW for short. This section describes in detail the implementation of this software including its structure, interface and the solutions to key computational challenges faced.
@@ -888,3 +938,4 @@ This alignment is nowhere visible in the original data, as pictured in \autoref{
 \todo{Include both papers}
 
 \end{document}
+q

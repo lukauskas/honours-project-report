@@ -8,6 +8,7 @@
 \usepackage{amsmath}
 \usepackage{copyrightbox}
 \usepackage{forloop}
+\usepackage{pdfpages}
 
 \DeclareMathOperator*{\argmax}{arg\,max}
 \DeclareMathOperator*{\argmin}{arg\,min}
@@ -708,6 +709,7 @@ The clustering step is completed by computing the hierarchical clustering linkag
 algorithm from the \pythonpackage{fastcluster} package is used.
 
 \subsubsection{Prototype Generation and Data Projection}
+\label{sec:prototypes}
 
 An important property of hierarchical clustering is that there will always be $n-1$ nodes in the resulting dendrogram, where $n$ is the number of elements being clustered. This means that there are at most $n-1$ distinct clusters possible from any particular clustering of data, therefore there will at most be $n-1$ cluster prototypes possible. The worker exploits this and computes all $n-1$ prototypes using the bottom-up algorithm described in \autoref{sec:prototypes}. 
 
@@ -1046,12 +1048,41 @@ These lines might indicate nucleosome positioning, at these locations, but are n
 
 \chapter{Conclusions}
 
+In conclusion, the project aimed to develop a method that would allow clustering of the epigenetic marks from next-generation sequencing experiments. The proposed new method, called Dynamic Genome Warping (DGW), combines Dynamic Time Warping, a well-established method from speech recognition community, with hierarchical clustering to group similar histone marks together.
+
+A software package that implements this method efficiently has been released to the Python Package Index (\url{https://pypi.python.org/pypi}). The source code is also made public via Github (\url{http://sauliusl.github.com/dgw/}).
+
+Perhaps more importantly, pilot experiments have proved this method to able to align the distinct epigenetic marks present near $5'$ splicing sites (\cite{Bieberstein:2012tf}) without supervision. 
+The warped data projections have been shown to ease visual inspection of the regions, allowing hypotheses about their origin to be made.
+
+This project is rather limited on the possible biological applications of this method, due to the fact that the author does not have any formal qualifications in biology. Nevertheless, the applications of this method are by no means limited to studying ChIP-Seq data. In order to be able to harvest the full potential of this method it needs to be evangelised across the field first. Some work on this has already been done. 
+
+Specifically, the project is agreed to be presented in the poster session of \emph{The Next NGS Challenge: Data Processing and Integration} conference (\url{http://www.thenextngschallenge.org/}). Furthermore, an application note describing the method has also been submitted to \emph{Bioinformatics} (published by Oxford University Press) and is currently under the peer review. This application note is attached in the appendix.
+
+With a bit of luck, the research community will find this way of looking to ChIP-Seq data interesting, and will be able to generate useful insights out of it. 
+
+Unavoidably, as with all software, DGW will have to be continuously maintained to suit the needs of the growing user base.
+
+The method itself could also be subject of further improvements. 
+In the author's opinion further research on improving the dendrogram cutting mechanism. This could be achieved by either providing meaningful guidance on what the best cut is, or by defining a metric upon which the cluster assignments could be automated.
+
+Future research may also focus on improving the prototyping algorithm, either by getting closer to the true centroid sequence, or by finding a more intelligent way of dealing with the prototype length problem, described in \autoref{sec:prototypes}. \todo{make sure I describe it !}
+
+Finally, further research might focus on different uses of this method. For instance, instead of
+looking for a way to group similar patterns within the regions of interest into clusters, a similar
+method could be used to look for motifs that are warped by the algorithm very little, or not warped at all. This is essentially the idea behind the ChromaSig approach described earlier \cite{Hon:2008wv}. Similarly, regions of the genome that are almost always warped to a shorter region, would be also interesting to study as to find the reason why.
+
+\todo{end with a bang}
 
 \bibliographystyle{alpha}
 \bibliography{papers2}
 
 \appendix
-\chapter{Supplementary figures}
+\chapter{Application Note About This Project}
+The application note that has been submitted to \emph{Bioinformatics} (Oxford University Press) is attached to the subsequent pages of this appendix.
+
+\includepdf[pages={2-3}]{appendix/dgw_paper.pdf}
+
 \label{sec:supplementary-figures}
 
 

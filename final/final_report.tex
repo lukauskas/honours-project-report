@@ -169,72 +169,76 @@ The aligned reads are then stacked together into a histogram, creating a landsca
 
 Chapter \ref{cha:motivation} reviews the common computational approaches of exploring this data, as well as gives motivation on the approach taken by the author.
 
-\section{Publicly available Datasets}
+\subsection{Publicly available Datasets}
 \label{sec:datasets}
 
-Before jumping to the motivation for the project, it is important to explain the available datasets for 
-studying these histone modifications.
+Before jumping to the motivation for the project, it is important to note the publicly available datasets of ChIP-Seq experiment results.
 
-The Encyclopedia of DNA elements, ENCODE, \cite{TheENCODEProjectConsortium:2004db} has compiled a large collection of histone modification data from the ChIP-Seq experiments performed by the Broad Institute (\url{https://www.broadinstitute.org/}). This data is publicly available to download and use from the ENCODE website at \url{http://genome.ucsc.edu/cgi-bin/hgFileUi?db=hg19&g=wgEncodeBroadHistone}. 
-The data from the ChIP-Seq experiments on the K562 leukemia cell line is used in this project, unless explicitly stated otherwise.
+The Encyclopedia of DNA elements, ENCODE, \cite{TheENCODEProjectConsortium:2004db} has compiled a large collection of histone modification data from the Broad Institute (\url{https://www.broadinstitute.org/}). This data is publicly available to download and use via the ENCODE website at \url{http://genome.ucsc.edu/cgi-bin/hgFileUi?db=hg19&g=wgEncodeBroadHistone}. 
 
-ENCODE project also provides annotations for genomic locations, via their table browser (\url{http://encodeproject.org/cgi-bin/hgTables}). UCSC Known Genes track \cite{Hsu:2006dh} (hg19 assembly) is used in this project to provide annotations of the locations of transcription start sites and first splicing sites for all known genes. Unique 10-character ids, e.g. \gene{uc003vhn.1}, that are associated with each of the rows of this dataset, are often referenced within this report when talking about particular regions within the genome. These unique locations can then be explored using the UCSC Genome browser \cite{Kent:2002wd}, if desired.
+This project uses these publicly available datasets in all of it's experiments and some of the figures. Unless explicitly stated otherwise, the ENCODE ChIP-Seq datasets for K562 leukaemia cell line are used in this project.
+
+Whenever the annotated locations of known genes, transcription start sites, and first-splicing sites are used, they are used from the UCSC Known Genes collection \cite{Hsu:2006dh} (hg19 assembly), and are free to download via the ENCODE table browser. 
+
+This track assigns a unique 10-character id, e.g. \gene{uc003vhn.1}, for each of the genes and their variants. These identifiers are referenced in the text of the report whenever possible, and they can be used to query the UCSC Genome browser \cite{Kent:2002wd} directly, if it is desired.
 
 \chapter{Motivation}
 \label{cha:motivation}
 
-In one of the early reviews of ChIP-Seq, \cite{Park:2009wc}, P J Park already predicted data processing to be the major challenge of this technology, and therefore listed the most common approaches to data processing at that time. Most of these approaches are still valid to this date.
+In one of the early reviews of ChIP-Seq, \cite{Park:2009wc}, P J Park already predicted data processing to be the major challenge of this technology, and therefore listed the most common approaches to data processing at that time. Almost four years later today, most of these approaches still remain valid.
 
-For protein-DNA binding, he writes, the most common analysis is the discovery of binding sequence motifs. A large variety of methods in doing that are available today, probably the best-known one being MEME\cite{Grundy:1997vb}.
+For protein-DNA binding, he writes, the most common analysis is the discovery of the short segments of DNA the protein is most likely to bind to, so called binding sequence motifs. A large variety of methods to do that are available today, probably the best-known one being MEME \cite{Grundy:1997vb}.
 
-In order to find these transcription factor binding sites, significantly enriched regions of the genome (so called "peaks") need to be located first. MACS peak caller\cite{Zhang:2008wp} is probably the most popular method of doing this to date, even though a variety of methods exist (see \cite{Furey:2012ha} for a recent review). This peak caller has been used in one of the experiments in this paper (see \autoref{sec:macs-experiment}).\todo{Explain how macs works if there is time}
+In order to find these transcription factor binding sites, significantly enriched regions of the genome (so called "peaks") need to be located first. MACS peak caller \cite{Zhang:2008wp} is probably the most popular method of doing this to date, even though a variety of methods exist (see \cite{Furey:2012ha} for a recent review).
 
 \begin{figure}[p]
    \centering
    \copyrightbox{\includegraphics[width=\textwidth]{figures/motivation/barski-histone-modifications-around-tss.jpeg}}
    {Reproduced from Cell, 129, Artem Barski, Suresh Cuddapah, Kairong Cui, Tae-Young Roh, Dustin E. Schones, Zhibin Wang, Gang Wei, Iouri Chepelev and Keji Zhao, High-Resolution Profiling of Histone Methylations in the Human Genome\cite{Barski:2007ww}, p. 826, Copyright 2007, with permission from Elsevier}
-   \caption{Profiles of histone marks around known transcription start sites. The profiles for highly active, two stages of intermediately active and silent genes are colour-coded. The histone modification is shown on top of each plot. The results were compiled by \cite{Barski:2007ww}.}
+   \caption{Profiles of histone marks around known transcription start sites. The profiles for highly active, two stages of intermediately active and silent genes are colour-coded. The histone modification is shown on top of each plot. ``Normalized counts" on the Y axes refers to the normalised number of reads obtained from ChIP-Seq experiment that overlap a particular bin. The results were compiled by \cite{Barski:2007ww}.}
     \label{fig:motivation:histone_profiles}
 \end{figure}
 
 For histone modification studies, an obvious approach, as claimed by P J Park, is to annotate the locations of these peaks relative to known genomic features. For instance, it has been observed
-that Histone Modifications have a very distinct bimodal marks neartTranscription start sites on average\cite{Barski:2007ww}, as pictured in \autoref{fig:motivation:histone_profiles}. In these graphs, ``normalized counts" refers to the normalised number of reads obtained from ChIP-Seq experiment that overlap the bin around transcription start site. The authors also note that most of the marks, e.g.
+that, on average, histone modifications have very distinct bimodal marks near transcription start sites  \cite{Barski:2007ww}, as pictured in \autoref{fig:motivation:histone_profiles}. The authors also note that most of the marks, e.g.
 \histonemodification{H3K4me3} mark, correlate with the activity of genes being analysed: highly active genes (red in the figure) have more reads falling within the same region than intermediately active ones (green and blue).
 
-What is more interesting, however, is that these histone marks are so distinctive, that 
+What is more interesting, these histone marks are so distinctive, that 
 \cite{Heintzman:2007ke} were able to predict locations of regions that both initiate (promote) and enhance transcription of DNA by training a classifier on the histone marks around known promoter and enhancer regions. Later, \cite{Hon:2008wv} developed a method, ChromaSig, that was able to find these promoter and enhancer signatures in a completely unsupervised way.
 
-There is also evidence that ChIP-Seq signal can tell us more than just the type of DNA region. In the same paper discussed earlier, \cite{Barski:2007ww}, the authors note: \todo{Note somewhere that this can be done \emph{visually}}``A series of peaks of H3K4me3 signals at +50, +210, and +360 were detected, suggesting similar nucleosome positioning relative to TSS in active genes"\footnote{Original citation has a typo and spells \emph{H4K4me3}, instead of \emph{H3K4Me3}}, these peaks can be seen in figure \autoref{fig:motivation:histone_profiles}. 
-This claim was later followed-up by \cite{Schmid:2007ue}, who were able to locate promoter-specific nucleosomes ``with unprecedented precision" from this ChIP-Seq data. 
+There is also evidence that ChIP-Seq signal can tell us more than just the type of DNA region. In the same paper, \cite{Barski:2007ww}, the authors note: ``A series of peaks of H3K4me3 signals at +50, +210, and +360 were detected, suggesting similar nucleosome positioning relative to TSS in active genes"\footnote{Original citation has a typo and spells \emph{H4K4me3}, instead of \emph{H3K4Me3}}, these peaks can be seen in figure \autoref{fig:motivation:histone_profiles}. This claim was later followed-up by \cite{Schmid:2007ue}, who were able to locate promoter-specific nucleosomes ``with unprecedented precision" from this ChIP-Seq data.
 
 Another, very recent paper by Bieberstein and colleagues\cite{Bieberstein:2012tf} has shown that \histonemodification{H3K4me3} and \histonemodification{H3K9ac} profiles tend to peak at the locations of $5'$ splicing sites of known genes. The authors also conclude that these peaks are independent of nucleosome positioning, unlike the peaks observed by \cite{Barski:2007ww}.
 
-These two observations are the ones that motivate this project. This project aims to develop a method, that given a set of user-defined points of interest, such as peaks called by MACS or regions around known transcription start sites, would be able to clusters the marks that share similar patterns, so these patterns can then be explored in order to look for biological reason for them to occur.
+An important point to take away from these two results is that insights to underlying biological processes can be produced from the visual inspection of these histone marks. This observation is the main source of motivation for this project. The ultimate goal of this project is to develop a tool that would allow to group similar patterns into clusters and provide means to visually compare these patterns on a common ground, so hypotheses about their origin could be made.
 
 \section{Prior art}
 
-I have already mentioned the ChromaSig\cite{Hon:2008wv} approach earlier. In it's essence, it aligns various segments of genome to each other in order to find patterns that are common between them and then outputs the patterns that are shared in the genome the most. Another, a bit more recent approach \cite{Lai:2010ue}, uses a similar alignment method to output the best-possible alignment of ChIP-Seq patterns between the user defined regions so they can be compared visually or computationally.
+There have been a few prior attempts at clustering these histone marks.
+The already mentioned ChromaSig method (\cite{Hon:2008wv}) aims to find the patterns that commonly occur in the genome, by aligning various segments of genome to each other. Another paper, \cite{Lai:2010ue}, uses a similar alignment method to align patterns from user-supplied regions in the genome, so they can then be visually compared on the same ground.
 
-While these methods could align the peaks that occur due to nucleosome positioning, as nucleosome size is constant around the genome, both of them would fail align the patterns around $5'$ splicing site that are described in \cite{Bieberstein:2012tf}. The reason for this is that the position of $5'$ splicing site depends on the length of the first exon of a gene, which in turn varies a lot from one gene to another. 
+While both of these methods would probably succeed in detecting the patterns that occur at relatively uniform intervals, e.g. patterns that occur due to nucleosome positioning, both of them would struggle to provide the splicing site insights documented in \cite{Bieberstein:2012tf}. The vastly varying lengths of first exons call for non-linear scaling of the genomic regions to align them.
 
-Also, in some cases, using a window-based approach and one-to-one alignment between patterns, does not make any sense at all. For instance, if one was comparing genes, which differ vastly in length, it makes little sense to compare the full length of one gene, to a small part of some other gene. This is the reason why some studies, e.g. \cite{Taslim:vj}, rescale the regions of interest to be of the same length, before doing clustering. This could indeed detect similar patterns that vary in length, however such approach is vulnerable to misalignment -- a problem window-based alignment methods solve pretty well.
+Also, in some cases, alignment without any kind of scaling, does not make any sense at all. For instance, if one was about to compare the regions spanning whole lengths of known genes, the best these methods could do is to compare a small fragment of the longer gene to the complete length of the shorter one, which is not necessarily the correct thing to do. 
 
-An interesting approach on this problem is taken by Wang et al.\citep{Wang:2012cb}. 
-Their method is based on the methods developed for sequence alignment.
-The algorithm they propose, ChAT, tries to find the best alignment between two patterns before doing any clustering, just as ChromaSig or ArchAlign, yet it allows to ignore a part of some region as if it was not there. The authors of the paper claim that these gaps ``are critical because they allow the algorithm to extend beyond regions with variant (or diffuse) chromatin enrichment signatures, and in so doing facilitate the discovery of chromatin signatures that span long genomic regions as well as those with complex multi-modal patterns of histone modification enrichment". 
+This is the reason why some studies, e.g. \cite{Taslim:vj}, rescale the regions of interest to be of the same length, before doing clustering. This could indeed allow visualisation of similar patterns between the different regions, provided that these patterns scale linearly with the length of the regions. However, most likely this is not the case, and non-uniform scaling is needed.
 
-This, in fact, is a very similar approach to the one taken in this project. The main difference is that when creating gaps, ChAT algorithm applies a penalty that is proportional to the norm of the vector that is being skipped. Such penalty biases the algorithm to skip unexpressed regions more than expressed ones as per reasoning that depleted regions are not as interesting as the expressed ones. 
+Essentially, this problem of comparing genomic patterns of varying lengths is very similar to the problem of comparing waveforms of spoken words in speech recognition. 
+For instance, it is desired to identify two words being the same even though the recording for one of them started, say half a second later. Equivalently, it is desired to detect patterns that are similar, but misaligned. Furthermore, a good speech recognition system would be able to recognise a word correctly even though the speaker prolonged one of the vowels in the word more than it usual, what is similar to patterns that are influenced by the length of the first exon.
+
+Fortunately, the speech recognition community has already matured an approach to this problem. This approach, called Dynamic Time Warping (or simply, DTW), compares two sequences by shrinking or expanding both of them non-uniformly to be as similar as possible. This non-linear warping can then both account for misalignment, by shrinking the misaligned part of one of the sequences, and scaled patterns, by rescaling them to be of the same length. This method is the corner stone of this project.
+
+A paper by Wang et al. \citep{Wang:2012cb} proposes a similar method, they call ChAT.
+Their method tries to find the best alignment between two patterns before doing any clustering, just as ChromaSig or ArchAlign, yet it allows to ignore a part of some region as if it was not there. The authors of the paper claim that these gaps ``are critical because they allow the algorithm to extend beyond regions with variant (or diffuse) chromatin enrichment signatures, and in so doing facilitate the discovery of chromatin signatures that span long genomic regions as well as those with complex multi-modal patterns of histone modification enrichment". 
+
+The main difference between the method used in this project and the one used by Wang et al. is that when creating gaps, ChAT algorithm applies a penalty that is proportional to the norm of the vector that is being skipped. Such penalty biases the algorithm to skip unexpressed regions more than expressed ones as per reasoning that depleted regions are not as interesting as the expressed ones. 
 While this penalty allows the discovery of multi-modal patterns separated by depleted regions across genome as the authors claim, it would heavily penalise any attempts to discover highly-expressed patterns of varying lengths.
 
-The intuition behind the methods proposed in this project comes from realising that comparing genomic marks is very similar to comparing waveforms of spoken words. That is, in speech recognition, we want to identify two words being the same even though we started recording one of them, say half a second later, which is equivalent of detecting patterns that are similar, but misaligned. Similarly, if one speaker was to say the same word faster than the other, what is equivalent to comparing genomic regions of different lengths, the words should still be detected as being the same. A common solution for this problem in Speech Recognition community is to use Dynamic Time Warping distance to compare the waveforms, which is used in this project.
+Contrary to this, the DTW distance measure does not allow skipping of the points at all. It does, however, allow a set of points on one sequence to a single point on another as if that point was stretched to become a sequence of n points. This way the penalty of warping the genome depends directly on the points that are aligned to each other, so the algorithm is able to do this both for highly expressed and fairly depleted regions, as long as the values mapped to each other are similar.
 
-Contrary to the ChAT method, this distance measure does not allow skipping of points at all. It does, however, allow a set of points on one sequence to a single point on another as if that point was stretched to become a sequence of n points. This way the penalty of warping the genome depends directly on the points that are mapped together, so the algorithm is able to do this both for highly expressed and fairly depleted regions, as long as the values mapped to each other are similar.
+\todo{write about how chat method is independent of this one}
 
-\todo{Maybe summarise?}
-The later chapters give an in-depth overview of these methods.
-\todo{Talk about CAGT a little bit. From what I understand their tool is focused on reversing the patterns correctly. If this is true, the need to add the reversing next to aims of this project, if not then it need not be here.}
-
-
+This concludes the motivation section of the report. The next chapter describes the methods taken in this project in more detail.
 
 \chapter{Methods}
 \section{Dynamic Time Warping}

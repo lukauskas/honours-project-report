@@ -7,6 +7,8 @@
 \usepackage{subcaption}
 \usepackage{amsmath}
 \usepackage{copyrightbox}
+\usepackage{forloop}
+
 \DeclareMathOperator*{\argmax}{arg\,max}
 \DeclareMathOperator*{\argmin}{arg\,min}
 
@@ -601,6 +603,7 @@ Of course, as the reader might remember, usually only a short fragment of the DN
 Intuitively, the less reads collect to the same bin, the more likely this could have happened due to one kind of noise or another. Given a long-enough region, even in a setting where reads arrive to bins completely at random, there will be at least a few bins within that region that will have at least a few bins piled up. Even though these regions provide little meaning biologically, they still need the same amount of CPU operations to be processed as every other region. With this in mind, DGW employs a filtering strategy that automatically filters regions that do not have a single bin with more than 10 reads piled up inside. Again, as with other parameters this number can be easily changed by the user.
 
 \subsection{Pileup Height Normalisation}
+\label{sec:pileup_height_normalisation}
 \begin{figure}
    \centering
    \begin{subfigure}[b]{0.3\textwidth}
@@ -826,7 +829,7 @@ These newly-generated regions were then randomly mutated, with probability of $0
         \caption{\gene{uc001czx.3}}
         \label{fig:evaluation:exon_stretching:seeds:e}
     \end{subfigure}
-    \caption{The five seed regions that were used to generate the artificial dataset. Note the similarity between the patterns in \ref{fig:evaluation:exon_stretching:seeds:d} and \ref{fig:evaluation:exon_stretching:seeds:e}, if one of the patterns was reversed}
+    \caption{The five seed regions that were used to generate the artificial dataset. Note the similarity between the patterns in \ref{fig:evaluation:exon_stretching:seeds:d} and \ref{fig:evaluation:exon_stretching:seeds:e}, i.e. if one of the patterns was reversed}
     \label{fig:evaluation:exon_stretching:seeds}
 \end{figure}
 
@@ -917,7 +920,7 @@ All transcription start sites and first splicing sites that overlap these region
 
 The datasets for \histonemodification{H3K4Me3} and \histonemodification{H3K9Ac} histone modifications, the same histone modifications that were observed to peak at first splicing sites by \cite{Bieberstein:2012tf}, were obtained from ENCODE.
 
-Histone marks at the regions of interest were then clustered by DGW at the resolution of 50 base pairs per bin. Squared euclidean distance was selected to be the local distance measure and slanted band constraint of width 12, as described in \autoref{sec:slanted-band-constraint} was chosen. The maximum histogram heights were all normalised to be equal to one\todo{Need to write about this!}.
+Histone marks at the regions of interest were then clustered by DGW at the resolution of 50 base pairs per bin. Squared euclidean distance was selected to be the local distance measure and slanted band constraint of width 12, as described in \autoref{sec:slanted-band-constraint} was chosen. The maximum histogram heights were all normalised to be equal to one as described in \autoref{sec:pileup_height_normalisation}.
 
 The results are shown in \autoref{fig:evaluation:macs-peaks}. \autoref{fig:evaluation:macs-peaks:cut} shows the resulting dendrogram and the cut that was made. Explorer window for one of the clusters is pictured in \autoref{fig:evaluation:macs-peaks:explorer}. Note the highly varying lengths of the peaks in the original data. \autoref{fig:evaluation:macs-peaks:warped-heatmap} shows enlarged heatmap of the data projected onto the cluster prototype. Here, the heatmap of the left represents the projected \histonemodification{H3K4Me3} mark, whereas the heatmap on the right corresponds to \histonemodification{H3K9Ac}. 
 
@@ -963,13 +966,96 @@ This alignment is nowhere visible in the original data, as pictured in \autoref{
     \label{fig:evaluation:macs-peaks}
 \end{figure}
 
-\chapter{Conclusions and Contributions}
+\section{Distinct Patterns Around Transcription Start Sites}
+\label{sec:evaluation:tss}
+
+In the final experiment, designed to show DGW's ability to identify distinct patterns within the regions of interest, regions around transcription start sites of known genes were clustered.
+
+More specifically, 2000 base pair windows around the transcription start sites of UCSC known genes dataset (see \autoref{sec:datasets}) were selected. Regions that overlap each other, were merged 
+together using BEDTools package, as in the previous experiment.
+
+The data at these specific regions was extracted from the ENCODE \histonemodification{H3K4Me3} dataset for the K562 leukaemia  cell line at the resolution of 25 base pairs per bin. Heights of the read pileups were normalised as described in \autoref{sec:pileup_height_normalisation} before processing.
+This data was then clustered using DTW constrained with slanted band of size 12.
+
+The resulting dendrogram can be seen in \autoref{fig:evaluation:tss_regions:cut}. Looking at the cluster prototypes, pictured in \autoref{fig:evaluation:tss_regions:prototypes}, the standard bimodal patterns can be seen in figures \ref{fig:evaluation:tss_regions:prototypes:3} and \ref{fig:evaluation:tss_regions:prototypes:7}. A bit more unusual unimodal patterns at the ends of the regions can be seen in figures \ref{fig:evaluation:tss_regions:prototypes:5} and \ref{fig:evaluation:tss_regions:prototypes:10}. Finally, highly-unusual multimodal patterns can be seen in figures \ref{fig:evaluation:tss_regions:prototypes:1} and \ref{fig:evaluation:tss_regions:prototypes:6}, most probably resulting from the regions that have a number of transcription start sites in proximity.
+
+Figures \ref{fig:evaluation:tss_regions:heatmaps:unwarped} and \ref{fig:evaluation:tss_regions:heatmaps:warped} illustrate how Dynamic Time Warping is able to highlight the common patterns between the items in the region. For each of the thirteen clusters, both the actual and the warped data is pictured between the two images. Some of the common patterns can be seen just by looking closely to \autoref{fig:evaluation:tss_regions:heatmaps:unwarped}, because the majority of the regions are of fixed length and organised around the transcription start site at the fixed position. However, even in this case, warping the data onto the cluster prototype make these patterns obvious and aligned (\autoref{fig:evaluation:tss_regions:heatmaps:warped}. 
+
+Warping also helps to visualise patterns that would also be non-trivial to spot. For instance have a look at the uniformly spaced lines visible in \autoref{fig:evaluation:tss_regions:heatmaps:warped:5}.
+These lines might indicate nucleosome positioning, at these locations, but are not trivial to spot in the original data, nor they are evident in the unclustered datasets.
+
+\todo{finish this, and maybe update with the results form running the experiment again}.
+
+
+\begin{figure}[p]
+   \centering
+   \includegraphics[height=0.35\textheight]{figures/evaluation/tss_regions/cut.png}
+   \caption{Hierarchical clustering of H3K4Me3 marks around transcription start sites of known genes, as described in \autoref{sec:evaluation:tss}. The threshold for forming flat clusters is drawn as dashed line, and the resulting clusters are colour-coded. Prototypes for each of these 13 clusters are shown in \autoref{fig:evaluation:tss_regions:prototypes}}
+   \label{fig:evaluation:tss_regions:cut}
+\end{figure}
+
+\newcounter{cluster_number}
+\begin{figure}[p]
+   \centering
+   \forloop{cluster_number}{1}{\value{cluster_number} < 14}{
+        \begin{subfigure}[b]{0.13\textwidth}
+            \centering
+            \includegraphics[width=\textwidth]{figures/evaluation/tss_regions/cluster-\arabic{cluster_number}.pdf}
+           \caption{}
+           \label{fig:evaluation:tss_regions:prototypes:\arabic{cluster_number}}
+        \end{subfigure}
+        ~
+   }
+   \caption{Prototypes The thirteen clusters resulting from the hierarchical clustering in \autoref{fig:evaluation:tss_regions:cut}. Cluster (c) is probably closest to the
+   bimodal pattern seen on average. Other prototypes seem to show an intriguing set of patterns.
+   For instance, a the bimodal pattern containing a variety of small throughs can be seen in (a), probably resulting from longer regions of the data that have more than a single TSS in the proximity. 
+   Clusters (b) and (e) seem to capture a set of regions that are not activated at the annotated transcription start sites, but are rather active in one of the edges of the window. Cluster (k) captures regions around transcription start sites that have well-documented bimodal peaks, yet the peak on one of the sides stretches much longer than the other. Heatmaps of regions that form each of these clusters can be seen in Figures \ref{fig:evaluation:tss_regions:heatmaps:unwarped} and \ref{fig:evaluation:tss_regions:heatmaps:warped}}
+   \label{fig:evaluation:tss_regions:prototypes}
+\end{figure}
+
+
+\begin{figure}
+   \centering
+   \forloop{cluster_number}{1}{\value{cluster_number} < 14}{
+        \begin{subfigure}[b]{0.3\textwidth}
+            \centering
+            \includegraphics[width=\textwidth]{figures/evaluation/tss_regions/unwarped-heatmaps/cluster-\arabic{cluster_number}.pdf}
+           \caption{}
+           \label{fig:evaluation:tss_regions:heatmaps:unwarped:\arabic{cluster_number}}
+        \end{subfigure}
+        ~
+   }
+   \caption{Regions forming the thirteen clusters resulting from the hierarchical clustering in \autoref{fig:evaluation:tss_regions:cut}. Actual, unwarped, data is pictured in this figure. As you can see the patterns within the data can be seen without the warping, yet these patterns become unmistakable after the warping, as seen in \autoref{fig:evaluation:tss_regions:heatmaps:warped}. Note that some clusters, e.g. clusters (g) and (h), have a visible division of the elements inside them, suggesting that cutting the dendrogram at a lower threshold, might capture the specifics of these sub-clusters better.}
+   \label{fig:evaluation:tss_regions:heatmaps:unwarped}
+\end{figure}
+
+\begin{figure}
+   \centering
+   \forloop{cluster_number}{1}{\value{cluster_number} < 14}{
+        \begin{subfigure}[b]{0.3\textwidth}
+            \centering
+            \includegraphics[width=\textwidth]{figures/evaluation/tss_regions/cluster-warped-\arabic{cluster_number}.pdf}
+           \caption{}
+           \label{fig:evaluation:tss_regions:heatmaps:warped:\arabic{cluster_number}}
+        \end{subfigure}
+        ~
+   }
+   \caption{Clustered regions warped onto their cluster prototypes. Compare this figure with \autoref{fig:evaluation:tss_regions:heatmaps:unwarped} in terms of visualisation of the cluster contents. The patterns inside the clusters seem to be easier to distinguish here, rather than in \autoref{fig:evaluation:tss_regions:heatmaps:unwarped}.}
+   \label{fig:evaluation:tss_regions:heatmaps:warped}
+\end{figure}
+
+\chapter{Conclusions}
+
 
 \bibliographystyle{alpha}
 \bibliography{papers2}
 
 \appendix
-\todo{Include both papers}
+\chapter{Supplementary figures}
+\label{sec:supplementary-figures}
+
+
+
+
 
 \end{document}
-q

@@ -270,7 +270,8 @@ Dynamic Time Warping (DTW) algorithm is the corner stone of the methods implemen
 
 This comparison is achieved by warping the time axis nonlinearly. That is, the axis is stretched or compressed as to minimise the total distance between the points aligned to each other. The stretching and compressing is done by creating an alignment between the two sequences, also known as the warping path, almost arbitrarily, with a few constraints described below. The distances between aligned points are then computed and summed to obtain what is commonly referred to as DTW Distance.
 
-More formally, given two sequences $\mathbf{a} = a_1, a_2, ..., a_n$ and $\mathbf{b} = b_1, b_2, ..., b_m$, Dynamic Time Warping aims to construct a warping path $\mathbf{p} = { (p_{1,0}, p_{1,1}), (p_{2,0}, p_{2,1}), ..., (p_{k,0}, p_{k, 1}) }$ that maps each point on the first sequence, specified as $p_{i,0}$ to a point on the second sequence, $p_{i,1}$ such that the following three constraints hold:
+More formally, given two sequences $\mathbf{a} = a_1, a_2, ..., a_n$ and $\mathbf{b} = b_1, b_2, ..., b_m$, Dynamic Time Warping aims to construct a warping path\\
+$\mathbf{p} = { (p_{1,0}, p_{1,1}), (p_{2,0}, p_{2,1}), ..., (p_{k,0}, p_{k, 1}) }$ that maps each point on the first sequence, specified as $p_{i,0}$ to a point on the second sequence, $p_{i,1}$ such that the following three constraints hold:
 
 \begin{enumerate}
 \item \emph{Boundary Condition}: The path must start at the first point of sequence $\mathbf{a}$ and this point must be mapped to the first point of the second sequence: $p_1 = (1,1)$. Similarly, the final points of both sequences should be mapped to each other, and the path must end there: $p_k = (m, n).$ 
@@ -280,13 +281,13 @@ More formally, given two sequences $\mathbf{a} = a_1, a_2, ..., a_n$ and $\mathb
     $p_{i+1} - p_{i} \in \{(0,1), (1,0), (1,1)\}$ for all $i < k$.
 \end{enumerate}
 
-Furthermore, we are only interested in a warping that is minimal, given some distance measure $d$ that would compute the distances between aligned points (e.g. Euclidean distance): $\hat{P} = \argmin_P \sum_{(i,j) \in P} d(a_i, b_j)$. Such minimal warping alignment can be computed in $O(nm)$ time by applying dynamic programming techniques. We construct a $n \times m$ matrix $\mathbf{D}$ where each entry $D_{i,j}$ will contain a minimal (warped) distance of matching first $i$ components of the first sequence, $a_1..a_i$, to first $j$ elements of the second sequence, $b_1..b_j$. The first component of the matrix, $D_{1,1}$ is initialised to the distance between the first components of the two sequences, $d(a_1, b_1)$ as specified by the boundary condition.
+The problem is to find a warping path that is minimal, given some distance measure $d$ that would compute the distances between aligned points (e.g. Euclidean distance): $\hat{P} = \argmin_P \sum_{(i,j) \in P} d(a_i, b_j)$. Such minimal warping alignment can be computed in $O(nm)$ time by applying dynamic programming techniques. We construct a $n \times m$ matrix $\mathbf{D}$ where each entry $D_{i,j}$ will contain a minimal (warped) distance of matching first $i$ components of the first sequence, $a_1..a_i$, to first $j$ elements of the second sequence, $b_1..b_j$. The first component of the matrix, $D_{1,1}$ is initialised to the distance between the first components of the two sequences, $d(a_1, b_1)$ as specified by the boundary condition.
 
 The matrix is then filled row by row, according to the following recursive equation:
 $$D_{i,j} = d(a_i, b_j) + min(D_{i-1, j}, D_{i, j-1}, D_{i,j})$$
 
 In the end, the column $D_{n,m}$ holds the minimal warped distance between two series.
-If the minimal warping path is needed, it can be traced back by following the recursive relation backwards from $D_{i,j}$. Please refer to \citep{Muller:2007bo} for more details on the workings of DTW.
+If the minimal warping path is needed, it can be traced back by following the recursive relation backwards from $D_{i,j}$. Please note that the elements of the sequences, i.e. $a_1, a_2, ..., a_n$, do not necessarily need to be scalar, provided that the local distance measure is able to compute the distance between two vectors. Refer to \citep{Muller:2007bo} for more details on the workings of DTW.
 
 To illustrate what DTW does, have a look at the \autoref{fig:DTW:alignments}. The two sequences in the figure are sine and cosine plotted over the range $[-\pi; \pi)$. Given the nature of these functions, we know that the shapes in the two sequences are essentially identical, just shifted by $\frac{\pi}{2}$ radians, therefore we should get a good alignment of them by some warping of the x axis that is used as the time axis in this sense.
 

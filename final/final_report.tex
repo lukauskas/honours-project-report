@@ -2,7 +2,7 @@
 
 \usepackage{hyperref}
 \usepackage{todonotes}
-\usepackage{natbib}
+\usepackage[square]{natbib}
 \usepackage[font=footnotesize]{caption}
 \usepackage{subcaption}
 \usepackage{amsmath}
@@ -25,7 +25,7 @@
 
 \author{Saulius Lukauskas}
 
-\degree{Artificial Intelligence}
+\degree{BSc Artificial Intelligence}
 \project{Undergraduate Dissertation}
 
 \date{\today}
@@ -291,14 +291,55 @@ Such minimal warping alignment can be computed in $O(nm)$ time by applying dynam
 Specifically, we construct a $n \times m$ matrix $\mathbf{D}$ where each entry $D_{i,j}$ will contain a minimal (warped) distance of matching first $i$ components of the first sequence, $a_1..a_i$, to first $j$ elements of the second sequence, $b_1..b_j$. The first component of the matrix, $D_{1,1}$ is initialised to the distance between the first components of the two sequences, $d(a_1, b_1)$ as specified by the boundary condition.
 
 The matrix is then filled row by row, according to the following recursive equation:
-\begin{equation}
+\begin{equation}\label{eq:dtw_equation}
 D_{i,j} = d(a_i, b_j) + min(D_{i-1, j}, D_{i, j-1}, D_{i,j})
 \end{equation}
 
 In the end, the column $D_{n,m}$ holds the minimal warped distance between two series.
-If the minimal warping path is needed, it can be traced back by following the recursive relation backwards from $D_{i,j}$. \todo{Add a worked example here}
+If the minimal warping path is needed, it can be traced back by following the recursive relation backwards from $D_{i,j}$. This algorithm is illustrated in \autoref{fig:DTW:example}. 
 
-Please note that the elements of the sequences, i.e. $a_1, a_2, ..., a_n$, do not necessarily need to be scalar, provided that the local distance measure is able to compute the distance between two vectors. Refer to \citep{Muller:2007bo} for more details on the workings of DTW.
+More information on the workings of DTW can be found in e.g. \citep{Muller:2007bo}.
+
+\begin{figure}
+   \centering
+   \begin{subfigure}[b]{0.3\textwidth}
+       \includegraphics[width=\textwidth]{figures/DTW/worked-out/step-1.png}
+       \caption{}
+       \label{fig:DTW:example:1}
+   \end{subfigure}
+   ~
+   \begin{subfigure}[b]{0.3\textwidth}
+       \includegraphics[width=\textwidth]{figures/DTW/worked-out/step-2.png}
+       \caption{}
+       \label{fig:DTW:example:2}
+   \end{subfigure}
+   ~
+   \begin{subfigure}[b]{0.3\textwidth}
+       \includegraphics[width=\textwidth]{figures/DTW/worked-out/step-3.png}
+       \caption{}
+       \label{fig:DTW:example:3}
+   \end{subfigure}
+   ~
+   \begin{subfigure}[b]{0.3\textwidth}
+       \includegraphics[width=\textwidth]{figures/DTW/worked-out/step-4.png}
+       \caption{}
+       \label{fig:DTW:example:4}
+   \end{subfigure}
+   ~
+   \begin{subfigure}[b]{0.3\textwidth}
+       \includegraphics[width=\textwidth]{figures/DTW/worked-out/step-5.png}
+       \caption{}
+       \label{fig:DTW:example:5}
+   \end{subfigure}
+   ~
+   \caption{Illustration of the DTW algorithm. Two sequences $(2,1,4,3,2)$ and $(1,4,2,1)$ are being compared here using Euclidean distance. The algorithm first creates an empty table of size $n \times m$, where $n$ and $m$ are the lengths of respective sequences, in this case $n=5$, $m=4$. In this table, each column and row correspond to some value on one or the other sequences, pictured in blue.
+The distance between the first elements of the sequence is put into the column $(0,0)$, as pictured in (a). The first row and column are then filled in sequentially, by adding the distance between respective points on each of the sequences to the previously computed value, as illustrated in (a). After the first row and column were computed (b), the remainder of the table is filled in according to the recursive equation \ref{eq:dtw_equation} as pictured in (c). Once the table is completed (d) the resulting distance is in the top-right corner (red). The warping path can be traced back from the top right corner, by applying the recursive equation backwards (e).}
+   
+   \label{fig:DTW:example}
+\end{figure}
+
+
+Please note that the elements of the sequences, i.e. $a_1, a_2, ..., a_n$, do not necessarily need to be scalar, as in the example. DTW is able to compute the distance between sequences of vectors, provided that the local distance measure is able to compare these vectors. 
 
 To illustrate what DTW does, have a look at the \autoref{fig:DTW:alignments}. The two sequences in the figure are sine and cosine plotted over the range $[-\pi; \pi)$. Given the nature of these functions, we know that the shapes in the two sequences are essentially identical, just shifted by $\frac{\pi}{2}$ radians, therefore we should get a good alignment between them by warping the $x$ axis.
 
@@ -330,7 +371,7 @@ The mapping seen in \autoref{fig:DTW:dtw_alignment}, on the other hand is able t
 In some cases, warping the time axis arbitrarily might not necessarily be a correct thing to do.
 For instance, have a look at \autoref{fig:DTW:std}. Here DTW is used to compare the \histonemodification{H3K4Me3} activation profiles around transcription start sites (TSS) of two genes, \gene{uc003okl.3} and \gene{uc021uwd.1}. We can immediately see that first activation profile appears to be unimodal, whereas the second one is clearly bimodal. The minimal warping path maps a relatively inactive region from around bin 40 to around bin 80 in the series for \gene{uc003okl.3} to a single point on the series for \gene{uc021uwd.1}. However, this unexpressed region might have biological significance, e.g. indicate removal of a nucleosome, and we might not want to allow it to be compressed to a single point. 
 
-We can manually impose restrictions on warping paths that are allowed by introducing global constraints. The two most commonly used global constraints on DTW are Sakoe-Chiba Band and Itakura parallelogram\citep{Ratanamahatana:2004wu}.
+We can manually impose restrictions on warping paths that are allowed by introducing global constraints. Sakoe-Chiba Band is one of the most commonly used global constraints on DTW \citep{Ratanamahatana:2004wu}. 
 
 \subsubsection{Sakoe-Chiba Band}
 
@@ -354,7 +395,7 @@ We can manually impose restrictions on warping paths that are allowed by introdu
 \end{figure}
 
 Sakoe \& Chiba constraint, as first described in \citep{Sakoe:1978ta} allows only the warping paths 
-that satisfy $|i-j| \le k$ where $k$ is some integer specifying the tightness of the constraint. The constraint is commonly referred to as "Sakoe \& Chiba band" as the cost matrix looks like a band around the main diagonal (see \autoref{fig:DTW:sakoe_chiba:cost}). Such constraint reduces the complexity of DTW to $O(k \times max(n,m))$ where $n$ and $m$ are the lengths of the two sequences. 
+that satisfy $|i-j| \le k$ where $k$ is some integer specifying the tightness of the constraint. The constraint is commonly referred to as "Sakoe \& Chiba band" as the cost matrix has a shape of a band around the main diagonal (see \autoref{fig:DTW:sakoe_chiba:cost}). Such constraint reduces the complexity of DTW to $O(k \times max(n,m))$ where $n$ and $m$ are the lengths of the two sequences. 
 
 Intuitively, the constraint requires that each point on sequence A is mapped to a point no more than $k$ points away on the sequence B. That is, it assumes that there won't be any warping of the time axis greater than by $k$ points. Note that setting the $k$ parameter to zero would give us Euclidean distance between the two sequences.
 
@@ -362,17 +403,27 @@ Intuitively, the constraint requires that each point on sequence A is mapped to 
 
 As far as the author is aware, there is no established way of picking the value of parameter $k$.
 Historically, $k$ was set to 10\% of the length of the sequences.
-For nearest-neighbour classification tasks, \cite{Ratanamahatana:2004wu} has shown that an even a window sufficiently smaller than 10\% gives the highest accuracy for some datasets, though the actual number strongly depends on the actual dataset. Due to this, the constraint $k$ is not imposed in the Dynamic Genome Warping package and is left as a free parameter an user could specify herself.
+For nearest-neighbour classification tasks, \cite{Ratanamahatana:2004wu} has shown that an even a window sufficiently smaller than 10\% gives the highest accuracy for some datasets, though the actual number strongly depends on the actual dataset. Due to this, the constraint $k$ is not imposed in the Dynamic Genome Warping package and is left as a free parameter the user could specify herself.
 
 \subsubsection{Slanted Band Constraint}
 \label{sec:slanted-band-constraint}
 
-Sakoe \& Chiba band makes DTW incomputable for sequences whose lengths differ by more than $k$ items, as the last points of those sequences point $n$ and point $m$ will not satisfy the constraint 
-$|i-j| \le k$. The reason for this failure is the fact that $i=j$ is not the real diagonal of the cost matrix if the lengths of the two sequences, $n$ and $m$, are not equal. 
-Toni Giorgino \nocite{Giorgino:2009ue} was well aware of this problem when implementing DTW module for R \footnote{The R Project For Statistical Computing - \url{http://www.r-project.org/}} where he included a modified version of Sakoe \& Chiba constraint, he calls a slanted band constraint\citep{Giorgino:2009ue}. 
+Sakoe \& Chiba band makes DTW incomputable for sequences whose lengths differ by more than $k$ items, as the last points of those sequences, point $n$ and point $m$, will not satisfy the constraint 
+$|i-j| \le k$. The reason for this failure is the fact that $i=j$ is not the real diagonal of the cost matrix, if the lengths of the two sequences, $n$ and $m$, are not equal. 
+
+Toni Giorgino \nocite{Giorgino:2009ue} was well aware of this problem when implementing DTW module for R\footnote{The R Project For Statistical Computing - \url{http://www.r-project.org/}} where he included a modified version of Sakoe \& Chiba constraint, he calls a slanted band constraint \citep{Giorgino:2009ue}. 
 
 Slanted band constraint solves the problem of different sequence lengths by changing the constraint to 
-$|i - \frac{m}{n} \times j| <= k$, where $m$ and $n$ are the lengths of the two sequences being compared. This essentially changes the slope of the diagonal line to $\frac{m}{n}$ (cf. to slope being 1 in \citep{Sakoe:1978ta}). Unfortunately, the meaning of the parameter $k$ is inconsistent in this definition: if the second sequence is longer than the first one, thus $m > n$, the constraint can be thought to scale the second sequence down to the length of the first one and then apply the Sakoe \& Chiba constraint of size $k$, meaning $k$ is in the units of the shorter sequence. However, if the second sequence is shorter than the first one, it will be essentially rescaled to match the length of the first (longer) sequence and then the parameter $k$ will be measured in units of the longer sequence. In this particular case, DTW distance might not even be computable as in order for the warping path to remain continuous, the following inequality must hold $(j+1) \frac{m}{n} - k \le j \frac{m}{n} + k + 1$. In other words, for each $j$, there should be some $i$ in the warping window, that is either in the window of $j+1$ or is by at most one unit away from some $i'$ that is. Reshuffling the inequality we get that this holds if $\frac{m}{n} \le 2k + 1$ does.
+$|i - \frac{m}{n} \times j| <= k$, where $m$ and $n$ are the lengths of the two sequences being compared. This essentially changes the slope of the diagonal line to $\frac{m}{n}$ (cf. to slope being 1 in \citep{Sakoe:1978ta}).
+
+Unfortunately, the meaning of the parameter $k$ is inconsistent in Georgino's definition of the constraint: if the second sequence is longer than the first one, thus $m > n$, the constraint can be thought to scale the second sequence down to the length of the first one and then apply the Sakoe \& Chiba constraint of size $k$, meaning $k$ is in the units of the shorter sequence. However, if the second sequence is shorter than the first one, it will be essentially rescaled to match the length of the first (longer) sequence and then the parameter $k$ will be measured in units of the longer sequence. In this particular case, DTW distance might not even be computable as in order for the warping path to remain continuous, the following inequality must hold: 
+
+$$(j+1) \frac{m}{n} - k \le j \frac{m}{n} + k + 1$$
+
+What it says is that for each $j$, there should be some $i$ within the allowed warping window, that is also either in the window of $j+1$ or is by at most one unit away from some $i'$ that is. 
+After some algebra, this inequality can be rewritten as:
+
+$$\frac{m}{n} \le 2k + 1$$
 
 This inconsistency might not be important in the situations where we have a query sequence that we want to match to a reference sequence as the order of parameters will not change in these cases. However, other applications, such as clustering, require symmetry. Since DGW uses DTW distance for clustering, I had to solve these issues with slanted band constraint, thus
 DGW implements a modified version of it. 
@@ -402,25 +453,25 @@ This modified constraint is now always consistent, being in units of shorter seq
 \end{figure}
 
 \autoref{fig:DTW:antisense_comparison} shows the average profiles of regions around annotated transcription start sites in the ENCODE pilot regions of the genome \cite{ENCODEProjectConsortium:2007fu}. The average patterns are evidently symmetrical along the horizontal axis.
-Even though this directionality is generally known for patterns around well-annotated regions, such as the transcription start sites, the directionality for other regions of interest, such as peaks found by a peak caller, is rarely known.  With this in mind, every DTW comparison is actually made twice: once as described in previous sections, and once with one of the patterns reversed. The smaller distance between the two is then returned as the true distance between patterns. 
+Even though this directionality is generally known for patterns around well-annotated regions, such as the transcription start sites, the directionality for other regions of interest, such as peaks found by a peak caller, is rarely known.  
+
+In order to be able to account for this opposing directionality, without referring to the dataset annotations, every DTW comparison that is made when clustering, is actually made twice: once as described in previous sections, and once with one of the patterns reversed. The smaller distance between the two is then returned as the true distance between the patterns. 
 
 Of course, DGW also supports an option to turn this behaviour off, in case we would like to force the different strands into different clusters, or an option to use the annotated strandedness, if it is provided.
 
 \subsection{DTW projection}
-
 \label{sec:dtw-projection}
 
 Just like one can project a vector in euclidean space to new basis, one can project some time series onto the time axis of another series with the help of DTW. 
 
-Given the original sequence $\mathbf{a}$ and the basis sequence $\mathbf{b}$, we can project $\mathbf{a}$ onto $\mathbf{b}$ by computing the warping path between the two sequences, 
-and then, for every point of the basis sequence, compute the average value of all points mapped to that point to compute the projection of one sequence onto the other.
+Given the original sequence $\mathbf{a}$, the basis sequence $\mathbf{b}$, and the warping path between the two sequences, $p$, we can project $\mathbf{a}$ onto $\mathbf{b}$ compute the average value of all points mapped to every point of sequence $\mathbf{b}$.
 
 More formally, each point $x_k$ of the projected sequence is computed by the following equation:
 \begin{equation}
-    x_k =  \frac{\sum_{(i,j) \in wp} a_i \times \delta_{j=k}}{\sum_{(i,j) \in wp} \delta_{j=k}} 
+    x_k =  \frac{\sum_{(i,j) \in p} a_i \times \delta_{j=k}}{\sum_{(i,j) \in p} \delta_{j=k}} 
 \end{equation}
 
-Where $k=1..|\mathbf{b}|$, $wp$ is the warping path generated by DTW, and $\delta_{j=k}$ is the delta function that is $1$ when $j=k$, and $0$ otherwise.
+Where $k=1..|\mathbf{b}|$ and $\delta_{j=k}$ is the delta function that is $1$ when $j=k$, and $0$ otherwise.\todo{Put a worked example here as well}
 
 \begin{figure}[t,b]
    \centering
@@ -444,11 +495,11 @@ Where $k=1..|\mathbf{b}|$, $wp$ is the warping path generated by DTW, and $\delt
        \caption{Projection}
        \label{fig:DTW:projection:projection}
    \end{subfigure}
-   \caption{Result of projecting sequence, pictured in \ref{fig:DTW:projection:sequence} onto the basis, pictured in \ref{fig:DTW:projection:basis}. Unconstrained DTW was used to generate the warping path.}
+   \caption{Result of projecting sequence, pictured in \ref{fig:DTW:projection:sequence} onto the basis, pictured in \ref{fig:DTW:projection:basis} with unconstrained DTW used to generate the warping path.}
    \label{fig:DTW:projection}
 \end{figure}
 
-\autoref{fig:DTW:projection} illustrates this projection by projecting one histone mark around the transcription start site on another.
+\autoref{fig:DTW:projection} illustrates this projection by projecting one histone mark around the transcription start site onto another.
 
 
 \section{Clustering}
@@ -456,11 +507,13 @@ Where $k=1..|\mathbf{b}|$, $wp$ is the warping path generated by DTW, and $\delt
 
 Previous chapters have defined the mechanics of DTW distance. The important question that is yet to be raised is how the data can be clustered under it. 
 
-It has been shown, that computation of a sequence that minimises the distance to all other sequences in the cluster under DTW distance, so called centroid sequence, is a NP-Complete problem as the search space grows exponentially with number of sequences being averaged\cite{Hautamaki:2008fh,Petitjean:2012bp}.
+It has been shown, that under the DTW distance, computation of a sequence that minimises the distance to all other sequences in the cluster, so called centroid sequence, is a NP-Complete problem as the search space grows exponentially with number of sequences being averaged \cite{Hautamaki:2008fh,Petitjean:2012bp}.
 
-Even though a variety of methods to approximate this calculation have been proposed through the years, \cite{Gupta:1996tw,Niennattrakul:2009ep,Petitjean:2011bq,Petitjean:2012bp}, it has been shown that one needs to be careful about using them for clustering, as incorrect averaging methods might create incorrect clusterings, e.g. allow the averaged center drift outside the sequences being averaged \cite{Niennattrakul:2007wv}. Due to this, it is not clear how to implement centroid-based clustering methods (e.g. k-means) under Dynamic Time Warping distance. 
+Even though a variety of methods to approximate this calculation have been proposed through the years, \cite{Gupta:1996tw,Niennattrakul:2009ep,Petitjean:2011bq,Petitjean:2012bp}, one needs to be careful before using any of them for clustering, because incorrect averaging methods might create incorrect clusterings, e.g. allow the averaged center drift outside the sequences being averaged \cite{Niennattrakul:2007wv}. Due to this, implementation of centroid-based clustering methods (e.g. k-means) under Dynamic Time Warping distance is usually tricky.
 
-Hierarchical-clustering methods, on the other hand, do not require a notion of centroid. A well-known agglomerative clustering method, works by first computing the distances between all pairs of points in the dataset, then joining the two closest points into a cluster, forming a new cluster this way. Then the two second-closest points based on that distance forming another cluster, and so on. There are quite a few ways established in practice on how to compare these newly created clusters:
+Hierarchical-clustering methods, on the other hand, do not require a notion of centroid. One of the hierarchical clustering methods, agglomerative clustering, works by first computing the distances between all pairs of points in the dataset, then joining the two closest points into a cluster, forming a new cluster this way. Then the second two closest points are joined forming yet another cluster, and so on, eventually joining all of the points. 
+
+The comparison between two clusters is usually done in one of the following ways:
 
 \begin{itemize}
    \item \emph{Single linkage:} The distance between two clusters is equal to the smallest distance between the any two elements in the two clusters.
@@ -489,37 +542,36 @@ Hierarchical-clustering methods, on the other hand, do not require a notion of c
     \label{fig:clustering:dendrogram}
 \end{figure}
 
-Single linkage applied to agglomerative clustering using DTW distance is vulnerable to a phenomenon known as \emph{chaining}. This phenomenon occurs, when instead of forming distinct clusters early, agglomerative clustering algorithm forms a single cluster and incrementally joins more and more elements to it one, at the time. This is illustrated in \autoref{fig:clustering:dendrogram:single}. 
-Here it seems that majority of data is in one cluster and each data point is joined to the cluster one by one, creating a nice downwards going slope seen in the figure. This is an unhelpful clustering, as 
-if we were to cut the dendrogram at pretty much any point we would get the majority of the data in one of the clusters, with the remaining data points having a separate cluster for themselves. 
+Agglomerative clusterings that use single linkage criterion are vulnerable to the phenomenon known as \emph{chaining}. This phenomenon occurs, when instead of forming distinct clusters early, agglomerative clustering algorithm forms a single cluster and incrementally joins more and more elements to it, one at the time. This is illustrated in \autoref{fig:clustering:dendrogram:single}. 
+Here it seems that majority of data is in one cluster and each data point is joined to the cluster one by one, creating a smooth downwards facing slope seen in the figure. 
 
-We can see that chaining behaviour is not visible when using complete linkage. Here, the clusters are formed early, and then joined later on, as one would expect (\autoref{fig:clustering:dendrogram:complete}). In fact, Hirano et al. \cite{Hirano:2005wh} have shown empirically that out of the three linkage methods discussed above, only complete linkage was able to produce meaningful clusters when clustering time series data under DTW. Since such meaningful clusters are expected from an exploratory tool, complete linkage criterion is used to generate the clusters
-in the software produced by this project.
+This is by no means a meaningful clustering, as 
+if we were to cut the dendrogram at pretty much any threshold we would get the majority of the data in one of the clusters, with the remaining data points having a separate cluster for themselves. 
+
+We can see that chaining behaviour is not visible when complete linkage is used. Here, the clusters are formed early, and then joined later on, as one would expect (\autoref{fig:clustering:dendrogram:complete}). In fact, Hirano et al. \cite{Hirano:2005wh} have shown empirically that out of the three linkage methods discussed above, only complete linkage was able to produce meaningful clusters when clustering time series data under DTW. Due to this reason, DGW computes the distances between two clusters using complete linkage criterion.
 
 \subsection{Forming Flat Clusters}
 
 It is also worth noting, that there have been attempts to relax the requirement of having a notion of centroid in centroid clustering methods by using a medoid -- a representative object from within the cluster. For instance, k-medoids algorithm, implemented e.g. in \cite{Park:2009ks}, could in theory be used to cluster DTW distances. 
 
-The disadvantage of this method against hierarchical clustering is the fact that the number of clusters, the $k$ in k-medoids, still needs to be picked before the clustering was done. Several iterations of the algorithm could be run, and the results with different $k$s could be compared, of course, yet this is not efficient, and in the end it is not clear what metric should be used to
-measure the meaningfulness of the clustering.
+The disadvantage of this method against hierarchical clustering is the fact that the number of clusters, the $k$ in k-medoids, needs to be picked before the clustering was done. Several iterations of the algorithm could be run, and the results with different $k$s could be compared, of course, yet it is both not efficient to do, and not clear what metric should be used to
+measure the meaningfulness of the clustering in this case.
 
-Hierarchical clustering methods, on the other hand, need to decide on the number of clusters \emph{after} the clustering was done. This way the clusters can be decided on by cutting the dendrogram at some arbitrarily selected distance threshold between clusters. 
+Hierarchical clustering methods, on the other hand, do not need the number of clusters decided beforehand, as the number of flat clusters can be chosen \emph{after} the clustering was done. This
+allows inspection of the clustering results to guide this process.
 
-This cutting can either be done automatically, if there is clear way to do this, e.g. the distances in the dendrogram correspond to p-values, like in \cite{Wang:2012cb}, or by visual inspection of the resulting dendrogram, like in this project.
-
-\todo{this should link to the page describing the implementation, where sliding line is mentioned}
+This cutting can either be done automatically, if there is clear way to do this, e.g. if the distances in the dendrogram correspond to p-values, like in \cite{Wang:2012cb}, or by simple visual inspection of the resulting dendrogram. The latter approach is implemented in this project.
 
 \subsection{Cluster Prototypes}
 \label{sec:prototypes}
 
 After the flat clusters are formed, the clusters need to be visualised to the user somehow. Just displaying the original data (i.e. in the form of a heatmap) is insufficient, as such representation of the data does not does not explain why the data was clustered together in the first place. 
 
-The end user of the software, would want to see the data represented after warping, i.e. average profile of the warped data, to be able to get the structure and the shape of the resulting cluster marks. The problem of extracting this average warped profile lies in the fact that only two sequences are compared with each other at the time, and both of them can be arbitrarily warped. What this means, unfortunately, that the same sequence might be warped in as manny ways as there are sequences to compare it against. In order to be able to give an average warping of sequences in a cluster, one needs to agree upon the base sequence upon which to warp the remaining sequences on. In other words,
-one needs to find a prototype for the cluster to be able to visualise the warped items.
+The end user of the software, would want to see the data represented after warping, i.e. average profile of the warped data, as to be able to get the structure and the shape of the resulting cluster marks. The problem of extracting this average warped profile lies in the fact that only two sequences are compared with each other at the time, and both of them can be arbitrarily warped. What this means, unfortunately, that the same sequence might be warped in as many ways as there are sequences to compare it against. In order to be able to give an average warping of sequences in a cluster, one needs to agree upon the base sequence upon which to warp the remaining sequences on. In other words,
+one needs to find a prototype for the cluster in order to be able to visualise the warped items. Once this prototype sequence is chosen, DTW projection (\autoref{sec:dtw-projection}) can be used to warp the original data onto the basis defined by the prototype.
 
-Remember that inability to compute perfect centroids was one of the reasons why hierarchical clustering was chosen in favour of centroid-clustering in the first place. However, at this case the data is already clustered, and flat clusters are already formed. In this case, some error is acceptable as it will not will not be able to accumulate as clustering is being processed. The only requirement that is posed on the prototype is that it expresses a similar shape than the marks being clustered visually.
+Remember that inability to compute perfect centroids was one of the reasons why hierarchical clustering was chosen in favour of centroid-clustering in the first place. Then we were worried about the bias in the data clustering producing clusters that are not meaningful. However, at this case the data is already clustered and flat clusters are already formed. Some prototyping error is tolerable here as it won't be able to accumulate as easily as it would during clusteirng. The only requirement that is posed on the prototype is that it expresses a similar shape than the marks being clustered visually.
 
-\todo{Make sure the above text refers to DTW projection subsection}
 
 \subsubsection{Prioritised Shape Averaging}
 A method called Prioritised Shape Averaging (PSA), proposed in \cite{Niennattrakul:2009ep}, was chosen to generate the cluster prototypes. The reason why PSA was chosen, in favour of other methods, is the fact that it can exploit the hierarchical structure, we've already computed in prototype generation stage.
@@ -607,10 +659,10 @@ From these figures, it is hard to spot the difference between prototypes generat
 
 As previously mentioned in \autoref{sec:chip}, the result of ChIP-Seq experiment is a collection of short reads that are aligned to the reference genome, as pictured in \autoref{fig:background:chip-results}. In order to compute the activation profiles, each of the regions of interest are split into a series of bins of equal width. This bin width is simply referred to as \emph{read resolution}. The number of reads that falling within these bins is then counted to produce the activation mark.
 
-Of course, as the reader might remember, usually only a short fragment of the DNA attached to the target protein is sequenced. In some cases, these short reads will not be able to capture the true distribution of DNA attached to the target proteins, as pictured in \autoref{fig:methods:reading:shifts:broken}. Extending the reads seems to reduce this problem, as pictured in \autoref{fig:methods:reading:shifts:fixed}, therefore DGW extends the reads to be 200 bp before estimating the profiles.
+Of course, as the reader might remember, usually only a short fragment of the DNA attached to the target protein is sequenced. In some cases, these short reads will not be able to capture the true distribution of DNA attached to the target proteins, as pictured in \autoref{fig:methods:reading:shifts:broken}. In order to mitigate this problem, DGW extends all reads to be 200 base pairs wide as pictured in \autoref{fig:methods:reading:shifts:fixed}.
 
 \subsection{Highest Pileup Filter}
-Intuitively, the less reads collect to the same bin, the more likely this could have happened due to one kind of noise or another. Given a long-enough region, even in a setting where reads arrive to bins completely at random, there will be at least a few bins within that region that will have at least a few bins piled up. Even though these regions provide little meaning biologically, they still need the same amount of CPU operations to be processed as every other region. With this in mind, DGW employs a filtering strategy that automatically filters regions that do not have a single bin with more than 10 reads piled up inside. Again, as with other parameters this number can be easily changed by the user.
+Intuitively, the less reads collect to the same bin, the more likely this could have happened due to one kind of noise or another. Given a long-enough region, even in a setting where reads arrive to bins completely at random, there will be at least a few bins within that region that will have at least a few reads piled up. Even though these regions provide little meaning biologically, they still need the same amount of CPU operations to be processed as every other region. With this in mind, DGW employs a filtering strategy that automatically filters regions that do not have a single bin with more than 10 reads piled up inside. Again, as with other parameters this number can be easily changed by the user.
 
 \subsection{Pileup Height Normalisation}
 \label{sec:pileup_height_normalisation}
@@ -640,9 +692,9 @@ Intuitively, the less reads collect to the same bin, the more likely this could 
 DTW is sensitive to changes in scale, if the local distance measure is sensitive to changes of scale.
 In case of squared euclidean distance, it is very easy to artificially inflate the DTW warped distance between the two regions. For instance, consider the same region used in \autoref{fig:DTW:sakoe_chiba}. If one was to multiply all the bin counts by $1.5$, the underlying shape of the region will not change, however, as pictured in figures \ref{fig:pileup_normalisation:mappings_unnormalised} and \ref{fig:pileup_normalisation:cost_unnormalised}, the DTW distance will increase dramatically.
 
-In some settings, such as when we are comparing \histonemodification{H3K4Me3} marks at the $5'$ splicing sites, this is not desirable. In cases like this, where we are comparing only the shape of the mark, and not the expression value of the regions, it is desirable to have the scale normalised.
+In some settings, e.g. differential expression studies, this might be a perfectly valid behaviour, as we might indeed want to treat these two regions as different.
+In other settings, e.g. when we are trying to compare the marks at the $5'$ splicing sites, it might make more sense to compare only the shape of the mark, and not the shape and expression value. This comparison of shape can be achieved by normalising the values of the bins with the most reads falling into it to be equal to one for all regions of interest.
 
-DGW performs this normalisation by dividing all of the regions by the height of the maximum pileup.
 That is, if we thought the mark as of a vector $\mathbf{x}$, then the normalisation equation could be written as:
 \begin{equation}
    \mathbf{x}_{norm} = \frac{\mathbf{x}}{max (\mathbf{x})}
@@ -658,12 +710,13 @@ The core of DGW package was written in Python 2.7\footnote{See Python's homepage
 
 One of the core dependancies of DGW is the \verb"pandas" package available from \url{http://pandas.pydata.org/}. This package provides efficient, R-like data structures that are extremely easy to use. These data structures are used throughout the code to be able to store and manipulate the histone marks efficiently. 
 
-Packages in PyLab, namely \pythonpackage{numpy}, \pythonpackage{scipy} and \pythonpackage{matplotlib} also play a very important role. Together these packages bring functionality of MATLAB\footnote{See \url{http://www.mathworks.co.uk/products/matlab/} for more information about MATLAB} to Python. The first package, \pythonpackage{numpy} provides efficient computational routines on arrays and matrices; the second package, \pythonpackage{scipy} has a majority of scientific procedures implemented, including the ones required for drawing and analysing dendrograms; whereas the third one, \pythonpackage{matplotlib} \cite{Hunter:2007ux}, handles all of the visualisation and plotting. \todo{Get a link when scipy.org is back}.
+Packages in PyLab, namely \pythonpackage{numpy}, \pythonpackage{scipy} and \pythonpackage{matplotlib} also play a crucial part in this software. Together they bring functionality of MATLAB\footnote{See \url{http://www.mathworks.co.uk/products/matlab/} for more information about MATLAB} to Python. The first package, \pythonpackage{numpy} provides efficient computational routines on arrays and matrices; the second package, \pythonpackage{scipy} has a majority of scientific procedures implemented, including the ones required for drawing and analysing dendrograms; whereas the third one, \pythonpackage{matplotlib} \cite{Hunter:2007ux}, handles all of the visualisation and plotting. \todo{Get a link when scipy.org is back}.
 
 Daniel M\"ullner's \pythonpackage{fastcluster} package \cite{Mullner:2011wb}, is used for efficient computations
 of hierarchical clustering linkage matrices; and \pythonpackage{pysam} (\url{https://code.google.com/p/pysam/}) provides a Python wrapper around the \emph{SAMtools} (\cite{Li:2009ka}) toolkit.
 
-Finally, the implementation of DTW algorithm is based on \pythonpackage{mlpy} package \cite{Albanese:2012vf}. This package was extended to support variations of DTW algorithm, such as Sakoe \& Chiba band as described in \autoref{sec:DTW}. The package was modified to allow alignment of multidimensional data as well.
+Finally, the implementation of DTW algorithm used in the software is based on \pythonpackage{mlpy} package\cite{Albanese:2012vf}. The author of this project has written the code allowing this package to support variations of DTW algorithm, such as Sakoe \& Chiba band as described in \autoref{sec:DTW}. As well as added support for the alignment of multidimensional data as well.
+
 \section{File formats}
 Since ENCODE project, \cite{Rosenbloom:2011gw} is probably the largest repository of genomic data to date, the formats of data that are used in this repository can be considered to be the industry standard. These formats are listed at the FAQ section on their website, \url{https://genome.ucsc.edu/FAQ/FAQformat.html}, most important ones, BAM and BED are described below.
 
@@ -1093,7 +1146,7 @@ method could be used to look for motifs that are warped by the algorithm very li
 
 \todo{end with a bang}
 
-\bibliographystyle{alpha}
+\bibliographystyle{amsalpha}
 \bibliography{papers2}
 
 \appendix

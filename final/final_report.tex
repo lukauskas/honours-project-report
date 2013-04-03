@@ -319,7 +319,7 @@ The highest points are now mapped to each other, so are the other points that ar
 \end{figure}
 
 In some cases, warping the time axis arbitrarily might not necessarily be a correct thing to do.
-For instance, have a look at \autoref{fig:DTW:std}. Here DTW is used to compare the \histonemodification{H3K4Me3} activation profiles around transcription start sites (TSS) of two genes, \gene{uc003okl.3} and \gene{uc021uwd.1}. We can immediatelly see that first activation profile appears to be unimodal, whereas the second one is clearly bimodal. The minimal warping path maps a relatively inactive region from around bin 40 to around bin 80 in the series for \gene{uc003okl.3} to a single point on the series for \gene{uc021uwd.1}. However, this unexpressed region might have biological significance, e.g. indicate removal of a nucleosome, and we might not want to allow it to be compressed to a single point. 
+For instance, have a look at \autoref{fig:DTW:std}. Here DTW is used to compare the \histonemodification{H3K4Me3} activation profiles around transcription start sites (TSS) of two genes, \gene{uc003okl.3} and \gene{uc021uwd.1}. We can immediately see that first activation profile appears to be unimodal, whereas the second one is clearly bimodal. The minimal warping path maps a relatively inactive region from around bin 40 to around bin 80 in the series for \gene{uc003okl.3} to a single point on the series for \gene{uc021uwd.1}. However, this unexpressed region might have biological significance, e.g. indicate removal of a nucleosome, and we might not want to allow it to be compressed to a single point. 
 
 We can manually impose restrictions on warping paths that are allowed by introducing global constraints. The two most commonly used global constraints on DTW are Sakoe-Chiba Band and Itakura parallelogram\citep{Ratanamahatana:2004wu}.
 
@@ -766,6 +766,8 @@ Cluster Previewer window is pictured in \autoref{fig:implementation:explorer:pre
 This window previews the resulting clustering on a cluster-by-cluster basis. The top-left panel of the window shows the resulting cluster prototype. The original data is shown below it. This dataset is then projected onto the prototype using the DTW projection technique, described in the methods section. The user can navigate between the clusters by the help of \emph{Previous} and \emph{Next} buttons in the top-left corner of the window, or can choose to save the clusters to a set of BED files that can then be processed by other means, e.g. viewed in the Genome Browser (\cite{Kent:2002wd}).
 
 \subsubsection{Point-of-interest tracking}
+\label{sec:poi-tracking}
+
 The heatmap of the data projected onto the prototype is the single most useful piece of information in the cluster explorer window as it allows visual comparison of cluster items on a common ground.
 In order to make these comparisons even more effective, \emph{DGW-explorer} allows the user to specify interesting genomic locations, so called points-of-interet (POI), \emph{a priori}. These locations are then marked both in the original (unwarped) and warped data heatmaps.
 
@@ -971,78 +973,86 @@ This alignment is nowhere visible in the original data, as pictured in \autoref{
 \section{Distinct Patterns Around Transcription Start Sites}
 \label{sec:evaluation:tss}
 
-In the final experiment, designed to show DGW's ability to identify distinct patterns within the regions of interest, regions around transcription start sites of known genes were clustered.
+The final experiment is designed to test DGW's ability to identify and visualise the distinct patterns within the regions of interest. Due to this reason, well documented regions around transcription start sites were chosen to be clustered.
 
-More specifically, 2000 base pair windows around the transcription start sites of UCSC known genes dataset (see \autoref{sec:datasets}) were selected. Regions that overlap each other, were merged 
-together using BEDTools package, as in the previous experiment.
+More specifically, 2000 base pair windows around the transcription start sites of UCSC known genes dataset (see \autoref{sec:datasets}) were selected. If two regions were overlapping each other, both of them were discarded as to only leave regions that contain a single transcription start site and no other transcription start sites in the neighbourhood.
 
-The data at these specific regions was extracted from the ENCODE \histonemodification{H3K4Me3} dataset for the K562 leukaemia  cell line at the resolution of 25 base pairs per bin. Heights of the read pileups were normalised as described in \autoref{sec:pileup_height_normalisation} before processing.
+The data at these specific regions was extracted from the ENCODE \histonemodification{H3K4Me3} dataset for the K562 leukaemia cell line at the resolution of 25 base pairs per bin. Before processing, the dataset was normalised as described in \autoref{sec:pileup_height_normalisation}.
 This data was then clustered using DTW constrained with slanted band of size 12.
 
-The resulting dendrogram can be seen in \autoref{fig:evaluation:tss_regions:cut}. Looking at the cluster prototypes, pictured in \autoref{fig:evaluation:tss_regions:prototypes}, the standard bimodal patterns can be seen in figures \ref{fig:evaluation:tss_regions:prototypes:3} and \ref{fig:evaluation:tss_regions:prototypes:7}. A bit more unusual unimodal patterns at the ends of the regions can be seen in figures \ref{fig:evaluation:tss_regions:prototypes:5} and \ref{fig:evaluation:tss_regions:prototypes:10}. Finally, highly-unusual multimodal patterns can be seen in figures \ref{fig:evaluation:tss_regions:prototypes:1} and \ref{fig:evaluation:tss_regions:prototypes:6}, most probably resulting from the regions that have a number of transcription start sites in proximity.
+The resulting dendrogram can be seen in \autoref{fig:evaluation:tss_regions:cut}. Looking at the cluster prototypes, pictured in \autoref{fig:evaluation:tss_regions:prototypes}, the well-known bimodal patterns around be seen in figures \ref{fig:evaluation:tss_regions:prototypes:c}, \ref{fig:evaluation:tss_regions:prototypes:d} and \ref{fig:evaluation:tss_regions:prototypes:e}.
+\ref{fig:evaluation:tss_regions:prototypes:j}.
 
-Figures \ref{fig:evaluation:tss_regions:heatmaps:unwarped} and \ref{fig:evaluation:tss_regions:heatmaps:warped} illustrate how Dynamic Time Warping is able to highlight the common patterns between the items in the region. For each of the thirteen clusters, both the actual and the warped data is pictured between the two images. Some of the common patterns can be seen just by looking closely to \autoref{fig:evaluation:tss_regions:heatmaps:unwarped}, because the majority of the regions are of fixed length and organised around the transcription start site at the fixed position. However, even in this case, warping the data onto the cluster prototype make these patterns obvious and aligned (\autoref{fig:evaluation:tss_regions:heatmaps:warped}. 
+Perhaps more interestingly, unusual multimodal pattern can be seen in \ref{fig:evaluation:tss_regions:prototypes:b}. Prototypes of clusters pictured in \ref{fig:evaluation:tss_regions:prototypes:f}, \ref{fig:evaluation:tss_regions:prototypes:g} and  \ref{fig:evaluation:tss_regions:prototypes:i} seem to be very different from the remaining clusters. While some evidence of bimodality can be seen in the prototypes of these clusters, the resulting peaks are much narrower than in the other clusters, and in the case of figures,\ref{fig:evaluation:tss_regions:prototypes:f} and \ref{fig:evaluation:tss_regions:prototypes:i}, located at the wrong place (i.e. not at the annotated transcription start site). 
 
-Warping also helps to visualise patterns that would also be non-trivial to spot. For instance have a look at the uniformly spaced lines visible in \autoref{fig:evaluation:tss_regions:heatmaps:warped:5}.
-These lines might indicate nucleosome positioning, at these locations, but are not trivial to spot in the original data, nor they are evident in the unclustered datasets.
+Figures \ref{fig:evaluation:tss_regions:heatmaps:unwarped} and \ref{fig:evaluation:tss_regions:heatmaps:warped} provide heatmaps of the regions within each of the clusters. Note that common patterns between the regions can be noticed by inspecting the original data visually. The reason for this is that due to the way the experiment was designed, the regions are all of the same length, and share a common landmark, the transcription start site, at the bin in the middle. Note that in the previous section, where the peaks called by MACS were clustered, we did not have such a luxury.
 
-\todo{finish this, and maybe update with the results form running the experiment again}.
+Now if some patterns were identifiable from the original data, they are unmistakable in the warped data. For instance, the regions in \autoref{fig:evaluation:tss_regions:heatmaps:unwarped:a} look bimodal. After warping, these patterns are shown to actually be unimodal as seen in \autoref{fig:evaluation:tss_regions:heatmaps:warped:a}, suggesting that the bimodality of the two patterns was just an illusion created by a mixture of sense and antisense patterns.
 
+It is also clear that patterns in e.g. \autoref{fig:evaluation:tss_regions:heatmaps:warped:e} or \autoref{fig:evaluation:tss_regions:heatmaps:warped:j} are bimodal from the warped heatmap.
+
+The warping seems to uncover some curious features of the data, that are not visible in the unprocessed heatmaps. For instance, the data in cluster \autoref{fig:evaluation:tss_regions:heatmaps:warped:b} seems to have a trimodal pattern. Clusters \autoref{fig:evaluation:tss_regions:heatmaps:warped:f} and \autoref{fig:evaluation:tss_regions:heatmaps:warped:i} have a clear evenly-spaced pattern that is repeating throughout the right-hand side of the warped regions. 
+
+
+The hypotheses of the biological origin of such patterns can be verified using the point-of-interest tracking method as described \autoref{sec:poi-tracking}, however they are not in scope of this project.
+
+Please also note that patterns in the warped heatmaps have a noticeable amount of ``bleeding" away from the prototype shape. This \emph{bleeding} is clearly visible in, say, figure \autoref{fig:evaluation:tss_regions:heatmaps:warped:d}, where the central patterns seem to have a bit more red in the left-hand side. Such centralised \emph{bleeding} suggests that there is a definite sub-cluster of data within this cluster that is different enough from the remaining items for the prototype to not be able to model it correctly. In this case, cutting the dendrogram at a lower threshold as to separate these clusters out would create more accurate prototypes.
+
+Due to this, when investigating the biological properties of regions using points-of-interest tracking, it is desirable to cut the dendrogram closer to the leaves, as then cluster prototypes and thus in turn the warped clusters will be more accurate and thus the POI will be aligned better.
 
 \begin{figure}[p]
    \centering
    \includegraphics[height=0.35\textheight]{figures/evaluation/tss_regions/cut.png}
-   \caption{Hierarchical clustering of H3K4Me3 marks around transcription start sites of known genes, as described in \autoref{sec:evaluation:tss}. The threshold for forming flat clusters is drawn as dashed line, and the resulting clusters are colour-coded. Prototypes for each of these 13 clusters are shown in \autoref{fig:evaluation:tss_regions:prototypes}}
+   \caption{Hierarchical clustering of H3K4Me3 marks around transcription start sites of known genes, as described in \autoref{sec:evaluation:tss}. The threshold for forming flat clusters is drawn as dashed line, and the resulting clusters are colour-coded. Prototypes for each of these 11 clusters are shown in \autoref{fig:evaluation:tss_regions:prototypes}}
    \label{fig:evaluation:tss_regions:cut}
 \end{figure}
 
 \newcounter{cluster_number}
 \begin{figure}[p]
    \centering
-   \forloop{cluster_number}{1}{\value{cluster_number} < 14}{
-        \begin{subfigure}[b]{0.13\textwidth}
+   \forloop{cluster_number}{1}{\value{cluster_number} < 12}{
+        \begin{subfigure}[b]{0.17\textwidth}
             \centering
-            \includegraphics[width=\textwidth]{figures/evaluation/tss_regions/cluster-\arabic{cluster_number}.pdf}
+            \includegraphics[width=\textwidth]{figures/evaluation/tss_regions/prototypes/cluster-\arabic{cluster_number}.pdf}
            \caption{}
-           \label{fig:evaluation:tss_regions:prototypes:\arabic{cluster_number}}
+           \label{fig:evaluation:tss_regions:prototypes:\alph{cluster_number}}
         \end{subfigure}
         ~
    }
-   \caption{Prototypes The thirteen clusters resulting from the hierarchical clustering in \autoref{fig:evaluation:tss_regions:cut}. Cluster (c) is probably closest to the
-   bimodal pattern seen on average. Other prototypes seem to show an intriguing set of patterns.
-   For instance, a the bimodal pattern containing a variety of small throughs can be seen in (a), probably resulting from longer regions of the data that have more than a single TSS in the proximity. 
-   Clusters (b) and (e) seem to capture a set of regions that are not activated at the annotated transcription start sites, but are rather active in one of the edges of the window. Cluster (k) captures regions around transcription start sites that have well-documented bimodal peaks, yet the peak on one of the sides stretches much longer than the other. Heatmaps of regions that form each of these clusters can be seen in Figures \ref{fig:evaluation:tss_regions:heatmaps:unwarped} and \ref{fig:evaluation:tss_regions:heatmaps:warped}}
+   \caption{Prototypes of eleven clusters resulting from the hierarchical clustering in \autoref{fig:evaluation:tss_regions:cut}. Well-documented bimodal patterns are seen in some of the clusters, e.g. (c), (d), (e), (j). Other prototypes seem to show an intriguing set of patterns.
+   For instance, cluster (b) seems to have two throughs rather than one, or clusters (f) and (i) that seem to capture a set of regions that are not activated at the annotated transcription start sites, but are rather active in one of the edges of the window. The actual contents of these clusters can be seen in Figures \ref{fig:evaluation:tss_regions:heatmaps:unwarped} and \ref{fig:evaluation:tss_regions:heatmaps:warped}}
    \label{fig:evaluation:tss_regions:prototypes}
 \end{figure}
 
 
 \begin{figure}
    \centering
-   \forloop{cluster_number}{1}{\value{cluster_number} < 14}{
+   \forloop{cluster_number}{1}{\value{cluster_number} < 12}{
         \begin{subfigure}[b]{0.3\textwidth}
             \centering
-            \includegraphics[width=\textwidth]{figures/evaluation/tss_regions/unwarped-heatmaps/cluster-\arabic{cluster_number}.pdf}
+            \includegraphics[width=\textwidth]{figures/evaluation/tss_regions/heatmaps/cluster-\arabic{cluster_number}.pdf}
            \caption{}
-           \label{fig:evaluation:tss_regions:heatmaps:unwarped:\arabic{cluster_number}}
+           \label{fig:evaluation:tss_regions:heatmaps:unwarped:\alph{cluster_number}}
         \end{subfigure}
         ~
    }
-   \caption{Regions forming the thirteen clusters resulting from the hierarchical clustering in \autoref{fig:evaluation:tss_regions:cut}. Actual, unwarped, data is pictured in this figure. As you can see the patterns within the data can be seen without the warping, yet these patterns become unmistakable after the warping, as seen in \autoref{fig:evaluation:tss_regions:heatmaps:warped}. Note that some clusters, e.g. clusters (g) and (h), have a visible division of the elements inside them, suggesting that cutting the dendrogram at a lower threshold, might capture the specifics of these sub-clusters better.}
+   \caption{Regions forming the eleven clusters resulting from the hierarchical clustering in \autoref{fig:evaluation:tss_regions:cut}. Actual, unwarped, data is pictured in this figure. Looking closely at the figures, common patterns of items within the clusters can be seen from this data.
+However, it is the warped data, that makes these patterns obvious, as seen in \autoref{fig:evaluation:tss_regions:heatmaps:warped}. Note that some clusters, e.g. clusters (g) and (k), have a visible division of the items inside them, suggesting that the dendrogram may be cut a bit lower to capture the specifics of these sub-clusters better.}
    \label{fig:evaluation:tss_regions:heatmaps:unwarped}
 \end{figure}
-
+%
 \begin{figure}
    \centering
-   \forloop{cluster_number}{1}{\value{cluster_number} < 14}{
+   \forloop{cluster_number}{1}{\value{cluster_number} < 12}{
         \begin{subfigure}[b]{0.3\textwidth}
             \centering
-            \includegraphics[width=\textwidth]{figures/evaluation/tss_regions/cluster-warped-\arabic{cluster_number}.pdf}
+            \includegraphics[width=\textwidth]{figures/evaluation/tss_regions/heatmaps/cluster-warped-\arabic{cluster_number}.pdf}
            \caption{}
-           \label{fig:evaluation:tss_regions:heatmaps:warped:\arabic{cluster_number}}
+           \label{fig:evaluation:tss_regions:heatmaps:warped:\alph{cluster_number}}
         \end{subfigure}
         ~
    }
-   \caption{Clustered regions warped onto their cluster prototypes. Compare this figure with \autoref{fig:evaluation:tss_regions:heatmaps:unwarped} in terms of visualisation of the cluster contents. The patterns inside the clusters seem to be easier to distinguish here, rather than in \autoref{fig:evaluation:tss_regions:heatmaps:unwarped}.}
+   \caption{Clustered regions warped onto their cluster prototypes. Compare this figure with \autoref{fig:evaluation:tss_regions:heatmaps:unwarped} in terms of visualisation of the cluster contents. The patterns inside the clusters seem to be easier to distinguish here, rather than in \autoref{fig:evaluation:tss_regions:heatmaps:unwarped}. Also note how the deviations from the prototype patterns, e.g. clearly visible in (g) where there the highly-expressed red region seams to be leaking to the left from the center, are grouped together and seem to correlate with the visible subgroups of the patterns seen in \autoref{fig:evaluation:tss_regions:heatmaps:unwarped}. This indicates that the prototype is not able to capture the diversity of the data completely, suggesting the dendrogram should be cut at a lower threshold to separate these sub-clusters, if that is desired.}
    \label{fig:evaluation:tss_regions:heatmaps:warped}
 \end{figure}
 

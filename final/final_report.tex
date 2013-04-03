@@ -192,7 +192,7 @@ In one of the early reviews of ChIP-Seq, \cite{Park:2009wc}, P J Park already pr
 
 For protein-DNA binding, he writes, the most common analysis is the discovery of the short segments of DNA the protein is most likely to bind to, so called binding sequence motifs. A large variety of methods to do that are available today, probably the best-known one being MEME \cite{Grundy:1997vb}.
 
-In order to find these transcription factor binding sites, significantly enriched regions of the genome (so called "peaks") need to be located first. MACS peak caller \cite{Zhang:2008wp} is probably the most popular method of doing this to date, even though a variety of methods exist (see \cite{Furey:2012ha} for a recent review).
+In order to find these transcription factor binding sites, significantly enriched regions of the genome (so called "peaks") need to be located first. MACS peak caller \cite{Zhang:2008wp} is the method of choice for this task to date, even though a variety of other methods have been proposed since (see \cite{Furey:2012ha} for a recent review).
 
 \begin{figure}[p]
    \centering
@@ -203,17 +203,19 @@ In order to find these transcription factor binding sites, significantly enriche
 \end{figure}
 
 For histone modification studies, an obvious approach, as claimed by P J Park, is to annotate the locations of these peaks relative to known genomic features. For instance, it has been observed
-that, on average, histone modifications have very distinct bimodal marks near transcription start sites  \cite{Barski:2007ww}, as pictured in \autoref{fig:motivation:histone_profiles}. The authors also note that most of the marks, e.g.
-\histonemodification{H3K4me3} mark, correlate with the activity of genes being analysed: highly active genes (red in the figure) have more reads falling within the same region than intermediately active ones (green and blue).
+that, on average, histone modifications have very distinct bimodal marks near transcription start sites, as pictured in \autoref{fig:motivation:histone_profiles}. It is also noted that most of the marks, e.g.
+\histonemodification{H3K4me3} mark, correlate with the activity of genes being analysed: highly active genes (red in the figure) have more reads falling within the same region than intermediately active ones (green and blue) \cite{Barski:2007ww}.
 
 What is more interesting, these histone marks are so distinctive, that 
-\cite{Heintzman:2007ke} were able to predict locations of regions that both initiate (promote) and enhance transcription of DNA by training a classifier on the histone marks around known promoter and enhancer regions. Later, \cite{Hon:2008wv} developed a method, ChromaSig, that was able to find these promoter and enhancer signatures in a completely unsupervised way.
+\cite{Heintzman:2007ke} were able to predict locations of regions that both initiate (promote) and enhance transcription of DNA by training a classifier on a combination of histone marks around known promoter and enhancer regions. Later, \cite{Hon:2008wv} developed a method called ChromaSig, that was able to find the promoter and enhancer signatures in completely unsupervised way by simply looking at the most common histone mark motifs within the genome.
 
-There is also evidence that ChIP-Seq signal can tell us more than just the type of DNA region. In the same paper, \cite{Barski:2007ww}, the authors note: ``A series of peaks of H3K4me3 signals at +50, +210, and +360 were detected, suggesting similar nucleosome positioning relative to TSS in active genes"\footnote{Original citation has a typo and spells \emph{H4K4me3}, instead of \emph{H3K4Me3}}, these peaks can be seen in figure \autoref{fig:motivation:histone_profiles}. This claim was later followed-up by \cite{Schmid:2007ue}, who were able to locate promoter-specific nucleosomes ``with unprecedented precision" from this ChIP-Seq data.
+However, the fact that ChIP-Seq signal can tell us more than just the type of DNA region is more interesting. In the already mentioned paper, \cite{Barski:2007ww}, the authors note: ``A series of peaks of H3K4me3 signals at +50, +210, and +360 were detected, suggesting similar nucleosome positioning relative to TSS in active genes"\footnote{Original text misspells \emph{H3K4me3} as \emph{H4K4Me3}}, these peaks can be seen in figure \autoref{fig:motivation:histone_profiles}. This claim was later followed-up by \cite{Schmid:2007ue}, who were able to locate promoter-specific nucleosomes ``with unprecedented precision" from this ChIP-Seq data.
 
-Another, very recent paper by Bieberstein and colleagues\cite{Bieberstein:2012tf} has shown that \histonemodification{H3K4me3} and \histonemodification{H3K9ac} profiles tend to peak at the locations of $5'$ splicing sites of known genes. The authors also conclude that these peaks are independent of nucleosome positioning, unlike the peaks observed by \cite{Barski:2007ww}.
+Another, very recent paper by Bieberstein and colleagues \cite{Bieberstein:2012tf} has shown that \histonemodification{H3K4Me3} and \histonemodification{H3K9Ac} profiles tend to peak at the locations of $5'$ splicing sites of known genes. The authors also conclude that these peaks are independent of nucleosome positioning, unlike the peaks observed by \cite{Barski:2007ww}.
 
-An important point to take away from these two results is that insights to underlying biological processes can be produced from the visual inspection of these histone marks. This observation is the main source of motivation for this project. The ultimate goal of this project is to develop a tool that would allow to group similar patterns into clusters and provide means to visually compare these patterns on a common ground, so hypotheses about their origin could be made.
+An important point to take away from these two results is that insights to underlying biological processes can be produced from the visual inspection of these histone marks. This observation is the main source of motivation for this project. 
+
+The ultimate goal of this project is to develop a tool that would allow to group similar patterns into clusters and provide means to visually compare these patterns on a common ground, so hypotheses about their origin could be made.
 
 \section{Prior art}
 
@@ -224,24 +226,24 @@ While both of these methods would probably succeed in detecting the patterns tha
 
 Also, in some cases, alignment without any kind of scaling, does not make any sense at all. For instance, if one was about to compare the regions spanning whole lengths of known genes, the best these methods could do is to compare a small fragment of the longer gene to the complete length of the shorter one, which is not necessarily the correct thing to do. 
 
-This is the reason why some studies, e.g. \cite{Taslim:vj}, rescale the regions of interest to be of the same length, before doing clustering. This could indeed allow visualisation of similar patterns between the different regions, provided that these patterns scale linearly with the length of the regions. However, most likely this is not the case, and non-uniform scaling is needed.
+This is the reason why some studies, e.g. \cite{Taslim:vj}, rescale the regions of interest to be of the same length, before doing clustering. This could indeed allow visualisation of similar patterns between the different regions, provided that these patterns scale linearly with the length of the regions, yet most likely this is not the case.
 
 Essentially, this problem of comparing genomic patterns of varying lengths is very similar to the problem of comparing waveforms of spoken words in speech recognition. 
 For instance, it is desired to identify two words being the same even though the recording for one of them started, say half a second later. Equivalently, it is desired to detect patterns that are similar, but misaligned. Furthermore, a good speech recognition system would be able to recognise a word correctly even though the speaker prolonged one of the vowels in the word more than it usual, what is similar to patterns that are influenced by the length of the first exon.
 
-Fortunately, the speech recognition community has already matured an approach to this problem. This approach, called Dynamic Time Warping (or simply, DTW), compares two sequences by shrinking or expanding both of them non-uniformly to be as similar as possible. This non-linear warping can then both account for misalignment, by shrinking the misaligned part of one of the sequences, and scaled patterns, by rescaling them to be of the same length. This method is the corner stone of this project.
+Fortunately, the speech recognition community has already matured an approach to this problem. This approach, called Dynamic Time Warping (or simply, DTW), compares two sequences by shrinking or expanding both of them non-uniformly to be as similar as possible. This non-linear warping can then both account for misalignment, by shrinking the misaligned part of one of the sequences, and scaled patterns, by rescaling them to be of the same length. This project proposes a method that combines this Dynamic Time Warping distance with hierarchical clustering with the aim of comparing genomic features. Instead of using Dynamic Time Warping to compare time-series data, it is directly used to compare the genomic data. Due to this reason, this new method is named Dynamic Genome Warping or simply DGW.
 
-A paper by Wang et al. \citep{Wang:2012cb} proposes a similar method, they call ChAT.
-Their method tries to find the best alignment between two patterns before doing any clustering, just as ChromaSig or ArchAlign, yet it allows to ignore a part of some region as if it was not there. The authors of the paper claim that these gaps ``are critical because they allow the algorithm to extend beyond regions with variant (or diffuse) chromatin enrichment signatures, and in so doing facilitate the discovery of chromatin signatures that span long genomic regions as well as those with complex multi-modal patterns of histone modification enrichment". 
+In its essence, this method is very similar to the ChAT method, described in \citep{Wang:2012cb}.
+This method tries to find the best alignment between two patterns before doing any clustering, just as ChromaSig or ArchAlign, yet it allows to ignore a part of some region as if it was not there. The authors of the paper claim that these gaps ``are critical because they allow the algorithm to extend beyond regions with variant (or diffuse) chromatin enrichment signatures, and in so doing facilitate the discovery of chromatin signatures that span long genomic regions as well as those with complex multi-modal patterns of histone modification enrichment". 
 
 The main difference between the method used in this project and the one used by Wang et al. is that when creating gaps, ChAT algorithm applies a penalty that is proportional to the norm of the vector that is being skipped. Such penalty biases the algorithm to skip unexpressed regions more than expressed ones as per reasoning that depleted regions are not as interesting as the expressed ones. 
-While this penalty allows the discovery of multi-modal patterns separated by depleted regions across genome as the authors claim, it would heavily penalise any attempts to discover highly-expressed patterns of varying lengths.
+While this penalty allows the discovery of multi-modal patterns separated by depleted regions across genome, it would heavily penalise any attempts to discover patterns of varying lengths in highly-expressed regions.
 
 Contrary to this, the DTW distance measure does not allow skipping of the points at all. It does, however, allow a set of points on one sequence to a single point on another as if that point was stretched to become a sequence of n points. This way the penalty of warping the genome depends directly on the points that are aligned to each other, so the algorithm is able to do this both for highly expressed and fairly depleted regions, as long as the values mapped to each other are similar.
 
-\todo{write about how chat method is independent of this one}
+\todo{write about how chat method was developed independently of this one}
 
-This concludes the motivation section of the report. The next chapter describes the methods taken in this project in more detail.
+The exact workings of DGW are explained in detail in the next chapter.
 
 \chapter{Methods}
 \section{Dynamic Time Warping}

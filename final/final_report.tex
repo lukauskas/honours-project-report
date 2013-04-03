@@ -703,32 +703,38 @@ That is, if we thought the mark as of a vector $\mathbf{x}$, then the normalisat
 After the normalisation the bin with the highest number of reads in it, will always have a value equal to $1$, so the bins will be compared at the same scale. One can see the normalisation turning the distance between the original and modified regions to zero again in \autoref{fig:pileup_normalisation:cost_normalised}.
 
 \chapter{Implementation Details}
-The algorithms described in the previous chapter were packaged into a software package, named Dynamic Genome Warping, or DGW for short. This section describes in detail the implementation of this software including its structure, interface and the solutions to key computational challenges faced.
+The methods described in the previous chapter were compiled together into a software package, named Dynamic Genome Warping, or DGW for short. 
+
+This chapter describes the implementation of this software, including its structure, interface and solutions to key computational challenges faced.
 
 \section{Dependancies}
-The core of DGW package was written in Python 2.7\footnote{See Python's homepage for more information \url{http://www.python.org/}}. The developed software exploits the maturing scientific community around Python and builds upon a large variety of packages available.
+The core of DGW package was written in Python 2.7\footnote{See Python's homepage for more information \url{http://www.python.org/}}. The software exploits the maturing scientific community around Python and builds upon a large variety of packages produced by it.
 
-One of the core dependancies of DGW is the \verb"pandas" package available from \url{http://pandas.pydata.org/}. This package provides efficient, R-like data structures that are extremely easy to use. These data structures are used throughout the code to be able to store and manipulate the histone marks efficiently. 
+One of the core dependancies of DGW is the \verb"pandas" package, available from \url{http://pandas.pydata.org/}. This package provides efficient, R-like data structures that are extremely easy to use. DGW uses these data structures throughout the code as to be able to both store and manipulate the histone marks efficiently. 
 
-Packages in PyLab, namely \pythonpackage{numpy}, \pythonpackage{scipy} and \pythonpackage{matplotlib} also play a crucial part in this software. Together they bring functionality of MATLAB\footnote{See \url{http://www.mathworks.co.uk/products/matlab/} for more information about MATLAB} to Python. The first package, \pythonpackage{numpy} provides efficient computational routines on arrays and matrices; the second package, \pythonpackage{scipy} has a majority of scientific procedures implemented, including the ones required for drawing and analysing dendrograms; whereas the third one, \pythonpackage{matplotlib} \cite{Hunter:2007ux}, handles all of the visualisation and plotting. \todo{Get a link when scipy.org is back}.
+Packages in PyLab, namely \pythonpackage{numpy}, \pythonpackage{scipy} and \pythonpackage{matplotlib} also play a crucial part in this software. Together they bring functionality of MATLAB\footnote{See \url{http://www.mathworks.co.uk/products/matlab/} for more information about MATLAB} to Python. The first package, \pythonpackage{numpy} provides efficient computational routines on arrays and matrices; the second package, \pythonpackage{scipy} has a majority of scientific procedures available in MATLAB implemented, including the ones required for drawing and analysing hierarchical clustering dendrograms; whereas the third one, \pythonpackage{matplotlib} \cite{Hunter:2007ux}, handles all of the visualisation and plotting. 
 
-Daniel M\"ullner's \pythonpackage{fastcluster} package \cite{Mullner:2011wb}, is used for efficient computations
-of hierarchical clustering linkage matrices; and \pythonpackage{pysam} (\url{https://code.google.com/p/pysam/}) provides a Python wrapper around the \emph{SAMtools} (\cite{Li:2009ka}) toolkit.
+Furthermore, Daniel M\"ullner's \pythonpackage{fastcluster} package \cite{Mullner:2011wb}, is used for efficient computations
+of hierarchical clustering linkage matrices. Whereas \pythonpackage{pysam} (\url{https://code.google.com/p/pysam/}) package is used for it's Python interface to the \emph{SAMtools} (\cite{Li:2009ka}) toolkit.
 
-Finally, the implementation of DTW algorithm used in the software is based on \pythonpackage{mlpy} package\cite{Albanese:2012vf}. The author of this project has written the code allowing this package to support variations of DTW algorithm, such as Sakoe \& Chiba band as described in \autoref{sec:DTW}. As well as added support for the alignment of multidimensional data as well.
+Finally, implementation of the DTW algorithm is based on \pythonpackage{mlpy} package \cite{Albanese:2012vf}. The author of this project has extended this package, however, by adding support for variations of DTW algorithm described in \autoref{sec:DTW}. The author of this project has also refactored the implementation of the canonical DTW algorithm in the package as to support alignment between sequences of vectors, rather than sequences of scalars.
 
 \section{File formats}
-Since ENCODE project, \cite{Rosenbloom:2011gw} is probably the largest repository of genomic data to date, the formats of data that are used in this repository can be considered to be the industry standard. These formats are listed at the FAQ section on their website, \url{https://genome.ucsc.edu/FAQ/FAQformat.html}, most important ones, BAM and BED are described below.
+Since the ENCODE project, \cite{Rosenbloom:2011gw} is probably the largest repository of genomic data to date, the data formats used in this repository can be considered to be the industry standard. An exhaustive list of the data formats used in this project is provided at the FAQ section on their website, \url{https://genome.ucsc.edu/FAQ/FAQformat.html}. This section describes the two most important ones from this list, BAM and BED.
 
-BAM file format is a successor to the SAM file format the \emph{SAMtools} is named after. The package stores the sequence alignments from a NGS experiment in a compressed binary format. Due to the amount of sequencing data generated by these experiments, BAM files are often a few gigabytes in size. 
-To keep data access efficient, BAM files are often distributed along with an index file, that provides pointers to specific genetic locations in the compiled BAM file. These files are not designed to be processed by hand, and \emph{SAMtools} package is designed to be used instead. DGW also does not try to reinvent the wheel and uses a python wrapper around this library, \pythonpackage{pysam} as described earlier.
+BAM file format is a successor to the SAM file format the \emph{SAMtools} toolkit is named after. The package stores the sequence alignments from a NGS experiment in a compressed binary format. Due to the amount of sequencing data generated by these experiments, BAM files are often a few gigabytes in size. 
+To keep data access efficient, BAM files are often distributed along with an index file, that provides pointers to specific genetic locations in the compiled BAM file.
 
-Another file format, BED, is perfect for describing a set of regions of interest, due to this reason it is the format that MACS peak caller outputs by default. Due to it's simple structure: a set of tab separated fields for chromosome, start of the region, end of the region, name of the region and other optional fields, it is easy to parse by hand and can be read by the majority of CSV processing methods.
+This format is not designed to be processed by hand, and the use \emph{SAMtools} package is suggested instead. As already described earlier, DGW uses a python wrapper around this library, \pythonpackage{pysam} to be able to extract the reads from these files.
+
+Another file format, BED, is perfect for describing a set of genomic regions of interest, and is the default output format of the MACS peak caller due to this reason. It's structure is extremely simple: a set of tab separated fields for chromosome, start of the region, end of the region, name of the region and a few other optional fields. Due to this it is easy to parse by hand and a majority of methods that are designed to process CSV can be used to do this. 
 DGW uses one of such CSV processing methods, that is implemented in \pythonpackage{pandas} to quickly load the contents of this file into \pythonpackage{pandas} data structure.
 
-These two file formats are used for input to the software -- the ChIP-Seq datasets are expected to be in indexed BAM format, whereas the regions of interest to cluster are expected to be in BED format.
+These two file formats are used for input to the software -- the ChIP-Seq datasets are expected to be in BAM format, whereas the regions of interest to cluster are expected to be in BED format.
 
-DGW module also allows tracking of interesting locations both before and after the warping, for instance, tracking the locations of transcription start sites overlapping with clustered regions. In some cases there might be more than one such point to be tracked within some region, e.g. more than a single transcription start site overlapping some peak called by MACS. BED format does not support describing disjoint regions very intuitively, and therefore a simple file format for defining such regions is created to be used in DGW. Each line in this file format starts with the name of the region of interest that was clustered (e.g. name of the MACS peak), followed by a colon, followed by a list of comma-separated locations of points of interest within that region, for instance:
+DGW module also allows tracking of interesting locations both before and after the warping, for instance, tracking the locations of transcription start sites overlapping with clustered regions. In some cases there might be more than one such point to be tracked within the given region, e.g. more than a single transcription start site overlapping some peak called by MACS. Since BED format does not support describing disjoint regions by default, a simple file format for defining such regions was created for the sole purpose of using it in DGW. 
+
+Each line in this file format starts with the name of the region of interest that was clustered (e.g. name of the MACS peak), followed by a colon, followed by a list of comma-separated locations of points of interest within that region, for instance:
 
 \begin{verbatim}
 MACS_peak_84:1655238,1655387,1655705,1655696,1656202
@@ -737,10 +743,14 @@ MACS_peak_87:1689803
 MACS_peak_89:1709727,1710184,1711343
 \end{verbatim}
 
-Since this is an \emph{ad-hoc} file format, an utility script to automatically generate this file from overlapping regions in two BED files was developed and is shipped together with DGW, so the end users do not have to adapt any of existing workflows to support this new format.
+Regions that contain no such points of interest, can be safely ignored.
+
+Even though the format is simple, it is still an \emph{ad-hoc} file format users will not be used to working with. Due to this an utility script to automatically generate points-of-interest file overlapping regions in two BED files was developed. With the help of this script, a majority of the users will not need to know how the points-of-interest file is structured as the script will do the work for them.
 
 \section{Structure of the software}
-Dynamic Time Warping is an expensive distance metric to use, as the runtime of the algorithm scales quadratically with the length of the sequences. Combine that with tens of thousands regions of interest  that need to be compared to each other in order to hierarchically cluster them, and you will get a algorithm, that might take a long while to complete on your laptop. CPU-demanding software like this is not uncommon in the field of life sciences, due to the amount of data modern experiments can produce, and therefore a majority of these labs are equipped with a supercomputer.\todo{citation needed} 
+Dynamic Time Warping is an expensive distance metric to use, as the runtime of the algorithm scales quadratically with the length of the sequences (compare this with e.g. Euclidean distance which is $O(n)$ instead). Combining that with tens of thousands regions of interest that need to be compared to each other in order to hierarchically cluster them, one will get an algorithm that is probably unlikely to be run on a laptop. 
+
+CPU-demanding software like this is not uncommon in the field of life sciences, due to the amount of data modern experiments can produce, and therefore a majority of these labs have access to a supercomputer.
 
 With this in mind, DGW is designed as a combination of two standalone modules: a computationally heavy module designed to be run on a supercomputer, and an exploratory module, that can analyse the results obtained from the worker module on a less-powerful computer.
 
@@ -755,14 +765,23 @@ With this in mind, DGW is designed as a combination of two standalone modules: a
 \autoref{fig:implementation:dgw-worker-workflow} outlines the workflow of the worker module.
 The module first reads the regions of interest supplied by the user in a BED file. These regions are then divided into a set of bins of specified width (50 base pairs wide by default), and the histogram of number reads falling within those bins is computed, much like in \autoref{fig:background:chip-results}, to get a collection of profiles to be analysed. 
 
-These profiles are then filtered by keeping only the ones that have at least one bin with more than 10 reads falling into it. \todo{Maybe move this to preprocessing section in methods} This filtering removes a substantial part of the dataset and thus reduces the runtime significantly. The underlying assumption under it is that relatively unexpressed regions are not as interesting from the scientific point of view, and more prone to variations in patterns due to random noise. The resulting data is then converted to log scale and, optionally, normalised to be on the same scale. \todo{definitely need this in methods section}. At this point the alignments are ready for clustering. 
+These profiles are then by keeping only the ones that have at least one bin with more than 10 reads falling into it.This filtering removes a substantial part of the dataset and thus reduces the runtime significantly. The underlying assumption of this filtering is that relatively unexpressed regions are not as interesting from the scientific point of view, and more prone to variations in patterns due to random noise. The resulting data is then converted to log scale and, optionally, normalised to be on the same scale. Please refer to \autoref{sec:reading_and_preprocessing} for an in-depth discussion of these methods.
+
+At this point the profiles are ready to be clustered.
 
 \subsubsection{Clustering}
 During the clustering step, pairwise distances between each of the profiles are calculated.
-Since this is the most time-demanding step of the algorithm, an extra effort has been put to make the clustering as efficient as it gets. as efficient as it gets. To achieve this, the DTW clustering routines are implemented in native C. These native C modules are then called from Python code using the C-Extensions for Python suite (\url{http://www.cython.org/}). Native C code reduces the time required to compute the distance between two alignments from milliseconds to microseconds. Microseconds might not seem much, but the number of computations that are needed to compute the pairwise distance matrix is extraordinary. If the DTW distance computation on average takes around $161$ microseconds to complete for two sequences of length 80, computing the pairwise distances for $30000$ regions would take around $20$ hours to complete as there would be ${30000 \choose 2} \approx 4.5 \times 10^8$ comparisons to make. Fortunately, computation of pairwise distances is easy to parallelise as each computation is completely independent from the others.
+Since this is the most time-demanding step of the algorithm, an extra effort has been put to make the clustering as efficient as it gets. 
 
-Python supports multithreading out of the box, however, there is a catch. The Global Interpreter Lock (GIL), prohibits more than one thread interacting with the Python interpreter. Unfortunately, this means that the multithreading module is only useful for off-loading long-running non-Python procedures, such as I/O waits to a separate thread. Due to this, instead of creating new threads, parallel programs in Python create new processes each having separate Python interpreters attached to them and therefore separate GILs. Such architecture, however, makes sharing of information between threads challenging.
-By default, Python copies the memory contents from the parent process to the child process. This behaviour is sufficient in nine cases out of ten, however, not this one. In DGW, the alignment profiles, once read, could take up to a few gigabytes of memory. While it is not uncommon today to see computers with 8 or more gigabytes of RAM that can easily fit datasets like this into memory, few computers could afford copying this dataset four or more times in the memory. With this in mind, DGW implementation is careful to share critical bits of memory between the processes so the same amount of memory is used when splitting the computation between the processes.
+To achieve this, the DTW clustering routines are implemented in native C. These native C modules are then called from Python code using the C-Extensions for Python suite, Cython (\url{http://www.cython.org/}). Native C code reduces the time required to compute the distance between two alignments from milliseconds to microseconds.
+
+Microseconds might not seem much, but the number of computations that are needed to compute the pairwise distance matrix is extraordinary. If the DTW distance computation on average takes around $161$ microseconds to complete for two sequences of length 80, computing the pairwise distances for $30000$ regions would take around $20$ hours to complete as there would be ${30000 \choose 2} \approx 4.5 \times 10^8$ comparisons to make. Fortunately, computation of pairwise distances is easy to parallelise as each computation is completely independent from the others.
+
+Parallelisation in software is usually done by splitting the execution into multiple threads.
+Python supports multithreading out of the box, however, there is a catch. The Global Interpreter Lock (GIL), prohibits more than one thread interacting with the Python interpreter. Unfortunately, this means that the multithreading module is only useful for off-loading long-running non-Python procedures, such as I/O waits to a separate thread. Due to this, instead of creating new threads, parallel programs in Python create new processes each having separate Python interpreters attached to them and therefore separate GILs.
+
+Multiprocessed architecture, however, makes sharing of information between threads challenging.
+By default, Python copies the memory contents from the parent process to the child process. This behaviour is sufficient in nine cases out of ten, however, not this one. ChIP-Seq alignment profiles, once read, could take up to a few gigabytes of memory. While it is not uncommon today to see computers with 8 or more gigabytes of RAM that can easily fit datasets like this, few computers could afford copying this dataset in the memory four or more times. With this in mind, DGW implementation is careful to share critical bits of memory between the processes so the same amount of memory is used when splitting the computation between the processes.
 
 This multiprocessing reduces the computational time by a factor equal to the number of processes used, usually upper-bounded by the number of CPUs in the computer. For instance, it would take eight times less to cluster the dataset on a machine with eight CPU cores, than it would take to cluster the same 
 dataset on a computer with a single CPU only. 
@@ -773,7 +792,7 @@ algorithm from the \pythonpackage{fastcluster} package is used.
 \subsubsection{Prototype Generation and Data Projection}
 \label{sec:prototypes}
 
-An important property of hierarchical clustering is that there will always be $n-1$ nodes in the resulting dendrogram, where $n$ is the number of elements being clustered. This means that there are at most $n-1$ distinct clusters possible from any particular clustering of data, therefore there will at most be $n-1$ cluster prototypes possible. The worker exploits this and computes all $n-1$ prototypes using the bottom-up algorithm described in \autoref{sec:prototypes}. 
+An important property of hierarchical clustering is that there will always be $n-1$ nodes in the resulting dendrogram, where $n$ is the number of elements being clustered. This means that there are at most $n-1$ distinct clusters possible from any particular clustering of data, therefore there will at most be $n-1$ cluster prototypes possible. The worker exploits this and computes all $n-1$ prototypes using the bottom-up algorithm described in section \ref{sec:prototypes}. 
 
 \begin{figure}[t,b]
    \centering
@@ -798,7 +817,7 @@ In order to compute the warped dataset, each element in each of the possible clu
 
 On the other hand, in the best case where the $n-1$ nodes would form a perfect binary tree, as pictured in \autoref{fig:implementation:dendrogram:best}, only $O(n \log n)$ DTW projection computations would be needed. Luckily, as the reader might remember from \autoref{sec:clustering}, the complete linkage criterion makes dendrograms like the one in \autoref{fig:implementation:dendrogram:worst} highly unlikely, and instead makes the dendrograms look closer to the one in \autoref{fig:implementation:dendrogram:best} on average. 
 
-The worker module exploits this and precomputes the DTW warping paths needed to project the dataset so the worker module does not have to. Computing these paths in the worker module has another advantage of the worker being able to parallelise these tasks within the multiple CPUs of the machine the code is being run on. Only the paths, and not the actual projections are computed, as the former takes up less memory to store. Also, having the precomputed paths allows the explorer module to be able to efficiently track locations of points-of-interest in the warped data, as described in the next section.
+The worker module exploits this and precomputes the DTW warping paths needed to project the dataset so the worker module does not have to. Computing these paths in the worker module has another advantage of the worker being able to parallelise these tasks within the multiple CPUs of the supercomputer. Only the paths, and not the actual projections are computed, as the former takes up less memory to store. Also, having the precomputed paths allows the explorer module to be able to efficiently track locations of points-of-interest in the warped data, as described in the next section.
 
 \subsection{The Explorer module}
 
@@ -814,7 +833,7 @@ visualisation and data exploration.
 \end{figure}
 
 The main window of \emph{DGW-explorer} is shown in \autoref{fig:implementation:explorer:main}.
-Here the dendrogram and zoomable heatmap of the original dataset is shown. The user is able to select the dendrogram cut threshold by simply right-clicking anywhere on the dendrogram with her mouse. 
+Here the dendrogram and zoomable heatmap of the original dataset is shown. The user is able to select the dendrogram cut threshold by simply right-clicking anywhere on the dendrogram. 
 The right-click was chosen instead of left-click in order to not interfere with the default zoom controls available in the bottom-left corner of \pythonpackage{matplotlib} windows. After the dendrogram is cut, a vertical line marking the threshold is drawn and the resulting clusters are immediately colour-coded, as seen in the figure. At this stage, pressing the \emph{Preview} button, brings the Cluster Previewer window up.
 
 \begin{figure}[p]
@@ -825,13 +844,15 @@ The right-click was chosen instead of left-click in order to not interfere with 
 \end{figure}
  
 Cluster Previewer window is pictured in \autoref{fig:implementation:explorer:previewer}.
-This window previews the resulting clustering on a cluster-by-cluster basis. The top-left panel of the window shows the resulting cluster prototype. The original data is shown below it. This dataset is then projected onto the prototype using the DTW projection technique, described in the methods section. The user can navigate between the clusters by the help of \emph{Previous} and \emph{Next} buttons in the top-left corner of the window, or can choose to save the clusters to a set of BED files that can then be processed by other means, e.g. viewed in the Genome Browser (\cite{Kent:2002wd}).
+This window summarises the clustering on a cluster-by-cluster basis. The resulting cluster prototype is shown in the top-left panel. The original data is shown below it. This dataset is then projected onto the prototype using the DTW projection technique, described in section \ref{sec:dtw-projection} and displayed in the bottom-most panel.
+
+ The user can navigate between the clusters by the help of \emph{Previous} and \emph{Next} buttons in the top-left corner of the window, or can choose to save the clusters to a set of BED files that can then be processed by other means, e.g. viewed in the Genome Browser (\cite{Kent:2002wd}).
 
 \subsubsection{Point-of-interest tracking}
 \label{sec:poi-tracking}
 
 The heatmap of the data projected onto the prototype is the single most useful piece of information in the cluster explorer window as it allows visual comparison of cluster items on a common ground.
-In order to make these comparisons even more effective, \emph{DGW-explorer} allows the user to specify interesting genomic locations, so called points-of-interet (POI), \emph{a priori}. These locations are then marked both in the original (unwarped) and warped data heatmaps.
+In order to make these comparisons even more effective, \emph{DGW-explorer} allows the user to specify interesting genomic locations, so called points-of-interest (POI), \emph{a priori}. These locations are then marked both in the original (unwarped) and warped data heatmaps.
 
 \begin{figure}
    \centering

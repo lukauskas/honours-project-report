@@ -30,7 +30,7 @@
 
 \date{\today}
 
-\abstract{Next Generation Sequencing methods, such as ChIP-Seq, have already become vitally important for studying epigenetic processes. Previous research has shown that visually observable patterns in the data produced by these methods can yield insights to the underlying biological mechanism, yet the enormous scale and specifics of this data makes the task of exploration challenging. This project proposes Dynamic Genome Warping (DGW), a novel method of exploring this data that combines Dynamic Time Warping, a well-established method coming from speech recognition community, with hierarchical clustering. The method is shown to be able to recognise well-documented features in ChIP-Seq datasets automatically, as well as to provide means to explore the data for previously unseen ones.}
+\abstract{Next Generation Sequencing methods, such as ChIP-Seq, have already become vitally important for studying epigenetic processes. Previous research has shown that visually observable patterns in the data produced by these methods can yield insights to the underlying biological mechanism, yet the enormous scale and specifics of this data makes the task of exploration challenging. This project proposes Dynamic Genome Warping (DGW), a novel method of exploring this data that combines Dynamic Time Warping, a well-established method coming from speech recognition community, with hierarchical clustering. The method is shown to be able to recognise well-documented features in ChIP-Seq datasets automatically, as well as to provide means to explore the data to discover previously unseen ones.}
 
 \maketitle
 
@@ -107,6 +107,14 @@ The fifth histone, H1, attaches itself to the DNA from the opposite side to the 
 These DNA-wrapping histones are known to be mostly modular in structure, with a number of ``tails" that are susceptible to chemical modifications such as methylation, acetylation and phosphorylation \cite{Fischle:2003tl,Kouzarides:2007js}. These chemical modifications on histone tails have been shown to be able to alter the structure of chromatin. For instance, acetylation of histone H4 on lysine 16 (shortened as \histonemodification{H4K16Ac}, where \emph{H4} is the histone number, \emph{K16} stands for lysine 16 and \emph{Ac} stands for Acetylation) has been shown to inhibit formation of the 30-nanometer fibre \cite{ShogrenKnaak:2006gt}. These changes of the chromatin structure can affect the accessibility of the DNA. Intuitively, the tighter DNA is packaged, the less accessible it is to various chemical interactions.
 
 \section{Gene Expression}
+Gene expression process can be summarised using the central dogma of molecular biology: 
+\emph{DNA makes RNA makes proteins}. Technically speaking, gene expression is a combination of two processes, transcription (DNA to RNA) and
+translation (RNA to protein) which produce a functional product of a gene, e.g. a protein\footnote{Not all genes produce proteins as their functional product. For the sake of simplicity, these so called non-coding genes are not discussed in this chapter.}.
+
+During transcription, RNA polymerase molecule binds to a region of DNA that is indicated by a complex ensemble of proteins bound to promoter regions of DNA. This molecule then proceeds to read information encoded in one of the strands, synthesising RNA molecule complimentary to the nucleotides read. The strand that was read by RNA polymerase molecule is commonly referred to as the template or antisense strand, and is read in direction from $3'$ end to $5'$ end, meaning that the RNA molecule is created from $5'$ end to $3'$ end. 
+Since the generated RNA is complimentary to the sequence on the template strand, it will have exactly the same arrangement of nucleotides, as in the remaining strand\footnote{The only exception being that in RNA molecule thymine is replaced with uracyl.}. Due to this reason the remaining strand is often referred to as the coding or sense strand.
+Also, the location of the first nucleotide that was transcribed is often referred to as the transcription start site of a gene or TSS for short.
+
 \begin{figure}[t]
 \centering
 \copyrightbox[b]{
@@ -117,24 +125,14 @@ The green regions at the edges of both pre-mRNA and mRNA are called untranslated
 \label{fig:background:splicing}
 \end{figure}
 
-Gene expression process can be summarised using the central dogma of molecular biology: 
-\emph{DNA makes RNA makes proteins}. Technically speaking, gene expression is a combination of two processes, transcription (DNA to RNA) and
-translation (RNA to protein) which produce a functional product of a gene, e.g. a protein\footnote{Not all genes produce proteins as their functional product. For the sake of simplicity, these so called non-coding genes are not discussed in this chapter.}.
+Even though the complete length of the gene is transcribed into RNA, only a fraction of it is translated to the protein. Fragments of genes, known as introns, are removed post transcription by the process known as RNA splicing. The remaining regions, exons, are then joined and form the final messenger RNA (mRNA). This process is schematically illustrated in \autoref{fig:background:splicing}. The regions between exons and introns are known as splicing sites. Please note the location of the first splicing site, otherwise known as the $5'$ splicing site, that is marked in the figure as it will become important in the next chapter. 
 
-During transcription, RNA polymerase molecule binds to a region of DNA that is indicated by a complex ensemble of proteins bound to promoter regions of DNA. This molecule then proceeds to read information encoded in one of the strands, synthesising RNA molecule complimentary to the nucleotides read. The strand that was read by RNA polymerase molecule is commonly referred to as the template or antisense strand, and is read in direction from $3'$ end to $5'$ end, meaning that the RNA molecule is created from $5'$ end to $3'$ end. Since the generated RNA is complimentary to the sequence on the template strand, it will have exactly the same arrangement of nucleotides, as in the remaining strand\footnote{The only exception being that in RNA molecule thymine is replaced with uracyl.}. Due to this reason the remaining strand is often referred to as the coding or sense strand.
-
-Even though the complete length of the gene is transcribed into RNA, only a fraction of it is translated to the protein. Fragments of gene, known as introns, are removed post transcription by the process known as RNA splicing. The remaining regions, exons, are then joined and form the final messenger RNA. This process is schematically illustrated in \autoref{fig:background:splicing}. The regions between exons and introns are known as splicing sites. 
-
-After splicing, the resulting messenger RNA (mRNA) is transferred to the ribosome, that will create the proteins from the blueprint encoded inside the mRNA. A more in depth view of these processes can be found in a molecular biology textbook, e.g. in \cite{Alberts:2002te}.
+After splicing, the resulting messenger RNA is transferred to the ribosome, that will create the proteins from the blueprint encoded inside the mRNA. A more in depth view of these processes can be found in a molecular biology textbook, e.g. in \cite{Alberts:2002te}.
 
 Gene expression is particularly interesting for epigeneticists, who are concerned about the factors that may alter it without altering the underlying DNA sequence. Chemical histone modifications have been shown to correlate with the transcriptional activity of the genes near them \cite{Pokholok:2005wn,Kouzarides:2007js}, making them an interesting topic of research for epigeneticists. The next section summarises the methods designed to study them. 
  
 \section{Next-Generation Sequencing}
 
-It took 13 years and around \$2.7 billion to sequence the whole human genome for the first time, by the scientists of the Human Genome Project\footnote{For more information, see \url{http://www.genome.gov/11006943} and
-    \url{http://www.ornl.gov/sci/techresources/Human_Genome/project/about.shtml}}. 
-    
-    
 \begin{figure}
     \centering
     \copyrightbox[b]{\includegraphics[width=0.8\textwidth]{figures/background/IlluminaSequencing.png}}
@@ -146,6 +144,8 @@ It took 13 years and around \$2.7 billion to sequence the whole human genome for
     \label{fig:background:ngs:illumina}
 \end{figure}
 
+It took 13 years and around \$2.7 billion to sequence the whole human genome for the first time, by the scientists of the Human Genome Project\footnote{For more information, see \url{http://www.genome.gov/11006943} and
+    \url{http://www.ornl.gov/sci/techresources/Human_Genome/project/about.shtml}}. 
 Since then, the cost and duration of DNA sequencing has dropped sharply with the invention of
 the Next-Generation Sequencing methods (NGS). Instead of sequencing a long segment of DNA sequentially,
 the next-generation sequencing methods sequence a lot of short DNA segments in a massively-parallel way, much like as depicted in \autoref{fig:background:ngs:illumina}.
@@ -166,9 +166,9 @@ The original document was licensed under Creative Commons Attribution-Share Alik
 \label{fig:background:chip}
 \end{figure}
 
-Chromatin Immunoprecipitation, followed by Sequencing (ChIP-Seq) is a NGS method that studies protein-DNA interactions within the cell. Instead of sequencing the whole genome, ChIP-Seq aims to sequence only parts of DNA that interact with some target protein. These target proteins can either be internal to DNA (histones) or arbitrary external proteins that interact with DNA.
+Chromatin Immunoprecipitation, followed by Sequencing (ChIP-Seq) is a NGS method that studies protein-DNA interactions within a cell. Instead of sequencing the whole genome, ChIP-Seq aims to sequence only parts of DNA that interact with some target protein. These target proteins can either be internal to DNA (histones) or arbitrary external proteins that interact with DNA.
 
-Basic ChIP-Seq workflow is summarised in \autoref{fig:background:chip}. In short, proteins are first ``glued" together with the DNA by chemical cross-linking. This DNA-with proteins attached to it is then shorn into smaller pieces. Antibodies are added to single the target proteins out using immunoprecipitation. Precipitate is then collected and the DNA that is attached to the target proteins is sequenced. This sequenced DNA is then matched to the reference genome to provide hints of which parts of genome interact with the protein \cite{Mardis:2007wa}.
+Basic ChIP-Seq workflow is summarised in \autoref{fig:background:chip}. In short, proteins are first ``glued" together with the DNA by chemical cross-linking. DNA with proteins attached to it is then shorn into smaller pieces by sonication. Antibodies are added to single the target proteins out using immunoprecipitation. Precipitate is then collected and the DNA that is attached to the target proteins is sequenced. This sequenced DNA is then matched to the reference genome to provide hints of which parts of genome interact with the protein \cite{Mardis:2007wa}.
 
 \begin{figure}[t]
     \centering
@@ -178,33 +178,32 @@ Basic ChIP-Seq workflow is summarised in \autoref{fig:background:chip}. In short
 \end{figure}
 
 Figure \ref{fig:background:chip-results} shows a typical result of ChIP-Sequencing experiment.
-The aligned reads are pictured as rectangles below the histogram. Usually only a short fragment of DNA attached to protein (e.g. 36 base pairs) is sequenced. In most cases, the sequencing is done from $5'$ end to $3'$ only\cite{Park:2009wc}. This means that the DNA that was read from the reverse strand will have opposite direction than the DNA that was read from the forward strand. This directionality is then recorded and can be used to correct some of the sequencing artefacts, as described in \autoref{sec:reading_and_preprocessing}.
+The aligned reads are pictured as rectangles below the histogram. Usually only a short fragment of DNA attached to protein is sequenced. In most cases, the sequencing is done from $5'$ end to $3'$ only \cite{Park:2009wc}. This means that the DNA that was read from the reverse strand will have opposite direction than the DNA that was read from the forward strand. This directionality is then recorded and can be used to correct some of the sequencing artefacts, as described in \autoref{sec:reading_and_preprocessing}.
 
 The aligned reads are then stacked together into a histogram, creating a landscape of target protein enrichment, as seen in \autoref{fig:background:chip-results}. These enrichment landscapes, often referred to as just ``marks", are then analysed computationally in order to gain insights on the role the target proteins play in the living organisms. Even though these marks are technically histograms of the number of reads falling within the region, they are commonly visualised as continuous functions, for the sake of simplicity.
-
-Chapter \ref{cha:motivation} reviews the common computational approaches of exploring this data, as well as gives motivation on the approach taken by the author.
 
 \subsection{Publicly available Datasets}
 \label{sec:datasets}
 
 Before jumping to the motivation for the project, it is important to note the publicly available datasets of ChIP-Seq experiment results.
 
-The Encyclopedia of DNA elements, ENCODE, \cite{TheENCODEProjectConsortium:2004db} has compiled a large collection of histone modification data from the Broad Institute (\url{https://www.broadinstitute.org/}). This data is publicly available to download and use via the ENCODE website at \url{http://genome.ucsc.edu/cgi-bin/hgFileUi?db=hg19&g=wgEncodeBroadHistone}. 
+The Encyclopedia of DNA elements, ENCODE, \cite{TheENCODEProjectConsortium:2004db} has compiled a large collection of histone modification data from the Broad Institute (\url{https://www.broadinstitute.org/}). This data is publicly available to download and use via the ENCODE website at\\
+\url{http://genome.ucsc.edu/cgi-bin/hgFileUi?db=hg19&g=wgEncodeBroadHistone}. 
 
 This project uses these publicly available datasets in all of it's experiments and some of the figures. Unless explicitly stated otherwise, the ENCODE ChIP-Seq datasets for K562 leukaemia cell line are used in this project.
 
 Whenever the annotated locations of known genes, transcription start sites, and first-splicing sites are used, they are used from the UCSC Known Genes collection \cite{Hsu:2006dh} (hg19 assembly), and are free to download via the ENCODE table browser. 
 
-This track assigns a unique 10-character id, e.g. \gene{uc003vhn.1}, for each of the genes and their variants. These identifiers are referenced in the text of the report whenever possible, and they can be used to query the UCSC Genome browser \cite{Kent:2002wd} directly, if it is desired.
+This track assigns a unique 10-character id, e.g. \gene{uc003vhn.1}, for each of the genes and their variants. These identifiers are referenced in the text of the report whenever possible, and can be used to query the UCSC Genome browser \cite{Kent:2002wd} directly, if it is desired.
 
 \chapter{Motivation}
 \label{cha:motivation}
 
 In one of the early reviews of ChIP-Seq, \cite{Park:2009wc}, P J Park already predicted data processing to be the major challenge of this technology, and therefore listed the most common approaches to data processing at that time. Almost four years later today, most of these approaches still remain valid.
 
-For protein-DNA binding, he writes, the most common analysis is the discovery of the short segments of DNA the protein is most likely to bind to, so called binding sequence motifs. A large variety of methods to do that are available today, probably the best-known one being MEME \cite{Grundy:1997vb}.
+For protein-DNA binding, he writes, the most common analysis is the discovery of the short segments of DNA the protein is most likely to bind to, so called binding sequence motifs. A large variety of methods for this kind of analysis are available today, probably the best-known one being MEME \cite{Grundy:1997vb}.
 
-In order to find these transcription factor binding sites, significantly enriched regions of the genome (so called "peaks") need to be located first. MACS peak caller \cite{Zhang:2008wp} is the method of choice for this task to date, even though a variety of other methods have been proposed since (see \cite{Furey:2012ha} for a recent review).
+In order to find these transcription factor binding sites, significantly enriched regions of the genome (so called ``peaks") need to be located first. MACS peak caller \cite{Zhang:2008wp} is the method of choice for this task to date, even though a variety of other methods have been proposed since (see \cite{Furey:2012ha} for a recent review).
 
 \begin{figure}[p]
    \centering
@@ -219,43 +218,43 @@ that, on average, histone modifications have very distinct bimodal marks near tr
 \histonemodification{H3K4me3} mark, correlate with the activity of genes being analysed: highly active genes (red in the figure) have more reads falling within the same region than intermediately active ones (green and blue) \cite{Barski:2007ww}.
 
 What is more interesting, these histone marks are so distinctive, that 
-\cite{Heintzman:2007ke} were able to predict locations of regions that both initiate (promote) and enhance transcription of DNA by training a classifier on a combination of histone marks around known promoter and enhancer regions. Later, \cite{Hon:2008wv} developed a method called ChromaSig, that was able to find the promoter and enhancer signatures in completely unsupervised way by simply looking at the most common histone mark motifs within the genome.
+\cite{Heintzman:2007ke} were able to predict locations of regions that both initiate (promote) and enhance transcription of DNA by training a classifier on a combination of histone marks around known promoter and enhancer regions. Later, \cite{Hon:2008wv} developed a method called ChromaSig, that was able to find the promoter and enhancer signatures in a completely unsupervised way by simply looking at the most common histone mark motifs within the genome.
 
-However, the fact that ChIP-Seq signal can tell us more than just the type of DNA region is more interesting. In the already mentioned paper, \cite{Barski:2007ww}, the authors note: ``A series of peaks of H3K4me3 signals at +50, +210, and +360 were detected, suggesting similar nucleosome positioning relative to TSS in active genes"\footnote{Original text misspells \emph{H3K4me3} as \emph{H4K4Me3}}, these peaks can be seen in figure \autoref{fig:motivation:histone_profiles}. This claim was later followed-up by \cite{Schmid:2007ue}, who were able to locate promoter-specific nucleosomes ``with unprecedented precision" from this ChIP-Seq data.
+However, the fact that ChIP-Seq signal can tell us more than just the type of of the DNA region is more interesting. In the already mentioned paper, \cite{Barski:2007ww}, the authors note: ``A series of peaks of H3K4me3 signals at +50, +210, and +360 were detected, suggesting similar nucleosome positioning relative to TSS in active genes"\footnote{Original text misspells \emph{H3K4me3} as \emph{H4K4Me3}}, these peaks can be seen in figure \autoref{fig:motivation:histone_profiles}. This claim was later followed-up by \cite{Schmid:2007ue}, who were able to locate promoter-specific nucleosomes ``with unprecedented precision" from this ChIP-Seq data.
 
 Another, very recent paper by Bieberstein and colleagues \cite{Bieberstein:2012tf} has shown that \histonemodification{H3K4Me3} and \histonemodification{H3K9Ac} profiles tend to peak at the locations of $5'$ splicing sites of known genes. The authors also conclude that these peaks are independent of nucleosome positioning, unlike the peaks observed by \cite{Barski:2007ww}.
 
 An important point to take away from these two results is that insights to underlying biological processes can be produced from the visual inspection of these histone marks. This observation is the main source of motivation for this project. 
 
-The ultimate goal of this project is to develop a tool that would allow to group similar patterns into clusters and provide means to visually compare these patterns on a common ground, so hypotheses about their origin could be made.
+Having said that, the ultimate goal of this project is to develop a tool that would allow to group similar patterns into clusters and provide means to visually compare these patterns on a common ground, so hypotheses about their origin could be made.
 
 \section{Prior Art}
 
-There have been a few prior attempts at clustering these histone marks.
-The aforementioned ChromaSig method (\cite{Hon:2008wv}) aims to find the patterns that commonly occur in the genome, by aligning various segments of genome to each other. Another paper, \cite{Lai:2010ue}, uses a similar alignment method to align patterns from user-supplied regions in the genome, so they can then be visually compared on the same ground.
+There have been a few prior attempts at clustering histone marks.
+The aforementioned ChromaSig method (\cite{Hon:2008wv}) aims to find the patterns that commonly occur in the genome, by aligning various segments of the genome to each other. Another paper, \cite{Lai:2010ue}, uses a similar alignment method to align patterns from user-supplied regions in the genome, so they can then be visually compared on the same ground.
 
-While both of these methods would probably succeed in detecting the patterns that occur at relatively uniform intervals, e.g. patterns that occur due to nucleosome positioning, both of them would struggle to provide the splicing site insights documented in \cite{Bieberstein:2012tf}. The vastly varying lengths of first exons call for non-linear scaling of the genomic regions to align them.
+While both of these methods would probably succeed in detecting the patterns that occur at relatively uniform intervals, e.g. patterns that occur due to nucleosome positioning, both of them would struggle to facilitate the splicing site insights documented in \cite{Bieberstein:2012tf}. The vastly varying lengths of first exons call for non-linear scaling of the genomic regions to align them.
 
 Also, in some cases, alignment without any kind of scaling, does not make any sense at all. For instance, if one was about to compare the regions spanning whole lengths of known genes, the best these methods could do is to compare a small fragment of the longer gene to the complete length of the shorter one, which is not necessarily the correct thing to do as usually genes will have distinct patterns that occur, e.g. at either end of the gene. Not comparing the gene regions in full would mean that some of these patterns are simply ignored.
 
-This is the reason why some studies, e.g. \cite{Taslim:vj}, rescale the regions of interest to be of the same length, before doing clustering. This could indeed allow visualisation of similar patterns between the different regions, provided that these patterns scale linearly with the length of the regions, yet most likely this is not the case.
+This is the reason why some studies, e.g. \cite{Taslim:vj}, rescale the regions of interest to be of the same length, before doing clustering. This could indeed allow visualisation of similar patterns between the different regions, provided that these patterns scale linearly with the length of the regions, yet there is no theoretical ground why this would be the case.
 
 Having said this, comparing the regions of different lengths on the same scale is the fundamental problem that this project tries to solve.
 
 The proposed solution makes an observation that this problem of comparing genomic patterns of varying lengths is very similar to the problem of comparing waveforms of spoken words in speech recognition. 
-For instance, it is desired to identify two words being the same even though the recording for one of them started, say half a second later. Equivalently, it is desired to detect patterns that are similar, but misaligned. Furthermore, a good speech recognition system would be able to recognise a word correctly even though the speaker prolonged one of the vowels in the word more than it usual, what is similar to patterns that are influenced by the length of the first exon.
+For instance, it is desired to identify two words being the same even though the recording for one of them started, say half a second later. Equivalently, it is desired to detect patterns that are similar, but misaligned. Furthermore, a good speech recognition system would be able to recognise a word correctly even though the speaker prolonged one of the vowels in the word more than usual, what is similar to comparing patterns that are influenced by the length of the first exon.
 
-Fortunately, the speech recognition community has already matured an approach to this problem. This approach, called Dynamic Time Warping (or simply, DTW), compares two sequences by shrinking or expanding both of them non-uniformly to be as similar as possible. This non-linear warping can then both account for misalignment, by shrinking the misaligned part of one of the sequences, and scaled patterns, by rescaling them to be of the same length. This project proposes a method that combines this Dynamic Time Warping distance with hierarchical clustering with the aim of comparing genomic features. Instead of using Dynamic Time Warping to compare time-series data, it is directly used to compare the genomic data. Due to this reason, this new method is named Dynamic Genome Warping or simply DGW.
+Fortunately, the speech recognition community has already matured an approach to this problem. This approach, called Dynamic Time Warping (or simply, DTW), compares two sequences by shrinking or expanding both of them non-uniformly to be as similar as possible. This non-linear warping can then both account for misalignment, by shrinking the misaligned part of one of the sequences, and scaled patterns, by rescaling them to be of the same length. 
 
-In its essence, this method is very similar to the ChAT method, described in \citep{Wang:2012cb}.
+This project proposes a method that combines this Dynamic Time Warping distance with hierarchical clustering with the aim of comparing genomic features. Instead of using Dynamic Time Warping to compare time-series data, it is directly used to compare the genomic data. Due to this reason, this new method is named Dynamic Genome Warping or simply DGW.
+
+This method is similar to the ChAT method, described in \citep{Wang:2012cb}.
 This method tries to find the best alignment between two patterns before doing any clustering, just as ChromaSig or ArchAlign, yet it allows to ignore a part of some region as if it was not there. The authors of the paper claim that these gaps ``are critical because they allow the algorithm to extend beyond regions with variant (or diffuse) chromatin enrichment signatures, and in so doing facilitate the discovery of chromatin signatures that span long genomic regions as well as those with complex multi-modal patterns of histone modification enrichment". 
 
 The main difference between the method used in this project and the one used by Wang et al. is that when creating gaps, ChAT algorithm applies a penalty that is proportional to the norm of the vector that is being skipped. Such penalty biases the algorithm to skip unexpressed regions more than expressed ones as per reasoning that depleted regions are not as interesting as the expressed ones. 
 While this penalty allows the discovery of multi-modal patterns separated by depleted regions across genome, it would heavily penalise any attempts to discover patterns of varying lengths in highly-expressed regions.
 
 Contrary to this, the DTW distance measure does not allow skipping of the points at all. It does, however, allow a set of points on one sequence to a single point on another as if that point was stretched to become a sequence of n points. This way the penalty of warping the genome depends directly on the points that are aligned to each other, so the algorithm is able to do this both for highly expressed and fairly depleted regions, as long as the values mapped to each other are similar.
-
-\todo{write about how chat method was developed independently of this one}
 
 The exact workings of DGW are explained in detail in the next chapter.
 
@@ -285,9 +284,9 @@ The exact workings of DGW are explained in detail in the next chapter.
    \label{fig:DTW:alignments}
 \end{figure}
 
-Dynamic Time Warping (DTW) algorithm is the corner stone of this project. This algorithm was initially developed in the speech recognition community in order to allow accurate comparisons between words spoken with tempo variations. 
+The Dynamic Time Warping (DTW) algorithm is the corner stone of this project. This algorithm was initially developed in the speech recognition community in order to allow accurate comparisons between words spoken with tempo variations. 
 
-This comparison is achieved by warping the time axis nonlinearly. That is, the axis is stretched or compressed as to minimise the total distance between the points aligned to each other. The stretching and compressing is done by creating an alignment between the two sequences, also known as the warping path, almost arbitrarily, with a few constraints described below. The distances between aligned points are then computed and summed up to obtain what is commonly referred to as DTW Distance.
+This comparison is achieved by warping the time axis nonlinearly. That is, the axis is stretched or compressed as to minimise the total distance between the points aligned to each other. The stretching and compressing is done by creating an alignment between the two sequences, also known as the warping path, almost arbitrarily, with a few constraints described below. The distances between aligned points are then computed and added together to obtain what is commonly referred to as the DTW Distance.
 
 More formally, given two sequences $\mathbf{a} = a_1, a_2, ..., a_n$ and $\mathbf{b} = b_1, b_2, ..., b_m$, Dynamic Time Warping aims to construct a warping path\\
 $\mathbf{p} = { (p_{1,0}, p_{1,1}), (p_{2,0}, p_{2,1}), ..., (p_{k,0}, p_{k, 1}) }$ that maps each point on the first sequence, specified as $p_{i,0}$ to a point on the second sequence, $p_{i,1}$, such that the following three constraints hold:
@@ -300,8 +299,10 @@ $\mathbf{p} = { (p_{1,0}, p_{1,1}), (p_{2,0}, p_{2,1}), ..., (p_{k,0}, p_{k, 1})
     $p_{i+1} - p_{i} \in \{(0,1), (1,0), (1,1)\}$ for all $i < k$.
 \end{enumerate}
 
-The problem is to find a warping path that is minimal, given some distance measure $d$ that would compute the distances between aligned points (e.g. Euclidean distance): $\hat{P} = \argmin_P \sum_{(i,j) \in P} d(a_i, b_j)$.
-
+The problem is to find a warping path that is minimal, given some distance measure $d$ that would compute the distances between aligned points (e.g. Euclidean distance): 
+\begin{equation}
+\hat{P} = \argmin_P \sum_{(i,j) \in P} d(a_i, b_j)
+\end{equation}
 Such minimal warping alignment can be computed in $O(nm)$ time by applying dynamic programming techniques. 
 
 Specifically, we construct a $n \times m$ matrix $\mathbf{D}$ where each entry $D_{i,j}$ will contain a minimal (warped) distance of matching first $i$ components of the first sequence, $a_1..a_i$, to first $j$ elements of the second sequence, $b_1..b_j$. The first component of the matrix, $D_{1,1}$ is initialised to the distance between the first components of the two sequences, $d(a_1, b_1)$ as specified by the boundary condition.
@@ -349,7 +350,8 @@ More information on the workings of DTW can be found in e.g. \citep{Muller:2007b
    \end{subfigure}
    ~
    \caption{Illustration of the DTW algorithm. Two sequences, $(2,1,4,3,2)$ and $(1,4,2,1)$ are being compared here using Euclidean distance. The algorithm first creates an empty table of size $n \times m$, where $n$ and $m$ are the lengths of respective sequences, in this case $n=5$, $m=4$. In this table, each column and row correspond to some value on one or the other sequences, pictured in blue.
-The distance between the first elements of the sequence is put into the column $(0,0)$, as pictured in (a). The first row and column are then filled in sequentially, by adding the distance between respective points on each of the sequences to the previously computed value, as illustrated in (a). After the first row and column were computed (b), the remainder of the table is filled in according to the recursive equation \ref{eq:dtw_equation} as pictured in (c). Once the table is completed (d) the resulting distance is in the top-right corner (red). The warping path can be traced back from the top right corner, by applying the recursive equation backwards (e).}
+The distance between the first elements of the sequence is put into the column $(0,0)$, as pictured in (a). 
+The first row and column are then filled in sequentially, by adding the distance between respective points on each of the sequences, shown in red, to the previously computed value, originating from a column indicated by an arrow, as illustrated in (a). After the first row and column were computed (b), the remainder of the table is filled in according to the recursive equation \ref{eq:dtw_equation} as pictured in (c). Once the table is completed (d) the resulting distance is in the top-right corner (red). The warping path can be traced back from the top right corner, by applying the recursive equation backwards (e).}
    
    \label{fig:DTW:example}
 \end{figure}
@@ -361,7 +363,7 @@ To illustrate what DTW does, have a look at the \autoref{fig:DTW:alignments}. Th
 
 In \autoref{fig:DTW:euclidean_alignment}, each point on the sequence A is aligned to corresponding point on the sequence B. If we were to sum the distances between aligned points, we would get the Euclidean distance between these two sequences. We can see that these sequences will likely not be labelled as similar, because the distance between mapped points is always fairly large. 
 
-The mapping seen in \autoref{fig:DTW:dtw_alignment}, on the other hand is able to correct for the shift on the $x$ axis. The highest points are now mapped to each other, so are the other points that are in patterns that coexist in both of the sequences. If we were to calculate the differences between the mapped points again, we would see that the resulting distance is much smaller than Euclidean one and the two sequences will likely be considered close, but not identical, as there still are features in the sequence A that sequence B lacks. For example, sequence A has a valley in the beginning, something what the sequence B does not, what results as a costly penalty.
+The mapping seen in \autoref{fig:DTW:dtw_alignment}, on the other hand is able to correct for the shift on the $x$ axis. The highest points are now mapped to each other, so are the other points that are in patterns that coexist in both of the sequences. If we were to calculate the differences between the mapped points again, we would see that the resulting distance is much smaller than the Euclidean one and the two sequences will likely be considered close, but not identical, as there still are features in the sequence A that sequence B lacks. For example, sequence A has a valley in the beginning, something what the sequence B does not, what results as a costly penalty.
 
 \subsection{Constrained DTW}
 
@@ -385,7 +387,7 @@ The mapping seen in \autoref{fig:DTW:dtw_alignment}, on the other hand is able t
 \end{figure}
 
 In some cases, warping the time axis arbitrarily might not necessarily be a correct thing to do.
-For instance, have a look at \autoref{fig:DTW:std}. Here DTW is used to compare the \histonemodification{H3K4Me3} activation profiles around transcription start sites (TSS) of two genes, \gene{uc003okl.3} and \gene{uc021uwd.1}. We can immediately see that first activation profile appears to be unimodal, whereas the second one is clearly bimodal. The minimal warping path maps a relatively inactive region from around bin 40 to around bin 80 in the series for \gene{uc003okl.3} to a single point on the series for \gene{uc021uwd.1}. However, this unexpressed region might have biological significance, e.g. indicate removal of a nucleosome, and we might not want to allow it to be compressed to a single point. 
+For instance, have a look at \autoref{fig:DTW:std}. Here DTW is used to compare the \histonemodification{H3K4Me3} activation profiles around transcription start sites (TSS) of two genes, \gene{uc003okl.3} and \gene{uc021uwd.1}. We can immediately see that the activation profile in the top panel appears to be unimodal, whereas the activation profile in the bottom panel is clearly bimodal. The minimal warping path maps a relatively inactive region from around bin 40 to around bin 80 in the series for \gene{uc003okl.3} to a single point on the series for \gene{uc021uwd.1}. However, this unexpressed region might have biological significance, e.g. indicate removal of a nucleosome, and we might not want to allow it to be compressed to a single point. 
 
 We can manually impose restrictions on warping paths that are allowed by introducing global constraints. Sakoe-Chiba Band is one of the most commonly used global constraints on DTW \citep{Ratanamahatana:2004wu}. 
 
@@ -411,7 +413,7 @@ We can manually impose restrictions on warping paths that are allowed by introdu
 \end{figure}
 
 Sakoe \& Chiba constraint, as first described in \citep{Sakoe:1978ta} allows only the warping paths 
-that satisfy $|i-j| \le k$ where $k$ is some integer specifying the tightness of the constraint. The constraint is commonly referred to as "Sakoe \& Chiba band" as the cost matrix has a shape of a band around the main diagonal (see \autoref{fig:DTW:sakoe_chiba:cost}). Such constraint reduces the complexity of DTW to $O(k \times max(n,m))$ where $n$ and $m$ are the lengths of the two sequences. 
+that satisfy $|i-j| \le k$ where $k$ is some integer specifying the tightness of the constraint. The constraint is commonly referred to as "Sakoe \& Chiba band" as the cost matrix has a shape of a band around the main diagonal (see \autoref{fig:DTW:sakoe_chiba:cost}). Such constraint reduces the complexity of DTW to $O(k \times max(n,m))$ where $n$ and $m$ are the lengths of the two sequences \cite{Muller:2007bo}. 
 
 Intuitively, the constraint requires that each point on sequence A is mapped to a point no more than $k$ points away on the sequence B. That is, it assumes that there won't be any warping of the time axis greater than by $k$ points. Note that setting the $k$ parameter to zero would give us Euclidean distance between the two sequences.
 
@@ -419,7 +421,7 @@ Intuitively, the constraint requires that each point on sequence A is mapped to 
 
 As far as the author is aware, there is no established way of picking the value of parameter $k$.
 Historically, $k$ was set to 10\% of the length of the sequences.
-For nearest-neighbour classification tasks, \cite{Ratanamahatana:2004wu} has shown that an even a window sufficiently smaller than 10\% gives the highest accuracy for some datasets, though the actual number strongly depends on the actual dataset. Due to this, the constraint $k$ is not imposed in the Dynamic Genome Warping package and is left as a free parameter the user could specify herself.
+For nearest-neighbour classification tasks, \cite{Ratanamahatana:2004wu} has shown that even a window sufficiently smaller than 10\% gives the highest accuracy for some datasets, though the actual number strongly depends on the actual dataset. Due to this, the constraint $k$ is not imposed in the Dynamic Genome Warping package and is left as a free parameter the user could specify.
 
 \subsubsection{Slanted Band Constraint}
 \label{sec:slanted-band-constraint}
@@ -432,19 +434,21 @@ Toni Giorgino \nocite{Giorgino:2009ue} was well aware of this problem when imple
 Slanted band constraint solves the problem of different sequence lengths by changing the constraint to 
 $|i - \frac{m}{n} \times j| <= k$, where $m$ and $n$ are the lengths of the two sequences being compared. This essentially changes the slope of the diagonal line to $\frac{m}{n}$ (cf. to slope being 1 in \citep{Sakoe:1978ta}).
 
-Unfortunately, the meaning of the parameter $k$ is inconsistent in Giorgino's definition of the constraint. If the second sequence is longer than the first one, thus $m > n$, the constraint can be thought to scale the second sequence down to the length of the shorter sequence and then apply the Sakoe \& Chiba constraint of size $k$, meaning $k$ is in the units of the shorter sequence. However, if the second sequence is shorter than the first one, it will be essentially rescaled to match the length of the longer sequence and then the parameter $k$ will be measured in units of the longer sequence. In this particular case, DTW distance might not even be computable as in order for the warping path to remain continuous, for all $j$, there should be some $i$ within the allowed warping window, that is also either in the window of $j+1$ or is by at most one unit away from some $i'$ that is within the window of $j+1$. More formally, the following inequality must hold: 
+Unfortunately, the meaning of the parameter $k$ is inconsistent in Giorgino's definition of the constraint. If the second sequence is longer than the first one, thus $m > n$, the constraint can be thought to scale the second sequence down to the length of the shorter sequence and then apply the Sakoe \& Chiba constraint of size $k$, meaning $k$ is in the units of the shorter sequence. 
+
+However, if the second sequence is shorter than the first one, it will be essentially rescaled to match the length of the longer sequence and then the parameter $k$ will be measured in units of the longer sequence. In this particular case, DTW distance might not even be computable as in order for the warping path to remain continuous, for all $j$, there should be some $i$ within the allowed warping window, that is also either in the window of $j+1$ or is by at most one unit away from some $i'$ that is within the window of $j+1$. More formally, the following inequality must hold: 
 
 \begin{equation}\label{eq:dtw:slanted-band:eq}
 (j+1) \frac{m}{n} - k \le j \frac{m}{n} + k + 1
 \end{equation}
 
-After some algebraic calculations, inequality \ref{eq:dtw:slanted-band:eq} can be rewritten as:
+After some algebraic calculations, inequality \ref{eq:dtw:slanted-band:eq} can be simplified as:
 
 \begin{equation}
 \frac{m}{n} \le 2k + 1
 \end{equation}
 
-This inconsistency might not be important in the situations where we have a query sequence that we want to match to a reference sequence as the order of parameters will not change in these cases. However, symmetry is crucial for hierarchical clustering, therefore Giorgino's constraint was modified slightly to always assume that the first sequence is longer than the second one as described below.
+This inconsistency might not be important in the situations where we have a query sequence that we want to match to a reference sequence as the order of parameters will not change. However, symmetry is crucial for hierarchical clustering, therefore Giorgino's constraint was modified slightly to always assume that the first sequence is longer than the second one as described below.
 
 The slope parameter is again calculated as $s = \frac{m}{n}$, however it is now always less than or equal to one. This slope is now applied to the first sequence, (not the second one as in \citep{Giorgino:2009ue}) essentially scaling it down to the length of the shorter sequence.
 The new constraint is then formally defined as:
@@ -479,14 +483,14 @@ This modified constraint is now always consistent, with the parameter $k$ always
 \autoref{fig:DTW:antisense_comparison} shows the average profiles of regions around annotated transcription start sites in the ENCODE pilot regions of the genome \cite{ENCODEProjectConsortium:2007fu}. The average patterns are evidently symmetrical along the horizontal axis.
 Even though this directionality is generally known for patterns around well-annotated regions, such as the transcription start sites, the directionality for other regions of interest, such as peaks found by a peak caller, is rarely known.  
 
-In order to be able to account for this opposing directionality, every DTW comparison that is made when clustering, is actually made twice: once as described in previous sections, and once with one of the patterns reversed. The smaller distance between the two is then returned as the true distance between the patterns. 
+In order to be able to account for this opposing directionality, every DTW comparison that is made when clustering, is actually made twice: once with the two sequences unchanged, and once with one of them reversed. The smaller distance between the two is then returned as the true distance between the patterns. 
 
 Of course, DGW also supports an option to turn this behaviour off, in case we would like to force the different strands into different clusters, or an option to use the annotated strandedness, if it is provided.
 
 \subsection{DTW Projection}
 \label{sec:dtw-projection}
 
-Just like one can project a vector in euclidean space onto a new basis, one can project some time series onto the time axis of another time series with the help of DTW. 
+Just like one can project a vector in euclidean space onto a new basis, one can project some time series onto the time axis of another time series under the DTW distance.
 
 Given the original sequence $\mathbf{a}$, the basis sequence $\mathbf{b}$, and the warping path between the two sequences, $p$, we can project $\mathbf{a}$ onto $\mathbf{b}$ by computing the average value of all points mapped to every point of sequence $\mathbf{b}$.
 
@@ -495,7 +499,7 @@ More formally, each point $x_k$ of the projected sequence is computed by the fol
     x_k =  \frac{\sum_{(i,j) \in p} a_i \times \delta_{j=k}}{\sum_{(i,j) \in p} \delta_{j=k}} 
 \end{equation}
 
-Where $k=1..|\mathbf{b}|$ and $\delta_{j=k}$ is the delta function that is $1$ when $j=k$, and $0$ otherwise.\todo{Put a worked example here as well}
+Where $k=1..|\mathbf{b}|$ and $\delta_{j=k}$ is the delta function that is $1$ when $j=k$, and $0$ otherwise.
 
 \begin{figure}[t,b]
    \centering
@@ -534,16 +538,15 @@ It has been shown, that under the DTW distance, computation of a sequence that m
 
 Even though a variety of methods to approximate this calculation have been proposed through the years, \cite{Gupta:1996tw,Niennattrakul:2009ep,Petitjean:2011bq,Petitjean:2012bp}, one needs to be careful before using any of them for clustering, because incorrect averaging methods might create incorrect clusterings, e.g. allow the averaged center drift outside the sequences being averaged \cite{Niennattrakul:2007wv}. Due to this, implementation of centroid-based clustering methods (e.g. k-means) under Dynamic Time Warping distance is usually tricky.
 
-Hierarchical-clustering methods, on the other hand, do not require a notion of centroid. One of the hierarchical clustering methods, agglomerative clustering, works by first computing the distances between all pairs of points in the dataset, then joining the two closest points into a cluster, forming a new cluster this way. Then the second two closest points are joined forming yet another cluster, and so on, eventually joining all of the points. 
+Hierarchical clustering methods, on the other hand, do not require a notion of centroid. One of the hierarchical clustering methods, agglomerative clustering, works by first computing the distances between all pairs of points in the dataset, then joining the two closest points into a cluster, forming a new cluster this way. Then the second two closest points are joined forming yet another cluster, and so on, eventually joining all of the points. 
 
-The comparison between two clusters is usually done in one of the following ways:
+The most common ways to compare two clusters that do not make any assumptions about the underlying distance metric are: 
 
 \begin{itemize}
    \item \emph{Single linkage:} The distance between two clusters is equal to the smallest distance between the any two elements in the two clusters.
    \item \emph{Complete linkage:} The distance between two clusters is equal to the largest distance between any two elements in the two clusters.
    \item \emph{Average linkage:} The distance between two clusters is equal to the average of the distances between the elements in the clusters.
 \end{itemize}
-\todo{Visualise this}
 
 \begin{figure}
     \centering
@@ -561,7 +564,7 @@ The comparison between two clusters is usually done in one of the following ways
         \label{fig:clustering:dendrogram:complete}
     \end{subfigure}
     \caption{Comparison of dendrograms obtained by clustering using single and complete linkages. The datasets being clustered are the same, generated from \celltype{K562} \histonemodification{H3K4Me3} dataset, and unconstrained DTW distance metric was used to cluster both of them. The only thing that is different is the linkage method.
-      One can see chaining of the items in the single linkage clustering  dendrogram (\ref{fig:clustering:dendrogram:single}), where each element is subsequently added to the same cluster, rather than forming many smaller clusters before, when complete linkage is used (\ref{fig:clustering:dendrogram:complete}).}
+      One can see chaining of the items in the single linkage clustering  dendrogram (a), where each element is subsequently added to the same cluster. Compare this to (b) where lots of smaller clusters are formed and then joined together.}
     \label{fig:clustering:dendrogram}
 \end{figure}
 
@@ -571,35 +574,35 @@ Here it seems that majority of data is in one cluster and each data point is joi
 This is by no means a meaningful clustering, as 
 if we were to cut the dendrogram at pretty much any threshold we would get the majority of the data in one of the clusters, with the remaining data points having a separate cluster for themselves. 
 
-We can see that chaining behaviour is not visible when complete linkage is used. Here, the clusters are formed early, and then joined later on, as one would expect (\autoref{fig:clustering:dendrogram:complete}). In fact, Hirano et al. \cite{Hirano:2005wh} have shown empirically that out of the three linkage methods discussed above, only complete linkage was able to produce meaningful clusters when clustering time series data under DTW. Due to this reason, DGW computes the distances between two clusters using complete linkage criterion.
+We can see that chaining behaviour is not visible when complete linkage is used. Here, the clusters are formed early, and then joined later on, as one would expect (\autoref{fig:clustering:dendrogram:complete}). In fact, Hirano et al. \cite{Hirano:2005wh} have shown empirically that out of the three linkage methods discussed above, only complete linkage was able to produce meaningful clusters when clustering time series data under DTW. Due to this reason, DGW computes the distances between two clusters using the complete linkage criterion.
 
 \subsection{Forming Flat Clusters}
 
 It is also worth noting, that there have been attempts to relax the requirement of having a notion of centroid in centroid clustering methods by using a medoid -- a representative object from within the cluster. For instance, k-medoids algorithm, implemented e.g. in \cite{Park:2009ks}, could in theory be used to cluster DTW distances. 
 
-The disadvantage of this method against hierarchical clustering is the fact that the number of clusters, the $k$ in k-medoids, needs to be picked before the clustering was done. Several iterations of the algorithm could be run, and the results with different $k$s could be compared, of course, yet it is both not efficient to do, and not clear what metric should be used to
+The disadvantage of this method against hierarchical clustering is the fact that the number of clusters, the $k$ in k-medoids, needs to be picked before the clustering was done. Several iterations of the algorithm could be run, and the results with different $k$s could be compared, of course, yet it is both not efficient to do so, and it is not clear what metric should be used to
 measure the meaningfulness of the clustering in this case.
 
-Hierarchical clustering methods, on the other hand, do not need the number of clusters decided beforehand, as the number of flat clusters can be chosen \emph{after} the clustering was done. This
+Hierarchical clustering methods, on the other hand, do not need to have the number of clusters decided beforehand, as the number of flat clusters can be chosen \emph{after} the clustering was done. This
 allows inspection of the clustering results to guide this process.
 
-This cutting can either be done automatically, if there is clear way to do this, e.g. if the distances in the dendrogram correspond to p-values, like in \cite{Wang:2012cb}, or by simple visual inspection of the resulting dendrogram. The latter approach is implemented in this project.
+This assignment to clusters is done by cutting the dendrogram at some threshold which can either be selected automatically, if there is clear way to do this, e.g. if the distances in the dendrogram correspond to p-values, like in \cite{Wang:2012cb}, or by simple visual inspection of the resulting dendrogram. The latter approach is implemented in this project.
 
 \subsection{Cluster Prototypes}
 \label{sec:prototypes}
 
 After the flat clusters are formed, the clusters need to be visualised to the user somehow. Just displaying the original data (i.e. in the form of a heatmap) is insufficient, as such representation of the data does not does not explain why the data was clustered together in the first place. 
 
-The end user of the software, would want to see the data represented after warping, i.e. average profile of the warped data, as to be able to get the structure and the shape of the resulting cluster marks. The problem of extracting this average warped profile lies in the fact that only two sequences are compared with each other at the time, and both of them can be arbitrarily warped. What this means, unfortunately, that the same sequence might be warped in as many ways as there are sequences to compare it against. In order to be able to give an average warping of sequences in a cluster, one needs to agree upon the base sequence upon which to warp the remaining sequences on. In other words,
+The end user of the software, would want to see the data represented after warping, i.e. average profile of the warped data, as to be able to get the structure and the shape of the resulting cluster marks. The problem of extracting this average warped profile lies in the fact that only two sequences are compared with each other one at the time, and both of them can be arbitrarily warped. What this means, unfortunately, that the same sequence might be warped in as many ways as there are sequences to compare it against. In order to be able to give an average warping of sequences in a cluster, one needs to agree on the base sequence upon which to warp the remaining sequences on. In other words,
 one needs to find a prototype for the cluster in order to be able to visualise the warped items. Once this prototype sequence is chosen, DTW projection (\autoref{sec:dtw-projection}) can be used to warp the original data onto the basis defined by the prototype.
 
-Remember that inability to compute perfect centroids was one of the reasons why hierarchical clustering was chosen in favour of centroid-clustering in the first place. Then we were worried about the bias in the data clustering producing clusters that are not meaningful. However, at this case the data is already clustered and flat clusters are already formed. Some prototyping error is tolerable here as it won't be able to accumulate as easily as it would during clusteirng. The only requirement that is posed on the prototype is that it expresses a similar shape than the marks being clustered visually.
+Remember that inability to compute perfect centroids was one of the reasons why hierarchical clustering was chosen in favour of centroid-clustering in the first place. Then we were worried about the bias in the data clustering producing clusters that are not meaningful. However, at this case the data is already clustered and flat clusters are already formed. Some prototyping error is tolerable here as it won't be able to accumulate as easily as it would during clustering. The only requirement that is posed on the prototype is that it expresses a similar shape than the marks being clustered visually.
 
 
 \subsubsection{Prioritised Shape Averaging}
 A method called Prioritised Shape Averaging (PSA), proposed in \cite{Niennattrakul:2009ep}, was chosen to generate the cluster prototypes. The reason why PSA was chosen, in favour of other methods, is the fact that it can exploit the hierarchical structure, we've already computed in prototype generation stage.
 
-The basic idea under the PSA can be thought of in terms of bottom-up algorithm.
+The basic idea under the PSA can be thought of in terms of a bottom-up algorithm.
 Initially, make all of the leaf nodes to be the prototypes of themselves, with the weight of one assigned to each of them. Moving up the clustering tree, for each node, average the two prototypes of the left and right child of the node (remember that hierarchical clustering trees are always binary), with some averaging procedure that takes the weights of the two nodes into account. Make the weight of this newly formed node equal to the number of elements in that node.
 
 The proposed method to be used in PSA is Scaled Dynamic Time Warping (SDTW) averaging algorithm that is also defined in the paper. This algorithm works similarly to the standard path averaging algorithm, which is defined as follows: For each pair of points on the DTW warping path, $(i,j)$, average the corresponding points in the two sequences $a_i$, and $b_j$, in the following way:
@@ -608,9 +611,10 @@ The proposed method to be used in PSA is Scaled Dynamic Time Warping (SDTW) aver
 \end{equation}
 
 Essentially, it is doing weighted averaging of these paths.
-SDTW extends this definition, by making the algorithm "stretch" the resulting point $x$,  $\lambda_a$ times, if the point in sequence $\mathbf{a}$ was unchanged compared to previous pair of points in the path, i.e. the warping path moved straight upwards; $\lambda_b$ times if the warping path moved horizontally, $\frac{\lambda_a + \lambda_b}{2}$ times if the warping path moved diagonally.
 
-Now it is obvious to see how such averaging method would create paths that are getting longer and longer as more and more points are being averaged. The proposed solution for this problem is to rescale the resulting average path to be of the length of one of the two sequences. As a convention, I always use the length of the longer sequence when rescaling the path.
+SDTW extends this definition, by making the algorithm ``stretch" the resulting point $x$,  $\lambda_a$ times, if the point in sequence $\mathbf{a}$ was unchanged compared to previous pair of points in the path, i.e. the warping path moved straight upwards; $\lambda_b$ times if the warping path moved horizontally, $\frac{\lambda_a + \lambda_b}{2}$ times if the warping path moved diagonally.
+
+The major problem with this averaging method is that the paths created will get longer and longer as the algorithm progresses up the tree. The possible solution for this problem, as proposed in \cite{Niennattrakul:2009ep} is to uniformly rescale the resulting average path to be of the length of one of the two sequences. DGW uses this solution and always rescales the computed prototype to match the length of the longer sequence. 
 
 \begin{figure}
     \centering
@@ -654,7 +658,7 @@ Now it is obvious to see how such averaging method would create paths that are g
 
 \autoref{fig:clustering:prototypes} compares the STDW averaging method with standard averaging method as in \autoref{eq:standard_path_averaging} as well as to standard unweighted averaging method (where $\lambda_a = \lambda_b = 1$). One can see that the average sequences produced by both SDTW and standard averaging methods favour the sequence with more weight strongly and therefore resulting average does resemble the second sequence more than the first one. Compare this to unweighted average of the two sequences, where the new shape resemble both features equally. 
 
-From these figures, it is hard to spot the difference between prototypes generated by SDTW and Standard methods in this particular case. Surprisingly, I did not find any but miniscule improvements SDTW makes to the end result of cluster prototype along the whole hierarchical clustering tree. These improvements seem not worth the extra overhead incurred by the clever treatment of these path changes, and therefore the DGW uses standard path averaging by default (though the user is able to override this, if she wants to).
+From these figures, it is hard to spot the difference between prototypes generated by SDTW and Standard methods is minimal. Surprisingly, I did not find any but minuscule improvements SDTW makes to the end result of the cluster prototype along the whole hierarchical clustering tree. These improvements do not seem to be worth the extra overhead incurred by the clever stretching of the warping path, and therefore the DGW uses standard path averaging by default, but the user is able to override this.
 
 \section{Reading and Preprocessing Data}
 \label{sec:reading_and_preprocessing}
@@ -680,7 +684,7 @@ From these figures, it is hard to spot the difference between prototypes generat
 \end{figure}
 
 
-As previously mentioned in \autoref{sec:chip}, the result of ChIP-Seq experiment is a collection of short reads that are aligned to the reference genome, as pictured in \autoref{fig:background:chip-results}. In order to compute the activation profiles, each of the regions of interest are split into a series of bins of equal width. This bin width is simply referred to as \emph{read resolution}. The number of reads that falling within these bins is then counted to produce the activation mark.
+As previously mentioned in \autoref{sec:chip}, the end result of a ChIP-Seq experiment is a collection of short reads that are aligned to the reference genome, as pictured in \autoref{fig:background:chip-results}. In order to compute the activation profiles, each of the regions of interest are split into a series of bins of equal width. This bin width is simply referred to as \emph{read resolution}. The number of reads falling within these bins is then counted to produce the activation mark.
 
 Of course, as the reader might remember, usually only a short fragment of the DNA attached to the target protein is sequenced. In some cases, these short reads will not be able to capture the true distribution of DNA attached to the target proteins, as pictured in \autoref{fig:methods:reading:shifts:broken}. In order to mitigate this problem, DGW extends all reads to be 200 base pairs wide as pictured in \autoref{fig:methods:reading:shifts:fixed}.
 
@@ -712,7 +716,7 @@ Intuitively, the less reads collect to the same bin, the more likely this could 
    \label{fig:pileup_normalisation}
 \end{figure}
 
-DTW is sensitive to changes in scale, if the local distance measure is sensitive to changes of scale.
+DTW distance is sensitive to changes in scale, if the local distance measure is sensitive to changes of scale.
 In case of squared euclidean distance, it is very easy to artificially inflate the DTW warped distance between the two regions. For instance, consider the same region used in \autoref{fig:DTW:sakoe_chiba}. If one was to multiply all the bin counts by $1.5$, the underlying shape of the region will not change, however, as pictured in figures \ref{fig:pileup_normalisation:mappings_unnormalised} and \ref{fig:pileup_normalisation:cost_unnormalised}, the DTW distance will increase dramatically.
 
 In some settings, e.g. differential expression studies, this might be a perfectly valid behaviour, as we might indeed want to treat these two regions as different.

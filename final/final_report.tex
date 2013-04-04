@@ -43,9 +43,18 @@ I would like to thank Gabriele Schweikert and my supervisor, Guido Sanguinetti, 
 
 \chapter{Introduction}
 
-\todo{Write intro}
+The DNA sequence of a living organism encodes the complete blueprint required to create the said organism. An emergent picture is that the mechanisms that are controlling how this blueprint is used are equally as important as the DNA sequence is.
+
+Next-generation sequencing methods, such as ChIP-Seq have already become vitally important for studying these epigenetic processes. These new methods usually produce large datasets of complex patterns, such as a series of peaks that extend over a long region of the DNA, making the data exploration task complicated.
+
+This project proposes a novel method of analysing this data that combines well-established methods from speech recognition community with hierarchical clustering, in order to aid the data exploration by grouping similar patterns together and by providing visualisations that simplify the complicated structures described earlier.
+
+This report is structured as follows: \autoref{cha:biological-background} provides the necessary biological background required to be able to understand the specifics of this method. The formal motivation and goals of the project are provided in the subsequent chapter \ref{cha:motivation}. 
+The report then proceeds to describe the method (chapter \ref{cha:methods}) as well as the details of the implementation (chapter \ref{cha:implementation-details}) in depth. 
+This method is then evaluated in chapter \ref{cha:results} and the report is concluded and the directions for further work are provided in the final chapter \ref{cha:conclusions}.
 
 \chapter{Biological Background}
+\label{cha:biological-background}
 This chapter summarises the biological background required to get to grips on what this honours project is about. 
 A more in depth review of the topics discussed in this chapter could be found in molecular biology textbooks, for instance in \cite{Alberts:2002te}.
 
@@ -201,7 +210,7 @@ In order to find these transcription factor binding sites, significantly enriche
    \centering
    \copyrightbox{\includegraphics[width=\textwidth]{figures/motivation/barski-histone-modifications-around-tss.jpeg}}
    {Reproduced from Cell, 129, Artem Barski, Suresh Cuddapah, Kairong Cui, Tae-Young Roh, Dustin E. Schones, Zhibin Wang, Gang Wei, Iouri Chepelev and Keji Zhao, High-Resolution Profiling of Histone Methylations in the Human Genome\cite{Barski:2007ww}, p. 826, Copyright 2007, with permission from Elsevier}
-   \caption{Profiles of histone marks around known transcription start sites. The profiles for highly active, two stages of intermediately active and silent genes are colour-coded. The histone modification is shown on top of each plot. ``Normalized counts" on the Y axes refers to the normalised number of reads obtained from ChIP-Seq experiment that overlap a particular bin. The results were compiled by \cite{Barski:2007ww}. Please note a series of peaks of H3K4me3 signals at +50, +210, and +360 base pairs offset from transcriptions tart site, that, according to Barski, suggests similar nucleosome positioning relative to TSS in active genes.}
+   \caption{Profiles of histone marks around known transcription start sites. The profiles for highly active, two stages of intermediately active and silent genes are colour-coded. The histone modification is shown on top of each plot. ``Normalized counts" on the Y axes refers to the normalised number of reads obtained from ChIP-Seq experiment that overlap a particular bin. The results were compiled by \cite{Barski:2007ww}. Please note a series of peaks of H3K4me3 signals at +50, +210, and +360 base pairs offset from transcriptions tart site, that, according to Barski et al., suggests similar nucleosome positioning relative to TSS in active genes.}
     \label{fig:motivation:histone_profiles}
 \end{figure}
 
@@ -220,18 +229,20 @@ An important point to take away from these two results is that insights to under
 
 The ultimate goal of this project is to develop a tool that would allow to group similar patterns into clusters and provide means to visually compare these patterns on a common ground, so hypotheses about their origin could be made.
 
-\section{Prior art}
+\section{Prior Art}
 
 There have been a few prior attempts at clustering these histone marks.
-The already mentioned ChromaSig method (\cite{Hon:2008wv}) aims to find the patterns that commonly occur in the genome, by aligning various segments of genome to each other. Another paper, \cite{Lai:2010ue}, uses a similar alignment method to align patterns from user-supplied regions in the genome, so they can then be visually compared on the same ground.
+The aforementioned ChromaSig method (\cite{Hon:2008wv}) aims to find the patterns that commonly occur in the genome, by aligning various segments of genome to each other. Another paper, \cite{Lai:2010ue}, uses a similar alignment method to align patterns from user-supplied regions in the genome, so they can then be visually compared on the same ground.
 
 While both of these methods would probably succeed in detecting the patterns that occur at relatively uniform intervals, e.g. patterns that occur due to nucleosome positioning, both of them would struggle to provide the splicing site insights documented in \cite{Bieberstein:2012tf}. The vastly varying lengths of first exons call for non-linear scaling of the genomic regions to align them.
 
-Also, in some cases, alignment without any kind of scaling, does not make any sense at all. For instance, if one was about to compare the regions spanning whole lengths of known genes, the best these methods could do is to compare a small fragment of the longer gene to the complete length of the shorter one, which is not necessarily the correct thing to do. 
+Also, in some cases, alignment without any kind of scaling, does not make any sense at all. For instance, if one was about to compare the regions spanning whole lengths of known genes, the best these methods could do is to compare a small fragment of the longer gene to the complete length of the shorter one, which is not necessarily the correct thing to do as usually genes will have distinct patterns that occur, e.g. at either end of the gene. Not comparing the gene regions in full would mean that some of these patterns are simply ignored.
 
 This is the reason why some studies, e.g. \cite{Taslim:vj}, rescale the regions of interest to be of the same length, before doing clustering. This could indeed allow visualisation of similar patterns between the different regions, provided that these patterns scale linearly with the length of the regions, yet most likely this is not the case.
 
-Essentially, this problem of comparing genomic patterns of varying lengths is very similar to the problem of comparing waveforms of spoken words in speech recognition. 
+Having said this, comparing the regions of different lengths on the same scale is the fundamental problem that this project tries to solve.
+
+The proposed solution makes an observation that this problem of comparing genomic patterns of varying lengths is very similar to the problem of comparing waveforms of spoken words in speech recognition. 
 For instance, it is desired to identify two words being the same even though the recording for one of them started, say half a second later. Equivalently, it is desired to detect patterns that are similar, but misaligned. Furthermore, a good speech recognition system would be able to recognise a word correctly even though the speaker prolonged one of the vowels in the word more than it usual, what is similar to patterns that are influenced by the length of the first exon.
 
 Fortunately, the speech recognition community has already matured an approach to this problem. This approach, called Dynamic Time Warping (or simply, DTW), compares two sequences by shrinking or expanding both of them non-uniformly to be as similar as possible. This non-linear warping can then both account for misalignment, by shrinking the misaligned part of one of the sequences, and scaled patterns, by rescaling them to be of the same length. This project proposes a method that combines this Dynamic Time Warping distance with hierarchical clustering with the aim of comparing genomic features. Instead of using Dynamic Time Warping to compare time-series data, it is directly used to compare the genomic data. Due to this reason, this new method is named Dynamic Genome Warping or simply DGW.
@@ -249,6 +260,8 @@ Contrary to this, the DTW distance measure does not allow skipping of the points
 The exact workings of DGW are explained in detail in the next chapter.
 
 \chapter{Methods}
+\label{cha:methods}
+
 \section{Dynamic Time Warping}
 \label{sec:DTW}
 
@@ -713,6 +726,7 @@ That is, if we thought the mark as of a vector $\mathbf{x}$, then the normalisat
 After the normalisation the bin with the highest number of reads in it, will always have a value equal to $1$, so the bins will be compared at the same scale. One can see the normalisation turning the distance between the original and modified regions to zero again in \autoref{fig:pileup_normalisation:cost_normalised}.
 
 \chapter{Implementation Details}
+\label{cha:implementation-details}
 The methods described in the previous chapter were compiled together into a software package, named Dynamic Genome Warping, or DGW for short. 
 
 This chapter describes the implementation of this software, including its structure, interface and solutions to key computational challenges faced.
@@ -876,6 +890,7 @@ Note that the POI locations are not used during the clustering or prototype gene
 The results chapter gives an example on what insights can be generated by this method.
 
 \chapter{Results}
+\label{cha:results}
 Evaluation of results of clustering methods has always been a challenging problem. Since clustering is unsupervised by definition, there hardly is any ground truth on what the correct way of assigning data into clusters is. One clustering might be perfectly sensible in one application, but completely useless in another. Hierarchical clustering has no clear way of deciding where dendrogram should be cut at, as already discussed earlier, making it even harder to evaluate clusterings like this. Finally, the highly exploratory goal of this project makes it even harder to sensibly evaluate the cluster assignments without doing a downstream biological analysis on them.
 
 As previously described, Bieberstein and colleagues have shown that \histonemodification{H3K4Me3} signal peaks at the location of $5'$ splicing site \cite{Bieberstein:2012tf}. The experiments described in this chapter all inspired by these results.
@@ -1162,6 +1177,7 @@ However, it is the warped data, that makes these patterns obvious, as seen in \a
 \end{figure}
 
 \chapter{Conclusions}
+\label{cha:conclusions}
 
 In conclusion, the project aimed to develop a method that would allow clustering of the epigenetic marks from next-generation sequencing experiments.
 

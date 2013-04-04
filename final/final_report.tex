@@ -30,7 +30,7 @@
 
 \date{\today}
 
-\abstract{Next Generation Sequencing methods, such as ChIP-Seq, have already become vitally important for studying epigenetic processes. Previous research has shown that visually observable patterns in the data produced by these methods can yield insights to the underlying biological mechanism, yet the enormous scale and specifics of this data makes the data exploration a challenging task. This project proposes Dynamic Genome Warping (DGW), a novel method of exploring this data that combines Dynamic Time Warping, a well-established method coming from speech recognition community, with hierarchical clustering. The method is shown to be able to recognise well-documented features in ChIP-Seq datasets automatically, as well as to provide means to explore the data for previously unseen ones.}
+\abstract{Next Generation Sequencing methods, such as ChIP-Seq, have already become vitally important for studying epigenetic processes. Previous research has shown that visually observable patterns in the data produced by these methods can yield insights to the underlying biological mechanism, yet the enormous scale and specifics of this data makes the task of exploration challenging. This project proposes Dynamic Genome Warping (DGW), a novel method of exploring this data that combines Dynamic Time Warping, a well-established method coming from speech recognition community, with hierarchical clustering. The method is shown to be able to recognise well-documented features in ChIP-Seq datasets automatically, as well as to provide means to explore the data for previously unseen ones.}
 
 \maketitle
 
@@ -43,6 +43,7 @@ I would like to thank Gabriele Schweikert and my supervisor, Guido Sanguinetti, 
 
 \chapter{Introduction}
 
+\todo{Write intro}
 
 \chapter{Biological Background}
 This chapter summarises the biological background required to get to grips on what this honours project is about. 
@@ -102,7 +103,8 @@ These DNA-wrapping histones are known to be mostly modular in structure, with a 
 \copyrightbox[b]{
 \includegraphics[width=\textwidth]{figures/background/gene_splicing.png}}
 {\centering Modified version of \url{https://en.wikipedia.org/wiki/File:Pre-mRNA_to_mRNA.svg}. The original image was released to the public domain.}
-\caption{RNA splicing}
+\caption{RNA splicing. The intron regions of the transcribed pre-mRNA (blue) are removed by splicing, leaving only the exon regions (red) that are then joined together. The regions between exons and introns are called splicing sites. The $5'$ splicing site, also referred to as the first splicing site is marked in the figure. 
+The green regions at the edges of both pre-mRNA and mRNA are called untranslated regions (UTR) and are included here just for completeness. These regions are not discussed any further in this project.}
 \label{fig:background:splicing}
 \end{figure}
 
@@ -199,7 +201,7 @@ In order to find these transcription factor binding sites, significantly enriche
    \centering
    \copyrightbox{\includegraphics[width=\textwidth]{figures/motivation/barski-histone-modifications-around-tss.jpeg}}
    {Reproduced from Cell, 129, Artem Barski, Suresh Cuddapah, Kairong Cui, Tae-Young Roh, Dustin E. Schones, Zhibin Wang, Gang Wei, Iouri Chepelev and Keji Zhao, High-Resolution Profiling of Histone Methylations in the Human Genome\cite{Barski:2007ww}, p. 826, Copyright 2007, with permission from Elsevier}
-   \caption{Profiles of histone marks around known transcription start sites. The profiles for highly active, two stages of intermediately active and silent genes are colour-coded. The histone modification is shown on top of each plot. ``Normalized counts" on the Y axes refers to the normalised number of reads obtained from ChIP-Seq experiment that overlap a particular bin. The results were compiled by \cite{Barski:2007ww}.}
+   \caption{Profiles of histone marks around known transcription start sites. The profiles for highly active, two stages of intermediately active and silent genes are colour-coded. The histone modification is shown on top of each plot. ``Normalized counts" on the Y axes refers to the normalised number of reads obtained from ChIP-Seq experiment that overlap a particular bin. The results were compiled by \cite{Barski:2007ww}. Please note a series of peaks of H3K4me3 signals at +50, +210, and +360 base pairs offset from transcriptions tart site, that, according to Barski, suggests similar nucleosome positioning relative to TSS in active genes.}
     \label{fig:motivation:histone_profiles}
 \end{figure}
 

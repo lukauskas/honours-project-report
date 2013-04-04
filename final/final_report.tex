@@ -89,9 +89,10 @@ Because of this redundancy, the sequences on both strands can be sequenced simul
 \end{figure}
 
 Since each base pair in the DNA is around 0.34 nanometers long \cite{Annunziato:2008wh},
-DNA sequence of a human diploid cell will take up around 2 meters in length, if stretched, yet it is packaged into the volume as small as the nucleus of a cell. This packaging is done with the help of proteins called histones that fold the DNA around them, eventually wrapping it into three dimensional structures.
+DNA sequence of a human diploid cell will take up around 2 meters in length, if stretched, yet it is packaged into a volume as small as the nucleus of a cell. This packaging is done with the help of proteins called histones that fold the DNA around them, eventually wrapping it into three dimensional structures.
 
-More specifically, DNA wraps around an octomer of two copies of each of the four core histones H2A, H2B, H3, and H4, creating a structure resembling beads on a string, as pictured in panels 2 and 3 of \autoref{fig:background:dna_packaging}. The fifth histone, H1, attaches to the DNA from the other side, pictured in yellow, panel 4 of figure \ref{fig:background:dna_packaging}. This DNA is then wrapped to form a structure known as the 30-nanometer fibre, which is then  wrapped to higher-order structures, as seen in \autoref{fig:background:dna_packaging}.
+More specifically, DNA wraps around an octomer of two copies of each of the four core histones, creating a structure resembling beads on a string that is pictured in panels 2 and 3 of \autoref{fig:background:dna_packaging}. These core histones are known as histones H2A, H2B, H3, and H4.
+The fifth histone, H1, attaches itself to the DNA from the opposite side to the other histones, as pictured in yellow in the panel 4 of figure \ref{fig:background:dna_packaging}. The segment of DNA and the histone it is wound around, is known as nucleosome. These nucleosomes are then further wrapped into a structure known as the 30-nanometer fibre, which is then  wrapped to even higher order structures, as seen in \autoref{fig:background:dna_packaging}. The warped combination of DNA and the proteins inside the nucleus of a cell is commonly referred to as the chromatin.
 
 These DNA-wrapping histones are known to be mostly modular in structure, with a number of ``tails" that are susceptible to chemical modifications such as methylation, acetylation and phosphorylation \cite{Fischle:2003tl,Kouzarides:2007js}. These chemical modifications on histone tails have been shown to be able to alter the structure of chromatin. For instance, acetylation of histone H4 on lysine 16 (shortened as \histonemodification{H4K16Ac}, where \emph{H4} is the histone number, \emph{K16} stands for lysine 16 and \emph{Ac} stands for Acetylation) has been shown to inhibit formation of the 30-nanometer fibre \cite{ShogrenKnaak:2006gt}. These changes of the chromatin structure can affect the accessibility of the DNA. Intuitively, the tighter DNA is packaged, the less accessible it is to various chemical interactions.
 
@@ -332,7 +333,7 @@ More information on the workings of DTW can be found in e.g. \citep{Muller:2007b
        \label{fig:DTW:example:5}
    \end{subfigure}
    ~
-   \caption{Illustration of the DTW algorithm. Two sequences $(2,1,4,3,2)$ and $(1,4,2,1)$ are being compared here using Euclidean distance. The algorithm first creates an empty table of size $n \times m$, where $n$ and $m$ are the lengths of respective sequences, in this case $n=5$, $m=4$. In this table, each column and row correspond to some value on one or the other sequences, pictured in blue.
+   \caption{Illustration of the DTW algorithm. Two sequences, $(2,1,4,3,2)$ and $(1,4,2,1)$ are being compared here using Euclidean distance. The algorithm first creates an empty table of size $n \times m$, where $n$ and $m$ are the lengths of respective sequences, in this case $n=5$, $m=4$. In this table, each column and row correspond to some value on one or the other sequences, pictured in blue.
 The distance between the first elements of the sequence is put into the column $(0,0)$, as pictured in (a). The first row and column are then filled in sequentially, by adding the distance between respective points on each of the sequences to the previously computed value, as illustrated in (a). After the first row and column were computed (b), the remainder of the table is filled in according to the recursive equation \ref{eq:dtw_equation} as pictured in (c). Once the table is completed (d) the resulting distance is in the top-right corner (red). The warping path can be traced back from the top right corner, by applying the recursive equation backwards (e).}
    
    \label{fig:DTW:example}
@@ -411,26 +412,34 @@ For nearest-neighbour classification tasks, \cite{Ratanamahatana:2004wu} has sho
 Sakoe \& Chiba band makes DTW incomputable for sequences whose lengths differ by more than $k$ items, as the last points of those sequences, point $n$ and point $m$, will not satisfy the constraint 
 $|i-j| \le k$. The reason for this failure is the fact that $i=j$ is not the real diagonal of the cost matrix, if the lengths of the two sequences, $n$ and $m$, are not equal. 
 
-Toni Giorgino \nocite{Giorgino:2009ue} was well aware of this problem when implementing DTW module for R\footnote{The R Project For Statistical Computing - \url{http://www.r-project.org/}} where he included a modified version of Sakoe \& Chiba constraint, he calls a slanted band constraint \citep{Giorgino:2009ue}. 
+Toni Giorgino \nocite{Giorgino:2009ue} was well aware of this problem when implementing the DTW module for R\footnote{The R Project For Statistical Computing - \url{http://www.r-project.org/}} where he included a modified version of Sakoe \& Chiba constraint, he calls a slanted band constraint \citep{Giorgino:2009ue}. 
 
 Slanted band constraint solves the problem of different sequence lengths by changing the constraint to 
 $|i - \frac{m}{n} \times j| <= k$, where $m$ and $n$ are the lengths of the two sequences being compared. This essentially changes the slope of the diagonal line to $\frac{m}{n}$ (cf. to slope being 1 in \citep{Sakoe:1978ta}).
 
-Unfortunately, the meaning of the parameter $k$ is inconsistent in Georgino's definition of the constraint: if the second sequence is longer than the first one, thus $m > n$, the constraint can be thought to scale the second sequence down to the length of the first one and then apply the Sakoe \& Chiba constraint of size $k$, meaning $k$ is in the units of the shorter sequence. However, if the second sequence is shorter than the first one, it will be essentially rescaled to match the length of the first (longer) sequence and then the parameter $k$ will be measured in units of the longer sequence. In this particular case, DTW distance might not even be computable as in order for the warping path to remain continuous, the following inequality must hold: 
+Unfortunately, the meaning of the parameter $k$ is inconsistent in Giorgino's definition of the constraint. If the second sequence is longer than the first one, thus $m > n$, the constraint can be thought to scale the second sequence down to the length of the shorter sequence and then apply the Sakoe \& Chiba constraint of size $k$, meaning $k$ is in the units of the shorter sequence. However, if the second sequence is shorter than the first one, it will be essentially rescaled to match the length of the longer sequence and then the parameter $k$ will be measured in units of the longer sequence. In this particular case, DTW distance might not even be computable as in order for the warping path to remain continuous, for all $j$, there should be some $i$ within the allowed warping window, that is also either in the window of $j+1$ or is by at most one unit away from some $i'$ that is within the window of $j+1$. More formally, the following inequality must hold: 
 
-$$(j+1) \frac{m}{n} - k \le j \frac{m}{n} + k + 1$$
+\begin{equation}\label{eq:dtw:slanted-band:eq}
+(j+1) \frac{m}{n} - k \le j \frac{m}{n} + k + 1
+\end{equation}
 
-What it says is that for each $j$, there should be some $i$ within the allowed warping window, that is also either in the window of $j+1$ or is by at most one unit away from some $i'$ that is. 
-After some algebra, this inequality can be rewritten as:
+After some algebraic calculations, inequality \ref{eq:dtw:slanted-band:eq} can be rewritten as:
 
-$$\frac{m}{n} \le 2k + 1$$
+\begin{equation}
+\frac{m}{n} \le 2k + 1
+\end{equation}
 
-This inconsistency might not be important in the situations where we have a query sequence that we want to match to a reference sequence as the order of parameters will not change in these cases. However, other applications, such as clustering, require symmetry. Since DGW uses DTW distance for clustering, I had to solve these issues with slanted band constraint, thus
-DGW implements a modified version of it. 
+This inconsistency might not be important in the situations where we have a query sequence that we want to match to a reference sequence as the order of parameters will not change in these cases. However, symmetry is crucial for hierarchical clustering, therefore Giorgino's constraint was modified slightly to always assume that the first sequence is longer than the second one as described below.
 
-The new constraint always assumes that the first sequence is longer than the second one. The slope parameter is again calculated as $s = \frac{m}{n}$, however it is now always less than or equal to one. This slope this slope is now applied to the first sequence, (not the second one as in \citep{Giorgino:2009ue}) essentially scaling it down to the length of the shorter sequence, giving the constraint: $|\lceil i \times \frac{m}{n} \rceil - j| \le k$. The algorithm could be modified and the slope applied to the second sequence instead, of course, however, the implementation is a bit more intuitive if it is the first sequence that gets rescaled not the second. 
+The slope parameter is again calculated as $s = \frac{m}{n}$, however it is now always less than or equal to one. This slope is now applied to the first sequence, (not the second one as in \citep{Giorgino:2009ue}) essentially scaling it down to the length of the shorter sequence.
+The new constraint is then formally defined as:
+\begin{equation}
+|\lceil i \times \frac{m}{n} \rceil - j| \le k
+\end{equation}
 
-This modified constraint is now always consistent, being in units of shorter sequence, and defined for all possible sequences.
+Of course, there are no technical limitations preventing the slope to be applied on the second sequence as in the original paper \cite{Giorgino:2009ue}. The reason why this was changed and the slope applied on the first sequence is purely because the implementation is a bit more intuitive this way. 
+
+This modified constraint is now always consistent, with the parameter $k$ always measured in units of the shorter sequence.
 
 \subsubsection{Correction for Antisense Regions}
 \begin{figure}
@@ -455,16 +464,16 @@ This modified constraint is now always consistent, being in units of shorter seq
 \autoref{fig:DTW:antisense_comparison} shows the average profiles of regions around annotated transcription start sites in the ENCODE pilot regions of the genome \cite{ENCODEProjectConsortium:2007fu}. The average patterns are evidently symmetrical along the horizontal axis.
 Even though this directionality is generally known for patterns around well-annotated regions, such as the transcription start sites, the directionality for other regions of interest, such as peaks found by a peak caller, is rarely known.  
 
-In order to be able to account for this opposing directionality, without referring to the dataset annotations, every DTW comparison that is made when clustering, is actually made twice: once as described in previous sections, and once with one of the patterns reversed. The smaller distance between the two is then returned as the true distance between the patterns. 
+In order to be able to account for this opposing directionality, every DTW comparison that is made when clustering, is actually made twice: once as described in previous sections, and once with one of the patterns reversed. The smaller distance between the two is then returned as the true distance between the patterns. 
 
 Of course, DGW also supports an option to turn this behaviour off, in case we would like to force the different strands into different clusters, or an option to use the annotated strandedness, if it is provided.
 
-\subsection{DTW projection}
+\subsection{DTW Projection}
 \label{sec:dtw-projection}
 
-Just like one can project a vector in euclidean space to new basis, one can project some time series onto the time axis of another series with the help of DTW. 
+Just like one can project a vector in euclidean space onto a new basis, one can project some time series onto the time axis of another time series with the help of DTW. 
 
-Given the original sequence $\mathbf{a}$, the basis sequence $\mathbf{b}$, and the warping path between the two sequences, $p$, we can project $\mathbf{a}$ onto $\mathbf{b}$ compute the average value of all points mapped to every point of sequence $\mathbf{b}$.
+Given the original sequence $\mathbf{a}$, the basis sequence $\mathbf{b}$, and the warping path between the two sequences, $p$, we can project $\mathbf{a}$ onto $\mathbf{b}$ by computing the average value of all points mapped to every point of sequence $\mathbf{b}$.
 
 More formally, each point $x_k$ of the projected sequence is computed by the following equation:
 \begin{equation}
@@ -499,8 +508,7 @@ Where $k=1..|\mathbf{b}|$ and $\delta_{j=k}$ is the delta function that is $1$ w
    \label{fig:DTW:projection}
 \end{figure}
 
-\autoref{fig:DTW:projection} illustrates this projection by projecting one histone mark around the transcription start site onto another.
-
+\autoref{fig:DTW:projection} illustrates the result of projecting one histone mark around the transcription start site onto another.
 
 \section{Clustering}
 \label{sec:clustering}

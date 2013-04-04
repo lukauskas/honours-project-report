@@ -1153,31 +1153,35 @@ However, it is the warped data, that makes these patterns obvious, as seen in \a
 
 \chapter{Conclusions}
 
-In conclusion, the project aimed to develop a method that would allow clustering of the epigenetic marks from next-generation sequencing experiments. The proposed new method, called Dynamic Genome Warping (DGW), combines Dynamic Time Warping, a well-established method from speech recognition community, with hierarchical clustering to group similar histone marks together.
+In conclusion, the project aimed to develop a method that would allow clustering of the epigenetic marks from next-generation sequencing experiments.
 
-A software package that implements this method efficiently has been released to the Python Package Index (\url{https://pypi.python.org/pypi}). The source code is also made public via Github (\url{http://sauliusl.github.com/dgw/}).
+This was achieved by proposing a new method, Dynamic Genome Warping (DGW), that combines Dynamic Time Warping, a well-established method from speech recognition community, with hierarchical clustering to group similar histone marks together.
 
-Perhaps more importantly, pilot experiments have proved this method to able to align the distinct epigenetic marks present near $5'$ splicing sites (\cite{Bieberstein:2012tf}) without supervision. 
-The warped data projections have been shown to ease visual inspection of the regions, allowing hypotheses about their origin to be made.
+The software package that implements this method efficiently has been released to the Python Package Index (\url{https://pypi.python.org/pypi}). The source code and the documentation of the software have been made public via Github (\url{http://sauliusl.github.com/dgw/}).
 
-This project is rather limited on the possible biological applications of this method, due to the fact that the author does not have any formal qualifications in biology. Nevertheless, the applications of this method are by no means limited to studying ChIP-Seq data. In order to be able to harvest the full potential of this method it needs to be evangelised across the field first. Some work on this has already been done. 
+Pilot experiments have shown this method to succeed in align the distinct epigenetic marks present near $5'$ splicing sites as first noted by \cite{Bieberstein:2012tf} in a completely unsupervised way.
+Another experiment has shown the method's ability to detect and visualise unusual histone modification profiles near the transcription sites.
 
-Specifically, the project is agreed to be presented in the poster session of \emph{The Next NGS Challenge: Data Processing and Integration} conference (\url{http://www.thenextngschallenge.org/}). Furthermore, an application note describing the method has also been submitted to \emph{Bioinformatics} (published by Oxford University Press) and is currently under the peer review. This application note is attached in the appendix.
+These experiments prove the effectiveness of this method for exploratory analysis of the data.
+The next logical step is to make and test biological hypotheses about the origin of the clustered patterns, 
+however, realising the author's limited background in biology, and the tight deadline of the project, this extensive downstream analysis was not performed. 
+
+Instead, an effort has been made to spread the word about this method and what it is capable of to the scientific communities that might be interested.
+
+Specifically, the project has already been agreed to be presented in the poster session of \emph{The Next NGS Challenge: Data Processing and Integration} conference (\url{http://www.thenextngschallenge.org/}). Furthermore, an application note describing the method and the MACS peak clustering experiment, has also been submitted to \emph{Bioinformatics} (published by Oxford University Press) and is currently under peer review. This application note is attached in the appendix.
 
 With a bit of luck, the research community will find this way of looking to ChIP-Seq data interesting, and will be able to generate useful insights out of it. 
 
-Unavoidably, as with all software, DGW will have to be continuously maintained to suit the needs of the growing user base.
+From the informatics perspective, further research could focus on improving of this method.
+The author believes that improvement of the dendrogram cutting mechanism would be the most valuable contribution to this method. This improvement could be achieved by either providing meaningful guidance on where the best cut is, or by defining a metric upon which the cluster assignments could be automated.
 
-The method itself could also be subject of further improvements. 
-In the author's opinion further research on improving the dendrogram cutting mechanism. This could be achieved by either providing meaningful guidance on what the best cut is, or by defining a metric upon which the cluster assignments could be automated.
+Future research may also focus on improving the prototyping algorithm, either by getting closer to the true centroid sequence, or by finding a better way of dealing with the ever increasing length of the prototypes than the one described in \autoref{sec:prototypes}.
 
-Future research may also focus on improving the prototyping algorithm, either by getting closer to the true centroid sequence, or by finding a more intelligent way of dealing with the prototype length problem, described in \autoref{sec:prototypes}. \todo{make sure I describe it !}
+Finally, further research might focus on pivotal uses for the method proposed in this project.
+For instance, instead of looking for a way to group similar patterns within the regions of interest into clusters, this method could be applied to study motifs that are warped very little, or not warped at all. This is essentially similar to the idea behind the ChromaSig approach described earlier (\cite{Hon:2008wv}). Conversely, regions of the genome that are almost always warped to a shorter region, would be also interesting to study as to find the reason why.
 
-Finally, further research might focus on different uses of this method. For instance, instead of
-looking for a way to group similar patterns within the regions of interest into clusters, a similar
-method could be used to look for motifs that are warped by the algorithm very little, or not warped at all. This is essentially the idea behind the ChromaSig approach described earlier \cite{Hon:2008wv}. Similarly, regions of the genome that are almost always warped to a shorter region, would be also interesting to study as to find the reason why.
-
-\todo{end with a bang}
+To summarise this, the project has succeeded in developing a novel method to look at the next-generation sequencing data. The practicality of this tool has been demonstrated by showing how previously described genomic features can be recaptured using this tool; as well as demonstrating how the visualisations of the warped data be helpful in the search for anomalous patterns within the data.
+Ground work for introducing this project to the research community has already been laid, hopefully aiding the formulation of hypotheses from ChIP-Seq data for the time to come.
 
 \bibliographystyle{amsalpha}
 \bibliography{papers2}
